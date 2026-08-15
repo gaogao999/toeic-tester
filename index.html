@@ -13,6 +13,7 @@
   <h1 class="app-title">🎓 EIS合格応援アプリ</h1>
   <nav class="tabs" id="tabs">
     <button class="tab is-active" data-view="home">ホーム</button>
+    <button class="tab" data-view="countdown">受験まで</button>
     <button class="tab" data-view="flashcard">単語カード</button>
     <button class="tab" data-view="quiz">クイズ</button>
     <button class="tab" data-view="list">単語一覧</button>
@@ -24,6 +25,12 @@
 
   <!-- ============ ホーム ============ -->
   <section class="view is-active" id="view-home">
+    <button class="countdown-strip" data-view="countdown">
+      <span class="strip-label">🎯 試験日まで</span>
+      <span class="strip-days"><strong id="home-countdown">—</strong> 日</span>
+      <span class="strip-more">カレンダー ›</span>
+    </button>
+
     <div class="dashboard">
       <div class="stat-card">
         <span class="stat-label">収録単語</span>
@@ -99,6 +106,46 @@
     <div class="start-buttons">
       <button class="btn btn-primary btn-lg" data-view="flashcard">単語カードで覚える</button>
       <button class="btn btn-secondary btn-lg" data-view="quiz">クイズで確認する</button>
+    </div>
+  </section>
+
+  <!-- ============ 受験まで ============ -->
+  <section class="view" id="view-countdown">
+    <div class="countdown-card">
+      <p class="countdown-label" id="countdown-label">試験日まで</p>
+      <p class="countdown-days"><span id="countdown-number">—</span><span class="countdown-unit">日</span></p>
+      <p class="countdown-date" id="countdown-date"></p>
+      <div class="countdown-sub">
+        <span id="countdown-weeks"></span>
+        <span id="countdown-pace"></span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="calendar-head">
+        <button class="btn btn-ghost cal-nav" id="cal-prev" aria-label="前の月">‹</button>
+        <span class="calendar-title" id="cal-title"></span>
+        <button class="btn btn-ghost cal-nav" id="cal-next" aria-label="次の月">›</button>
+      </div>
+      <div class="calendar" id="calendar"></div>
+      <div class="calendar-legend">
+        <span><i class="dot dot-exam"></i>試験日</span>
+        <span><i class="dot dot-today"></i>今日</span>
+        <span><i class="dot dot-studied"></i>学習した日</span>
+      </div>
+      <div class="calendar-actions">
+        <button class="btn btn-secondary" id="cal-today">今月へ</button>
+        <button class="btn btn-secondary" id="cal-exam">試験日の月へ</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2 class="panel-title">試験日の設定</h2>
+      <label class="field">
+        <span>試験日</span>
+        <input type="date" id="exam-date" />
+      </label>
+      <p class="hint">日付を変えるとカウントダウンとカレンダーに反映されます。</p>
     </div>
   </section>
 

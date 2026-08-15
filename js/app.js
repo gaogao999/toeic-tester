@@ -118,6 +118,7 @@
     window.scrollTo(0, 0);
 
     if (name === 'home') renderHome();
+    if (name === 'countdown') renderCountdownView();
     if (name === 'flashcard') startFlashcards();
     if (name === 'quiz') resetQuizToSetup();
     if (name === 'list') renderListFromTop();
@@ -139,6 +140,9 @@
     const due = WORD_DATA.filter(
       (w) => Storage.getRecord(w.id).lastStudied && Storage.isDue(w.id)
     ).length;
+
+    const days = daysUntilExam();
+    $('#home-countdown').textContent = days >= 0 ? days : '—';
 
     $('#home-total').textContent = WORD_DATA.length;
     $('#home-studied').textContent = studied;
@@ -191,6 +195,166 @@
     });
     $('#filter-quiz-length').addEventListener('change', (e) => {
       Storage.updateSettings({ quizLength: Number(e.target.value) });
+    });
+  }
+
+  // ============================================================
+  // 受験までのカウントダウンとカレンダー
+  // ============================================================
+
+  const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
+
+  // 表示中の月。初期値は初回描画時に決める
+  const cal = { year: null, month: null };
+
+  /** 'YYYY-MM-DD' をその日の 0 時のローカル日付として読む */
+  function parseDateKey(key) {
+    const [y, m, d] = key.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  function dateKeyOf(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  function startOfToday() {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  }
+
+  /** 試験日までの残り日数。過ぎていれば負の数 */
+  function daysUntilExam() {
+    const exam = parseDateKey(Storage.getSettings().examDate);
+    const diff = exam.getTime() - startOfToday().getTime();
+    return Math.round(diff / (1000 * 60 * 60 * 24));
+  }
+
+  function renderCountdown() {
+    const examDate = parseDateKey(Storage.getSettings().examDate);
+    const days = daysUntilExam();
+
+    const label = $('#countdown-label');
+    const number = $('#countdown-number');
+    const unit = $('.countdown-unit');
+
+    if (days > 0) {
+      label.textContent = '試験日まで';
+      number.textContent = days;
+      unit.hidden = false;
+    } else if (days === 0) {
+      label.textContent = '今日が試験日です';
+      number.textContent = '🎯';
+      unit.hidden = true;
+    } else {
+      label.textContent = '試験日から';
+      number.textContent = Math.abs(days);
+      unit.hidden = false;
+      label.textContent = '試験日を過ぎました';
+    }
+
+    $('#countdown-date').textContent =
+      `${examDate.getFullYear()}年${examDate.getMonth() + 1}月${examDate.getDate()}日（${WEEKDAYS[examDate.getDay()]}）`;
+
+    // 残り週数と、間に合わせるための1日あたりの語数
+    if (days > 0) {
+      const weeks = Math.floor(days / 7);
+      const rest = days % 7;
+      $('#countdown-weeks').textContent =
+        weeks > 0 ? `あと ${weeks} 週間と ${rest} 日` : `あと ${rest} 日`;
+
+      const remaining = WORD_DATA.filter((w) => !Storage.isLearned(w.id)).length;
+      const perDay = Math.ceil(remaining / days);
+      $('#countdown-pace').textContent =
+        remaining > 0
+          ? `未習得 ${remaining} 語 → 1日 ${perDay} 語のペース`
+          : '全ての単語を覚えました';
+    } else {
+      $('#countdown-weeks').textContent = '';
+      $('#countdown-pace').textContent = '';
+    }
+  }
+
+  function renderCalendar() {
+    const today = startOfToday();
+    const todayKey = dateKeyOf(today);
+    const examKey = Storage.getSettings().examDate;
+    const studied = Storage.getStudiedDates();
+
+    const first = new Date(cal.year, cal.month, 1);
+    const daysInMonth = new Date(cal.year, cal.month + 1, 0).getDate();
+    const leading = first.getDay(); // 月初の曜日ぶんだけ空ける
+
+    $('#cal-title').textContent = `${cal.year}年 ${cal.month + 1}月`;
+
+    const cells = [];
+    WEEKDAYS.forEach((w, i) => {
+      cells.push(`<div class="cal-dow ${i === 0 ? 'sun' : ''}${i === 6 ? 'sat' : ''}">${w}</div>`);
+    });
+    for (let i = 0; i < leading; i++) cells.push('<div class="cal-cell is-empty"></div>');
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(cal.year, cal.month, d);
+      const key = dateKeyOf(date);
+      const classes = ['cal-cell'];
+      if (key === examKey) classes.push('is-exam');
+      if (key === todayKey) classes.push('is-today');
+      if (date.getDay() === 0) classes.push('sun');
+      if (date.getDay() === 6) classes.push('sat');
+
+      const day = Storage.getDay(key);
+      const mark = studied.has(key) ? `<i class="cal-dot" title="${day.answered}問"></i>` : '';
+      const flag = key === examKey ? '<span class="cal-flag">🎯</span>' : '';
+      cells.push(`<div class="${classes.join(' ')}"><span class="cal-num">${d}</span>${flag}${mark}</div>`);
+    }
+
+    $('#calendar').innerHTML = cells.join('');
+  }
+
+  function renderCountdownView() {
+    if (cal.year === null) {
+      const today = startOfToday();
+      cal.year = today.getFullYear();
+      cal.month = today.getMonth();
+    }
+    $('#exam-date').value = Storage.getSettings().examDate;
+    renderCountdown();
+    renderCalendar();
+  }
+
+  function moveMonth(step) {
+    const d = new Date(cal.year, cal.month + step, 1);
+    cal.year = d.getFullYear();
+    cal.month = d.getMonth();
+    renderCalendar();
+  }
+
+  function initCountdown() {
+    $('#cal-prev').addEventListener('click', () => moveMonth(-1));
+    $('#cal-next').addEventListener('click', () => moveMonth(1));
+
+    $('#cal-today').addEventListener('click', () => {
+      const today = startOfToday();
+      cal.year = today.getFullYear();
+      cal.month = today.getMonth();
+      renderCalendar();
+    });
+
+    $('#cal-exam').addEventListener('click', () => {
+      const exam = parseDateKey(Storage.getSettings().examDate);
+      cal.year = exam.getFullYear();
+      cal.month = exam.getMonth();
+      renderCalendar();
+    });
+
+    $('#exam-date').addEventListener('change', (e) => {
+      if (!e.target.value) return;
+      Storage.updateSettings({ examDate: e.target.value });
+      renderCountdown();
+      renderCalendar();
+      toast('試験日を更新しました');
     });
   }
 
@@ -779,6 +943,7 @@
   function init() {
     Speech.init();
     initFilters();
+    initCountdown();
     initFlashcards();
     initQuiz();
     initList();

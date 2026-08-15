@@ -13,7 +13,14 @@ const Storage = (() => {
     records: {}, // { [wordId]: { box, correct, wrong, lastStudied, nextDue, starred, learned } }
     stats: { totalAnswers: 0, totalCorrect: 0, sessions: 0 },
     history: [], // [{ date: 'YYYY-MM-DD', answered: n, correct: n }]
-    settings: { level: 'all', category: 'all', scope: 'all', quizLength: 10, autoSpeak: false }
+    settings: {
+      level: 'all',
+      category: 'all',
+      scope: 'all',
+      quizLength: 10,
+      autoSpeak: false,
+      examDate: '2027-01-07' // 受験日（EIS Grade 8 入学試験）
+    }
   };
 
   let state = load();
@@ -179,6 +186,16 @@ const Storage = (() => {
     return result;
   }
 
+  /** 学習した日（1問以上解答した日）の一覧 */
+  function getStudiedDates() {
+    return new Set(state.history.filter((h) => h.answered > 0).map((h) => h.date));
+  }
+
+  /** 指定した日の学習量。学習していなければ null */
+  function getDay(dateKey) {
+    return state.history.find((h) => h.date === dateKey) || null;
+  }
+
   /** 今日を含む連続学習日数 */
   function getStreak() {
     let streak = 0;
@@ -236,6 +253,9 @@ const Storage = (() => {
     incrementSessions,
     getStats,
     getHistory,
+    getStudiedDates,
+    getDay,
+    todayKey,
     getStreak,
     reset,
     exportJSON,
