@@ -7,9 +7,9 @@
  *   node tools/import-words.mjs
  *
  * 読み取り対象と割り当てられるレベル:
- *   data/raw/toeic600.txt → 600点
- *   data/raw/toeic750.txt → 750点
- *   data/raw/toeic900.txt → 900点（toeic900b.txt があれば続きとして読む）
+ *   data/raw/level1.txt → レベル1（基礎）
+ *   data/raw/level2.txt → レベル2（標準）
+ *   data/raw/level3.txt → レベル3（応用）
  *
  * 既存の単語（js/data.js にすでにあるもの）は、発音記号・例文・カテゴリを保ったまま
  * レベルだけ更新する。新しい単語は末尾に追加される。id は一度割り当てたら変わらないため、
@@ -24,10 +24,9 @@ const DATA_JS = join(ROOT, 'js', 'data.js');
 const RAW_DIR = join(ROOT, 'data', 'raw');
 
 const SOURCES = [
-  { file: 'toeic600.txt', level: 600 },
-  { file: 'toeic750.txt', level: 750 },
-  { file: 'toeic900.txt', level: 900 },
-  { file: 'toeic900b.txt', level: 900 } // 900点リストは長いので2分割
+  { file: 'level1.txt', level: 1 }, // 基礎
+  { file: 'level2.txt', level: 2 }, // 標準
+  { file: 'level3.txt', level: 3 }  // 応用
 ];
 
 // ============================================================
@@ -206,14 +205,14 @@ function serialize(words) {
  *   note     : 補足（混同しやすい語など／空でも可）
  *   example  : 例文（英語／空でも可）
  *   exampleJa: 例文（日本語訳／空でも可）
- *   level    : 難易度 (600=レベル1 / 750=レベル2 / 900=レベル3)
+ *   level    : 難易度 (1=基礎 / 2=標準 / 3=応用)
  *   category : 出題されやすい場面
  */
 const WORD_DATA = [
 ${lines.join(',\n')}
 ];
 
-const LEVELS = [600, 750, 900];
+const LEVELS = [1, 2, 3];
 const CATEGORIES = [...new Set(WORD_DATA.map((w) => w.category))];
 `;
 }
@@ -225,7 +224,7 @@ const CATEGORIES = [...new Set(WORD_DATA.map((w) => w.category))];
 function main() {
   if (!existsSync(RAW_DIR)) {
     console.error(`取り込み元が見つかりません: ${RAW_DIR}`);
-    console.error('data/raw/ に toeic600.txt / toeic750.txt / toeic900.txt を置いてから実行してください。');
+    console.error('data/raw/ に level1.txt / level2.txt / level3.txt を置いてから実行してください。');
     process.exit(1);
   }
 
@@ -299,13 +298,13 @@ function main() {
 
   writeFileSync(DATA_JS, serialize(result), 'utf8');
 
-  const byLevel = { 600: 0, 750: 0, 900: 0 };
+  const byLevel = { 1: 0, 2: 0, 3: 0 };
   result.forEach((w) => { byLevel[w.level] = (byLevel[w.level] || 0) + 1; });
 
   console.log('');
   console.log(`js/data.js を更新しました: 合計 ${result.length} 語`);
   console.log(`  新規追加 ${added} 語 / レベル更新 ${updated} 語`);
-  console.log(`  600点 ${byLevel[600]} 語 / 750点 ${byLevel[750]} 語 / 900点 ${byLevel[900]} 語`);
+  console.log(`  レベル1 ${byLevel[1]} 語 / レベル2 ${byLevel[2]} 語 / レベル3 ${byLevel[3]} 語`);
   const noExample = result.filter((w) => !w.example).length;
   if (noExample) console.log(`  例文が未設定: ${noExample} 語（穴埋めクイズの対象外になります）`);
 }

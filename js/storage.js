@@ -3,7 +3,7 @@
  * データは localStorage に保存されるため、同じブラウザなら次回も引き継がれる。
  */
 const Storage = (() => {
-  const KEY = 'toeic-tester:v1';
+  const KEY = 'eis-app:v1'; // 単語データを入れ替えたため、旧バージョンの履歴は引き継がない
 
   // Leitner の各ボックスに対応する復習間隔（日数）
   const INTERVALS = [0, 1, 3, 7, 14, 30];
