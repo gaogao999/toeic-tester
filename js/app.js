@@ -208,9 +208,12 @@
     $('#fc-level').textContent = `${w.level}点`;
     $('#fc-category').textContent = w.category;
     $('#fc-pos').textContent = w.pos;
+    $('#fc-pos').hidden = !w.pos;
     $('#fc-meaning').textContent = w.meaning;
     $('#fc-example').textContent = w.example;
     $('#fc-example-ja').textContent = w.exampleJa;
+    // 取り込んだばかりで例文がない単語では、例文欄ごと隠す
+    $('#fc-example-box').hidden = !w.example;
 
     const starred = Storage.getRecord(w.id).starred;
     const starBtn = $('#fc-star');
@@ -441,8 +444,12 @@
 
     $('#quiz-score').textContent = `正解 ${quiz.correct}`;
     $('#feedback-title').textContent = isCorrect ? '⭕️ 正解' : '❌ 不正解';
-    $('#feedback-detail').textContent = `${q.word.word} ${q.word.phonetic} ${q.word.pos} … ${q.word.meaning}`;
-    $('#feedback-example').textContent = `${q.word.example} / ${q.word.exampleJa}`;
+    $('#feedback-detail').textContent = [q.word.word, q.word.phonetic, q.word.pos]
+      .filter(Boolean)
+      .join(' ') + ` … ${q.word.meaning}`;
+    $('#feedback-example').textContent = q.word.example
+      ? `${q.word.example} / ${q.word.exampleJa}`
+      : '';
     $('#quiz-next').textContent =
       quiz.index === quiz.questions.length - 1 ? '結果を見る →' : '次の問題 →';
     $('#quiz-feedback').hidden = false;
@@ -550,9 +557,8 @@
             <button class="star-btn" data-star-id="${w.id}" title="★ をつける">${rec.starred ? '★' : '☆'}</button>
           </div>
           <div class="word-detail" id="detail-${w.id}">
-            <div>${escapeHtml(w.phonetic)} ／ ${escapeHtml(w.level)}点レベル ／ ${escapeHtml(w.category)}</div>
-            <div>${escapeHtml(w.example)}</div>
-            <div>${escapeHtml(w.exampleJa)}</div>
+            <div>${[w.phonetic, `${w.level}点レベル`, w.category].filter(Boolean).map(escapeHtml).join(' ／ ')}</div>
+            ${w.example ? `<div>${escapeHtml(w.example)}</div><div>${escapeHtml(w.exampleJa)}</div>` : ''}
             <div>正解 ${rec.correct} 回 ／ 不正解 ${rec.wrong} 回</div>
             <button class="btn btn-icon" data-speak="${escapeHtml(w.word)}">🔊 発音</button>
           </div>`;
