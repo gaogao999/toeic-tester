@@ -285,6 +285,16 @@ body {
 
 .card-pos { margin: 0 0 6px; color: var(--primary); font-size: 0.8rem; font-weight: 700; }
 .card-meaning { margin: 0 0 16px; font-size: 1.35rem; font-weight: 700; }
+.card-note {
+  margin: -8px 0 14px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(224, 138, 18, 0.14);
+  color: var(--orange);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .card-example {
   border-top: 1px solid var(--border);
   padding-top: 14px;
@@ -377,6 +387,7 @@ body {
 }
 .feedback-title { margin: 0 0 4px; font-weight: 700; }
 .feedback-detail { margin: 0 0 8px; font-size: 0.92rem; }
+.feedback-note { margin: 0 0 8px; font-size: 0.85rem; color: var(--orange); font-weight: 600; }
 .feedback-example { margin: 0 0 14px; font-size: 0.85rem; color: var(--text-muted); }
 
 .result-panel { text-align: center; }

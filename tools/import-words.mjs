@@ -145,7 +145,8 @@ function serialize(words) {
   const lines = words.map(
     (w) =>
       `  { id: ${w.id}, word: '${esc(w.word)}', phonetic: '${esc(w.phonetic)}', pos: '${esc(w.pos)}', ` +
-      `meaning: '${esc(w.meaning)}', example: '${esc(w.example)}', exampleJa: '${esc(w.exampleJa)}', ` +
+      `meaning: '${esc(w.meaning)}', note: '${esc(w.note || '')}', example: '${esc(w.example)}', ` +
+      `exampleJa: '${esc(w.exampleJa)}', ` +
       `level: ${w.level}, category: '${esc(w.category)}' }`
   );
 
@@ -160,7 +161,8 @@ function serialize(words) {
  *   word     : 英単語
  *   phonetic : 発音記号
  *   pos      : 品詞 (n. / v. / adj. / adv. / prep. / phr.)
- *   meaning  : 日本語の意味
+ *   meaning  : 日本語の意味（クイズの問題文に使うので日本語だけにする）
+ *   note     : 補足（混同しやすい語など／空でも可）
  *   example  : 例文（英語／空でも可）
  *   exampleJa: 例文（日本語訳／空でも可）
  *   level    : 目標スコア帯 (600 / 750 / 900)
@@ -231,6 +233,7 @@ function main() {
         phonetic: entry.phonetic,
         pos: entry.pos,
         meaning: entry.meaning,
+        note: '',
         example: '',
         exampleJa: '',
         level,

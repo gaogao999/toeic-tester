@@ -215,6 +215,8 @@
     $('#fc-pos').textContent = w.pos;
     $('#fc-pos').hidden = !w.pos;
     $('#fc-meaning').textContent = w.meaning;
+    $('#fc-note').textContent = w.note ? `⚠ ${w.note}` : '';
+    $('#fc-note').hidden = !w.note;
     $('#fc-example').textContent = w.example;
     $('#fc-example-ja').textContent = w.exampleJa;
     // 取り込んだばかりで例文がない単語では、例文欄ごと隠す
@@ -469,6 +471,8 @@
         : `正解: ${q.word.word}`;
     $('#feedback-detail').textContent =
       [q.word.word, q.word.phonetic, q.word.pos].filter(Boolean).join(' ') + ` … ${q.word.meaning}`;
+    $('#feedback-note').textContent = q.word.note ? `⚠ ${q.word.note}` : '';
+    $('#feedback-note').hidden = !q.word.note;
     $('#feedback-example').textContent = q.word.example
       ? `${q.word.example} / ${q.word.exampleJa}`
       : '';
@@ -568,6 +572,7 @@
         (w) =>
           w.word.toLowerCase().includes(keyword) ||
           w.meaning.includes(keyword) ||
+          w.note.includes(keyword) ||
           w.example.toLowerCase().includes(keyword)
       );
     }
@@ -604,6 +609,7 @@
           </div>
           <div class="word-detail" id="detail-${w.id}">
             <div>${[w.phonetic, `${w.level}点レベル`, w.category].filter(Boolean).map(escapeHtml).join(' ／ ')}</div>
+            ${w.note ? `<div>⚠ ${escapeHtml(w.note)}</div>` : ''}
             ${w.example ? `<div>${escapeHtml(w.example)}</div><div>${escapeHtml(w.exampleJa)}</div>` : ''}
             <div>正解 ${rec.correct} 回 ／ 不正解 ${rec.wrong} 回</div>
             <button class="btn btn-icon" data-speak="${escapeHtml(w.word)}">🔊 発音</button>
