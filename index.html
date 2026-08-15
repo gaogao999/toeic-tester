@@ -13,7 +13,6 @@
   <h1 class="app-title">🎓 EIS合格応援アプリ</h1>
   <nav class="tabs" id="tabs">
     <button class="tab is-active" data-view="home">ホーム</button>
-    <button class="tab" data-view="countdown">受験まで</button>
     <button class="tab" data-view="flashcard">単語カード</button>
     <button class="tab" data-view="quiz">クイズ</button>
     <button class="tab" data-view="reading">長文読解</button>
@@ -27,126 +26,9 @@
 <main class="container">
 
   <!-- ============ ホーム ============ -->
+  <!-- ============ ホーム ============ -->
+  <!-- 試験日までの残り日数 → 今日の学習メニュー → カレンダー の3つだけ -->
   <section class="view is-active" id="view-home">
-    <button class="countdown-strip" data-view="countdown">
-      <span class="strip-label">🎯 試験日まで</span>
-      <span class="strip-days"><strong id="home-countdown">—</strong> 日</span>
-      <span class="strip-more">カレンダー ›</span>
-    </button>
-
-    <div class="panel today-panel">
-      <div class="today-head">
-        <h2 class="panel-title today-title">今日の学習メニュー</h2>
-        <span class="today-status" id="today-status"></span>
-      </div>
-      <div class="today-list" id="today-list"></div>
-      <p class="hint" id="today-note"></p>
-    </div>
-
-    <div class="subjects">
-      <div class="subject-card">
-        <p class="subject-name">📖 英語</p>
-        <p class="subject-count"><span id="subj-word-total">0</span> 語<span class="subject-sub"> ＋ 長文 <span id="subj-read-total">0</span> 本</span></p>
-        <div class="progress-bar slim"><div class="progress-fill" id="subj-word-bar"></div></div>
-        <p class="subject-progress" id="subj-word-progress">覚えた 0 語</p>
-        <div class="subject-actions">
-          <button class="btn btn-primary" data-view="reading">長文読解</button>
-          <button class="btn btn-secondary" data-view="flashcard">単語カード</button>
-          <button class="btn btn-secondary" data-view="quiz">単語クイズ</button>
-        </div>
-      </div>
-      <div class="subject-card">
-        <p class="subject-name">🔢 算数</p>
-        <p class="subject-count"><span id="subj-math-total">0</span> 問</p>
-        <div class="progress-bar slim"><div class="progress-fill" id="subj-math-bar"></div></div>
-        <p class="subject-progress" id="subj-math-progress">正解した 0 問</p>
-        <div class="subject-actions">
-          <button class="btn btn-primary" data-view="math">算数を解く</button>
-        </div>
-      </div>
-    </div>
-
-    <h2 class="section-title">英語の学習状況</h2>
-    <div class="dashboard">
-      <div class="stat-card">
-        <span class="stat-label">収録単語</span>
-        <span class="stat-value" id="home-total">0</span>
-        <span class="stat-unit">語</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-label">学習済み</span>
-        <span class="stat-value" id="home-studied">0</span>
-        <span class="stat-unit">語</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-label">覚えた ✓</span>
-        <span class="stat-value accent-green" id="home-learned">0</span>
-        <span class="stat-unit">語</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-label">今日の復習</span>
-        <span class="stat-value accent-orange" id="home-due">0</span>
-        <span class="stat-unit">語</span>
-      </div>
-    </div>
-
-    <div class="progress-block">
-      <div class="progress-head">
-        <span>全体の習得状況</span>
-        <span id="home-progress-text">0%</span>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" id="home-progress-fill"></div></div>
-    </div>
-
-    <div class="panel">
-      <h2 class="panel-title">英語の出題範囲</h2>
-      <div class="filters">
-        <label class="field">
-          <span>レベル</span>
-          <select id="filter-level">
-            <option value="all">すべて</option>
-            <option value="1">レベル1（基礎）</option>
-            <option value="2">レベル2（標準）</option>
-            <option value="3">レベル3（応用）</option>
-          </select>
-        </label>
-        <label class="field">
-          <span>カテゴリ</span>
-          <select id="filter-category"></select>
-        </label>
-        <label class="field">
-          <span>対象</span>
-          <select id="filter-scope">
-            <option value="all">すべての単語</option>
-            <option value="learned">✓ 覚えた単語だけ</option>
-            <option value="unlearned">まだ覚えていない単語だけ</option>
-            <option value="due">復習期限の単語</option>
-            <option value="weak">苦手な単語</option>
-            <option value="starred">★ をつけた単語</option>
-            <option value="new">未学習の単語</option>
-          </select>
-        </label>
-        <label class="field">
-          <span>クイズ出題数</span>
-          <select id="filter-quiz-length">
-            <option value="5">5問</option>
-            <option value="10" selected>10問</option>
-            <option value="20">20問</option>
-            <option value="9999">すべて</option>
-          </select>
-        </label>
-      </div>
-      <p class="hint" id="filter-count">対象: 0 語</p>
-    </div>
-
-    <div class="start-buttons">
-      <button class="btn btn-primary btn-lg" data-view="flashcard">単語カードで覚える</button>
-      <button class="btn btn-secondary btn-lg" data-view="quiz">クイズで確認する</button>
-    </div>
-  </section>
-
-  <!-- ============ 受験まで ============ -->
-  <section class="view" id="view-countdown">
     <div class="countdown-card">
       <p class="countdown-label" id="countdown-label">試験日まで</p>
       <p class="countdown-days"><span id="countdown-number">—</span><span class="countdown-unit">日</span></p>
@@ -155,6 +37,15 @@
         <span id="countdown-weeks"></span>
         <span id="countdown-pace"></span>
       </div>
+    </div>
+
+    <div class="panel today-panel">
+      <div class="today-head">
+        <h2 class="panel-title today-title">今日の学習メニュー</h2>
+        <span class="today-status" id="today-status"></span>
+      </div>
+      <div class="today-list" id="today-list"></div>
+      <p class="hint" id="today-note"></p>
     </div>
 
     <div class="panel">
@@ -184,7 +75,7 @@
     </div>
 
     <div class="empty-state" id="fc-empty" hidden>
-      <p>対象の単語がありません。ホームで出題範囲を変えてください。</p>
+      <p>対象の単語がありません。出題範囲を変えてください。</p>
       <button class="btn btn-secondary" data-view="home">ホームへ戻る</button>
     </div>
 
@@ -234,11 +125,53 @@
   <!-- ============ クイズ ============ -->
   <section class="view" id="view-quiz">
     <div class="empty-state" id="quiz-empty" hidden>
-      <p>対象の単語がありません。ホームで出題範囲を変えてください。</p>
+      <p>対象の単語がありません。出題範囲を変えてください。</p>
       <button class="btn btn-secondary" data-view="home">ホームへ戻る</button>
     </div>
 
     <div id="quiz-setup">
+      <div class="panel">
+        <h2 class="panel-title">出題範囲</h2>
+        <p class="hint">この設定は単語カードと単語一覧にも適用されます。</p>
+        <div class="filters">
+          <label class="field">
+            <span>レベル</span>
+            <select id="filter-level">
+              <option value="all">すべて</option>
+              <option value="1">レベル1（基礎）</option>
+              <option value="2">レベル2（標準）</option>
+              <option value="3">レベル3（応用）</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>カテゴリ</span>
+            <select id="filter-category"></select>
+          </label>
+          <label class="field">
+            <span>対象</span>
+            <select id="filter-scope">
+              <option value="all">すべての単語</option>
+              <option value="learned">✓ 覚えた単語だけ</option>
+              <option value="unlearned">まだ覚えていない単語だけ</option>
+              <option value="due">復習期限の単語</option>
+              <option value="weak">苦手な単語</option>
+              <option value="starred">★ をつけた単語</option>
+              <option value="new">未学習の単語</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>出題数</span>
+            <select id="filter-quiz-length">
+              <option value="5">5問</option>
+              <option value="10" selected>10問</option>
+              <option value="20">20問</option>
+              <option value="9999">すべて</option>
+            </select>
+          </label>
+        </div>
+        <p class="hint" id="filter-count">対象: 0 語</p>
+      </div>
+
       <div class="panel">
         <h2 class="panel-title">出題形式を選ぶ</h2>
         <p class="hint">どの形式も、答えの英単語をキーボードで入力します。</p>

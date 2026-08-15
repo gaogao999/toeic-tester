@@ -122,7 +122,6 @@
     window.scrollTo(0, 0);
 
     if (name === 'home') renderHome();
-    if (name === 'countdown') renderCountdownView();
     if (name === 'flashcard') startFlashcards();
     if (name === 'quiz') resetQuizToSetup();
     if (name === 'math') resetMathToSetup();
@@ -142,37 +141,15 @@
   // ============================================================
 
   function renderHome() {
-    const studied = WORD_DATA.filter((w) => Storage.getRecord(w.id).lastStudied).length;
-    const learned = WORD_DATA.filter((w) => Storage.isLearned(w.id)).length;
-    const due = WORD_DATA.filter(
-      (w) => Storage.getRecord(w.id).lastStudied && Storage.isDue(w.id)
-    ).length;
-
-    const days = daysUntilExam();
-    $('#home-countdown').textContent = days >= 0 ? days : '—';
-
-    // 2科目（英語・算数）の進み具合
-    const mathSolved = MATH_DATA.filter((p) => Storage.isLearned(p.id)).length;
-    $('#subj-word-total').textContent = WORD_DATA.length;
-    $('#subj-read-total').textContent = READING_DATA.length;
-    $('#subj-word-progress').textContent = `覚えた ${learned} 語`;
-    $('#subj-word-bar').style.width = `${(learned / WORD_DATA.length) * 100}%`;
-    $('#subj-math-total').textContent = MATH_DATA.length;
-    $('#subj-math-progress').textContent = `正解した ${mathSolved} 問`;
-    $('#subj-math-bar').style.width = `${(mathSolved / MATH_DATA.length) * 100}%`;
-
-    $('#home-total').textContent = WORD_DATA.length;
-    $('#home-studied').textContent = studied;
-    $('#home-learned').textContent = learned;
-    $('#home-due').textContent = due;
-
-    // 全体の進捗は「覚えた」チェックの割合で示す
-    const percent = Math.round((learned / WORD_DATA.length) * 100);
-    $('#home-progress-fill').style.width = `${percent}%`;
-    $('#home-progress-text').textContent = `${learned} / ${WORD_DATA.length} 語（${percent}%）`;
-
+    // ホームは「試験日までの残り日数」「今日の学習メニュー」「カレンダー」の3つだけ
+    if (cal.year === null) {
+      const today = startOfToday();
+      cal.year = today.getFullYear();
+      cal.month = today.getMonth();
+    }
+    renderCountdown();
     renderTodayMenu();
-    updateFilterCount();
+    renderCalendar();
   }
 
   function updateFilterCount() {
@@ -259,7 +236,7 @@
     const wordsLeft = goals[0].left;
     $('#today-note').textContent =
       days > 0
-        ? `試験まで ${days} 日。未習得の単語 ${wordsLeft} 語をこのペースで割り振っています。`
+        ? `未習得の単語 ${wordsLeft} 語を残り ${days} 日で割り振っています。`
         : '試験日を過ぎました。';
   }
 
@@ -416,16 +393,6 @@
     }
 
     $('#calendar').innerHTML = cells.join('');
-  }
-
-  function renderCountdownView() {
-    if (cal.year === null) {
-      const today = startOfToday();
-      cal.year = today.getFullYear();
-      cal.month = today.getMonth();
-    }
-    renderCountdown();
-    renderCalendar();
   }
 
   function moveMonth(step) {
@@ -634,6 +601,7 @@
   }
 
   function resetQuizToSetup() {
+    updateFilterCount();
     const enough = getFilteredWords().length > 0;
     $('#quiz-body').hidden = true;
     $('#quiz-result').hidden = true;
