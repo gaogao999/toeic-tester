@@ -442,6 +442,8 @@ body {
   border-bottom: 1px solid var(--border);
 }
 .word-detail.is-open { display: block; }
+
+.list-more { width: 100%; margin-top: 14px; }
 .mastery {
   flex-shrink: 0;
   font-size: 0.7rem;

@@ -112,7 +112,7 @@
     if (name === 'home') renderHome();
     if (name === 'flashcard') startFlashcards();
     if (name === 'quiz') resetQuizToSetup();
-    if (name === 'list') renderList();
+    if (name === 'list') renderListFromTop();
     if (name === 'stats') renderStats();
   }
 
@@ -556,10 +556,15 @@
 
   let listedWords = [];
 
+  // 3000語を一度に描画すると重いので、少しずつ表示する
+  const LIST_PAGE_SIZE = 200;
+  let listLimit = LIST_PAGE_SIZE;
+
   function updateListCount() {
     const learned = listedWords.filter((w) => Storage.isLearned(w.id)).length;
+    const shown = Math.min(listLimit, listedWords.length);
     $('#list-count').textContent =
-      `${listedWords.length} 語を表示中（うち ✓ 覚えた ${learned} 語）`;
+      `${listedWords.length} 語中 ${shown} 語を表示（うち ✓ 覚えた ${learned} 語）`;
   }
 
   function renderList() {
@@ -591,9 +596,11 @@
 
     listedWords = words;
     updateListCount();
+    const visible = words.slice(0, listLimit);
+    const remaining = words.length - visible.length;
 
     $('#word-list').innerHTML =
-      words
+      (visible
         .map((w) => {
           const rec = Storage.getRecord(w.id);
           const m = masteryInfo(w.id);
@@ -615,21 +622,35 @@
             <button class="btn btn-icon" data-speak="${escapeHtml(w.word)}">🔊 発音</button>
           </div>`;
         })
-        .join('') || '<p class="hint">該当する単語がありません。</p>';
+        .join('') || '<p class="hint">該当する単語がありません。</p>') +
+      (remaining > 0
+        ? `<button class="btn btn-secondary list-more" id="list-more">さらに表示（残り ${remaining} 語）</button>`
+        : '');
+  }
+
+  /** 検索やフィルタを変えたときは先頭から表示し直す */
+  function renderListFromTop() {
+    listLimit = LIST_PAGE_SIZE;
+    renderList();
   }
 
   function initList() {
-    $('#list-search').addEventListener('input', renderList);
-    $('#list-sort').addEventListener('change', renderList);
+    $('#list-search').addEventListener('input', renderListFromTop);
+    $('#list-sort').addEventListener('change', renderListFromTop);
 
     // 表示の絞り込みはホームの「対象」と同じ設定を共有する
     $('#list-scope').addEventListener('change', (e) => {
       Storage.updateSettings({ scope: e.target.value });
       $('#filter-scope').value = e.target.value;
-      renderList();
+      renderListFromTop();
     });
 
     $('#word-list').addEventListener('click', (e) => {
+      if (e.target.closest('#list-more')) {
+        listLimit += LIST_PAGE_SIZE;
+        renderList();
+        return;
+      }
       const check = e.target.closest('[data-learn-id]');
       if (check) {
         const on = Storage.setLearned(Number(check.dataset.learnId), check.checked);

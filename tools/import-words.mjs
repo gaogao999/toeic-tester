@@ -9,7 +9,7 @@
  * 読み取り対象と割り当てられるレベル:
  *   data/raw/toeic600.txt → 600点
  *   data/raw/toeic750.txt → 750点
- *   data/raw/toeic900.txt → 900点
+ *   data/raw/toeic900.txt → 900点（toeic900b.txt があれば続きとして読む）
  *
  * 既存の単語（js/data.js にすでにあるもの）は、発音記号・例文・カテゴリを保ったまま
  * レベルだけ更新する。新しい単語は末尾に追加される。id は一度割り当てたら変わらないため、
@@ -26,7 +26,8 @@ const RAW_DIR = join(ROOT, 'data', 'raw');
 const SOURCES = [
   { file: 'toeic600.txt', level: 600 },
   { file: 'toeic750.txt', level: 750 },
-  { file: 'toeic900.txt', level: 900 }
+  { file: 'toeic900.txt', level: 900 },
+  { file: 'toeic900b.txt', level: 900 } // 900点リストは長いので2分割
 ];
 
 // ============================================================
@@ -45,7 +46,10 @@ function loadExisting() {
 // 行の解析
 // ============================================================
 
-const HAS_JA = /[぀-ヿ㐀-鿿]/;      // ひらがな・カタカナ・漢字
+const JA_SET = '[぀-ヿ㐀-鿿]';        // ひらがな・カタカナ・漢字
+const HAS_JA = new RegExp(JA_SET);
+const LATIN_SET = 'A-Za-zÀ-ÖØ-öø-ÿ';  // アクセント付きラテン文字を含む
+const LATIN = `[${LATIN_SET}]`;
 const POS_MAP = {
   名: 'n.', 動: 'v.', 形: 'adj.', 副: 'adv.', 前: 'prep.', 接: 'conj.', 熟: 'phr.', 句: 'phr.'
 };
@@ -93,8 +97,11 @@ function parseLine(rawLine) {
     line = line.replace(phoneticMatch[0], ' ');
   }
 
-  // 先頭の英語（見出し語）を取り出す。熟語もあるので空白を許す
-  const wordMatch = line.match(/^([A-Za-z][A-Za-z'’.\- ]*?)(?=\s*[\t：:（(【\[]|\s*[^\x00-\x7F]|\s*$)/);
+  // 先頭の英語（見出し語）を取り出す。熟語もあるので空白を許し、résumé のような
+  // アクセント付きの文字も1語として扱う。区切りは日本語文字か記号で判定する。
+  const wordMatch = line.match(
+    new RegExp(`^(${LATIN}[${LATIN_SET}'’.\\- ]*?)(?=\\s*[\\t：:（(【\\[]|\\s*${JA_SET}|\\s*$)`)
+  );
   if (!wordMatch) return null;
 
   const word = wordMatch[1].replace(/\s+/g, ' ').trim();
@@ -120,8 +127,42 @@ function parseLine(rawLine) {
   return { word, phonetic, pos, meaning };
 }
 
+/**
+ * 単語と意味が別々の行に並ぶ形式を「単語\t意味」の1行にまとめ直す。
+ *
+ *   1              →  company\t会社、仲間
+ *   company
+ *   会社、仲間
+ *   ＋   0
+ */
+function reflowBlocks(text) {
+  const lines = text.split(/\r?\n/).map((l) => l.replace(/\t+/g, '\t').trim());
+  const isNoise = (l) => l === '' || /^\d+$/.test(l) || /^[＋+]\s*\d*$/.test(l) || /^[＋+]?\t?\d*$/.test(l);
+  const isWordOnly = (l) =>
+    !HAS_JA.test(l) && new RegExp(`^${LATIN}[${LATIN_SET}'’.\\- ]*$`).test(l) && l.length <= 40;
+
+  const out = [];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (isNoise(line)) continue;
+
+    if (isWordOnly(line)) {
+      // 次に現れる意味らしき行（日本語を含む行）と結合する
+      let j = i + 1;
+      while (j < lines.length && isNoise(lines[j])) j++;
+      if (j < lines.length && HAS_JA.test(lines[j]) && !isWordOnly(lines[j])) {
+        out.push(`${line}\t${lines[j]}`);
+        i = j;
+        continue;
+      }
+    }
+    out.push(line);
+  }
+  return out.join('\n');
+}
+
 function parseFile(path) {
-  const text = stripHtml(readFileSync(path, 'utf8'));
+  const text = reflowBlocks(stripHtml(readFileSync(path, 'utf8')));
   const parsed = [];
   const skipped = [];
   for (const line of text.split(/\r?\n/)) {
@@ -193,6 +234,7 @@ function main() {
   const result = existing.map((w) => ({ ...w }));
   let nextId = existing.reduce((max, w) => Math.max(max, w.id), 0) + 1;
 
+  const assignedThisRun = new Set(); // 同じ語が複数のリストに載っている場合の二重更新を防ぐ
   let added = 0;
   let updated = 0;
   let found = 0;
@@ -217,11 +259,15 @@ function main() {
       const hit = byWord.get(key);
 
       if (hit) {
-        // 既存の語は例文などを残したままレベルだけ更新する
+        // 既存の語は例文などを残したままレベルだけ更新する。
+        // ただし今回の取り込みで既にレベルを決めた語は、先に現れた（＝低い）レベルを優先する。
         const target = result.find((w) => w.id === hit.id);
-        if (target.level !== level) {
-          target.level = level;
-          updated += 1;
+        if (!assignedThisRun.has(key)) {
+          if (target.level !== level) {
+            target.level = level;
+            updated += 1;
+          }
+          assignedThisRun.add(key);
         }
         if (!target.phonetic && entry.phonetic) target.phonetic = entry.phonetic;
         continue;
@@ -241,6 +287,7 @@ function main() {
       };
       result.push(created);
       byWord.set(key, created);
+      assignedThisRun.add(key);
       added += 1;
     }
   }
