@@ -34,6 +34,10 @@
   };
   const levelLabel = (level) => LEVEL_LABELS[level] || `レベル${level}`;
 
+  // 算数は学年で示したほうが分かりやすいので、別の表示名を使う
+  const MATH_LEVEL_LABELS = { 1: '小学校の復習', 2: '中1の基本', 3: '中1の発展' };
+  const mathLevelLabel = (level) => MATH_LEVEL_LABELS[level] || `レベル${level}`;
+
   let toastTimer = null;
   function toast(message) {
     const el = $('#toast');
@@ -122,6 +126,7 @@
     if (name === 'flashcard') startFlashcards();
     if (name === 'quiz') resetQuizToSetup();
     if (name === 'math') resetMathToSetup();
+    if (name === 'reading') showReadingList();
     if (name === 'list') renderListFromTop();
     if (name === 'stats') renderStats();
   }
@@ -148,6 +153,7 @@
     // 2科目（英語・算数）の進み具合
     const mathSolved = MATH_DATA.filter((p) => Storage.isLearned(p.id)).length;
     $('#subj-word-total').textContent = WORD_DATA.length;
+    $('#subj-read-total').textContent = READING_DATA.length;
     $('#subj-word-progress').textContent = `覚えた ${learned} 語`;
     $('#subj-word-bar').style.width = `${(learned / WORD_DATA.length) * 100}%`;
     $('#subj-math-total').textContent = MATH_DATA.length;
@@ -724,6 +730,180 @@
   }
 
   // ============================================================
+  // 長文読解
+  // ============================================================
+
+  // order は選択肢の表示順。毎回シャッフルするので、正解の位置を覚えてしまうことがない
+  const reading = { passage: null, index: 0, correct: 0, results: [], answered: false, order: [] };
+
+  /** 設問ごとの学習履歴IDを作る（例: r3-2） */
+  const readingQuestionId = (passage, i) => `${passage.id}-${i + 1}`;
+
+  function readingSolved(passage) {
+    return passage.questions.filter((q, i) => Storage.isLearned(readingQuestionId(passage, i))).length;
+  }
+
+  function showReadingList() {
+    $('#reading-body').hidden = true;
+    $('#reading-result').hidden = true;
+    $('#reading-list-view').hidden = false;
+
+    const level = $('#reading-level').value;
+    const list = READING_DATA.filter((r) => level === 'all' || String(r.level) === level);
+
+    $('#reading-list').innerHTML = list
+      .map((r) => {
+        const solved = readingSolved(r);
+        const done = solved === r.questions.length;
+        return `<button class="reading-item ${done ? 'is-done' : ''}" data-passage="${r.id}">
+            <span class="reading-item-head">
+              <span class="reading-item-title">${done ? '✓ ' : ''}${escapeHtml(r.title)}</span>
+              <span class="badge badge-ghost">${levelLabel(r.level)}</span>
+            </span>
+            <span class="reading-item-meta">${escapeHtml(r.topic)} ／ 約${r.words}語 ／ 設問${r.questions.length}問</span>
+            <span class="reading-item-progress">正解 ${solved} / ${r.questions.length}</span>
+          </button>`;
+      })
+      .join('') || '<p class="hint">該当する長文がありません。</p>';
+  }
+
+  function startReading(passageId) {
+    const passage = READING_DATA.find((r) => r.id === passageId);
+    if (!passage) return;
+
+    reading.passage = passage;
+    reading.index = 0;
+    reading.correct = 0;
+    reading.results = [];
+
+    Storage.incrementSessions();
+    $('#reading-list-view').hidden = true;
+    $('#reading-result').hidden = true;
+    $('#reading-body').hidden = false;
+
+    $('#passage-meta').textContent = `${passage.topic} ／ ${levelLabel(passage.level)} ／ 約${passage.words}語`;
+    $('#passage-title').textContent = passage.title;
+    $('#passage-text').innerHTML = passage.passage
+      .split('\n')
+      .map((line) => `<p>${escapeHtml(line)}</p>`)
+      .join('');
+    $('#glossary-list').innerHTML = passage.glossary
+      .map((g) => `<dt>${escapeHtml(g.w)}</dt><dd>${escapeHtml(g.m)}</dd>`)
+      .join('');
+    $('#passage-glossary').hidden = passage.glossary.length === 0;
+    $('#passage-glossary').open = false;
+
+    renderReadingQuestion();
+    window.scrollTo(0, 0);
+  }
+
+  function renderReadingQuestion() {
+    const passage = reading.passage;
+    const q = passage.questions[reading.index];
+    reading.answered = false;
+
+    $('#reading-counter').textContent = `設問 ${reading.index + 1} / ${passage.questions.length}`;
+    $('#reading-progress').style.width = `${(reading.index / passage.questions.length) * 100}%`;
+    $('#reading-score').textContent = `正解 ${reading.correct}`;
+    $('#reading-question').textContent = q.q;
+
+    // 選択肢の並びは毎回シャッフルする
+    reading.order = shuffle(q.choices.map((_, i) => i));
+
+    const box = $('#reading-choices');
+    box.innerHTML = '';
+    reading.order.forEach((originalIndex, displayIndex) => {
+      const btn = document.createElement('button');
+      btn.className = 'choice';
+      btn.textContent = `${'ABCD'[displayIndex]}. ${q.choices[originalIndex]}`;
+      btn.addEventListener('click', () => answerReading(originalIndex, btn));
+      box.appendChild(btn);
+    });
+
+    $('#reading-feedback').hidden = true;
+  }
+
+  function answerReading(picked, btn) {
+    if (reading.answered) return;
+    reading.answered = true;
+
+    const passage = reading.passage;
+    const q = passage.questions[reading.index];
+    const isCorrect = picked === q.answer;
+    const id = readingQuestionId(passage, reading.index);
+
+    Storage.recordAnswer(id, isCorrect);
+    if (isCorrect) {
+      Storage.setLearned(id, true);
+      reading.correct += 1;
+    }
+    reading.results.push({ q, isCorrect });
+
+    const correctDisplayIndex = reading.order.indexOf(q.answer);
+    $$('#reading-choices .choice').forEach((el, i) => {
+      el.disabled = true;
+      if (i === correctDisplayIndex) el.classList.add('is-correct');
+    });
+    if (!isCorrect) btn.classList.add('is-wrong');
+
+    $('#reading-score').textContent = `正解 ${reading.correct}`;
+    $('#reading-feedback-title').textContent = isCorrect
+      ? '⭕️ 正解'
+      : `❌ 不正解（正解は ${'ABCD'[correctDisplayIndex]}）`;
+    $('#reading-explanation').textContent = q.explanation;
+    $('#reading-next').textContent =
+      reading.index === passage.questions.length - 1 ? '結果を見る →' : '次の設問 →';
+    $('#reading-feedback').hidden = false;
+  }
+
+  function nextReadingQuestion() {
+    if (reading.index === reading.passage.questions.length - 1) {
+      showReadingResult();
+      return;
+    }
+    reading.index += 1;
+    renderReadingQuestion();
+  }
+
+  function showReadingResult() {
+    const total = reading.passage.questions.length;
+    const rate = Math.round((reading.correct / total) * 100);
+
+    $('#reading-body').hidden = true;
+    $('#reading-result').hidden = false;
+    $('#reading-result-correct').textContent = reading.correct;
+    $('#reading-result-total').textContent = total;
+    $('#reading-result-rate').textContent = `正答率 ${rate}%`;
+    $('#reading-result-emoji').textContent =
+      rate === 100 ? '🏆' : rate >= 80 ? '🎉' : rate >= 50 ? '💪' : '📖';
+
+    $('#reading-result-list').innerHTML = reading.results
+      .map(
+        (r, i) => `<div class="result-item ${r.isCorrect ? 'ok' : 'ng'}">
+          <span>${r.isCorrect ? '⭕️' : '❌'}</span>
+          <b>設問${i + 1}</b>
+          <span>${escapeHtml(r.q.q)}</span>
+        </div>`
+      )
+      .join('');
+    window.scrollTo(0, 0);
+  }
+
+  function initReading() {
+    $('#reading-level').addEventListener('change', showReadingList);
+
+    $('#reading-list').addEventListener('click', (e) => {
+      const item = e.target.closest('[data-passage]');
+      if (item) startReading(item.dataset.passage);
+    });
+
+    $('#reading-back').addEventListener('click', showReadingList);
+    $('#reading-to-list').addEventListener('click', showReadingList);
+    $('#reading-next').addEventListener('click', nextReadingQuestion);
+    $('#reading-retry').addEventListener('click', () => startReading(reading.passage.id));
+  }
+
+  // ============================================================
   // 算数
   // ============================================================
 
@@ -794,7 +974,7 @@
     $('#math-counter').textContent = `${mathQuiz.index + 1} / ${mathQuiz.questions.length}`;
     $('#math-progress').style.width = `${(mathQuiz.index / mathQuiz.questions.length) * 100}%`;
     $('#math-score').textContent = `正解 ${mathQuiz.correct}`;
-    $('#math-tag').textContent = `${p.category} ／ ${levelLabel(p.level)}`;
+    $('#math-tag').textContent = `${p.category} ／ ${mathLevelLabel(p.level)}`;
     $('#math-question').textContent = p.question;
     $('#math-unit').textContent = p.unit;
     $('#math-unit').hidden = !p.unit;
@@ -1141,6 +1321,7 @@
     initFilters();
     initCountdown();
     initMath();
+    initReading();
     initFlashcards();
     initQuiz();
     initList();

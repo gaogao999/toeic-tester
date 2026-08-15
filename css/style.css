@@ -726,3 +726,86 @@ body {
 @media (max-width: 380px) {
   .subjects { grid-template-columns: 1fr; }
 }
+
+/* ---------- 長文読解 ---------- */
+.subject-sub { font-size: 0.72rem; font-weight: 400; color: var(--text-muted); }
+
+.reading-list { display: grid; gap: 8px; margin-top: 12px; }
+.reading-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.reading-item:hover { border-color: var(--primary); }
+.reading-item.is-done { border-color: var(--green); }
+.reading-item-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.reading-item-title { font-weight: 700; font-size: 0.95rem; }
+.reading-item-meta { font-size: 0.72rem; color: var(--text-muted); }
+.reading-item-progress { font-size: 0.72rem; font-weight: 700; color: var(--green); }
+
+.back-link { margin-bottom: 12px; padding: 7px 12px; font-size: 0.82rem; }
+
+.passage-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.passage-meta { margin: 0 0 4px; font-size: 0.72rem; color: var(--text-muted); }
+.passage-title { margin: 0 0 12px; font-size: 1.15rem; font-weight: 700; }
+.passage-text { font-size: 0.98rem; line-height: 1.95; }
+.passage-text p { margin: 0 0 12px; }
+.passage-text p:last-child { margin-bottom: 0; }
+
+.glossary {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+.glossary summary { cursor: pointer; color: var(--primary); font-weight: 600; }
+.glossary dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  margin: 10px 0 0;
+}
+.glossary dt { font-weight: 700; }
+.glossary dd { margin: 0; color: var(--text-muted); }
+
+.reading-question {
+  margin: 0 0 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+/* 4択（長文読解で使用） */
+.choices { display: grid; gap: 8px; }
+.choice {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  text-align: left;
+  cursor: pointer;
+}
+.choice:hover:not(:disabled) { border-color: var(--primary); }
+.choice.is-correct { background: var(--green); border-color: var(--green); color: #fff; font-weight: 700; }
+.choice.is-wrong { background: var(--red); border-color: var(--red); color: #fff; }
+.choice:disabled { cursor: default; }

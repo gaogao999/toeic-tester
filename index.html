@@ -16,6 +16,7 @@
     <button class="tab" data-view="countdown">受験まで</button>
     <button class="tab" data-view="flashcard">単語カード</button>
     <button class="tab" data-view="quiz">クイズ</button>
+    <button class="tab" data-view="reading">長文読解</button>
     <button class="tab" data-view="math">算数</button>
     <button class="tab" data-view="list">単語一覧</button>
     <button class="tab" data-view="stats">学習記録</button>
@@ -35,12 +36,13 @@
     <div class="subjects">
       <div class="subject-card">
         <p class="subject-name">📖 英語</p>
-        <p class="subject-count"><span id="subj-word-total">0</span> 語</p>
+        <p class="subject-count"><span id="subj-word-total">0</span> 語<span class="subject-sub"> ＋ 長文 <span id="subj-read-total">0</span> 本</span></p>
         <div class="progress-bar slim"><div class="progress-fill" id="subj-word-bar"></div></div>
         <p class="subject-progress" id="subj-word-progress">覚えた 0 語</p>
         <div class="subject-actions">
-          <button class="btn btn-primary" data-view="flashcard">単語カード</button>
-          <button class="btn btn-secondary" data-view="quiz">クイズ</button>
+          <button class="btn btn-primary" data-view="reading">長文読解</button>
+          <button class="btn btn-secondary" data-view="flashcard">単語カード</button>
+          <button class="btn btn-secondary" data-view="quiz">単語クイズ</button>
         </div>
       </div>
       <div class="subject-card">
@@ -321,6 +323,70 @@
     </div>
   </section>
 
+  <!-- ============ 長文読解 ============ -->
+  <section class="view" id="view-reading">
+    <div id="reading-list-view">
+      <div class="panel">
+        <h2 class="panel-title">長文を選ぶ</h2>
+        <label class="field">
+          <span>レベル</span>
+          <select id="reading-level">
+            <option value="all">すべて</option>
+            <option value="1">レベル1（基礎）</option>
+            <option value="2">レベル2（標準）</option>
+            <option value="3">レベル3（応用）</option>
+          </select>
+        </label>
+        <div class="reading-list" id="reading-list"></div>
+      </div>
+      <p class="hint center">本文を読んでから設問に答えます。答えるとすぐ日本語の解説が出ます。</p>
+    </div>
+
+    <div id="reading-body" hidden>
+      <button class="btn btn-ghost back-link" id="reading-back">← 長文の一覧へ</button>
+
+      <article class="passage-panel">
+        <p class="passage-meta" id="passage-meta"></p>
+        <h2 class="passage-title" id="passage-title"></h2>
+        <div class="passage-text" id="passage-text"></div>
+        <details class="glossary" id="passage-glossary">
+          <summary>語注を見る</summary>
+          <dl id="glossary-list"></dl>
+        </details>
+      </article>
+
+      <div class="panel">
+        <div class="session-bar">
+          <span id="reading-counter">0 / 0</span>
+          <div class="progress-bar slim"><div class="progress-fill" id="reading-progress"></div></div>
+          <span class="score" id="reading-score">正解 0</span>
+        </div>
+
+        <p class="reading-question" id="reading-question"></p>
+        <div class="choices" id="reading-choices"></div>
+
+        <div class="quiz-feedback" id="reading-feedback" hidden>
+          <p class="feedback-title" id="reading-feedback-title"></p>
+          <p class="math-explanation" id="reading-explanation"></p>
+          <button class="btn btn-primary" id="reading-next">次の設問 →</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="reading-result" hidden>
+      <div class="panel result-panel">
+        <p class="result-emoji" id="reading-result-emoji">🎉</p>
+        <h2 class="result-score"><span id="reading-result-correct">0</span> / <span id="reading-result-total">0</span> 正解</h2>
+        <p class="result-rate" id="reading-result-rate">正答率 0%</p>
+        <div class="result-list" id="reading-result-list"></div>
+        <div class="result-actions">
+          <button class="btn btn-primary" id="reading-retry">同じ長文をもう一度</button>
+          <button class="btn btn-ghost" id="reading-to-list">長文の一覧へ</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ 算数 ============ -->
   <section class="view" id="view-math">
     <div id="math-setup">
@@ -335,9 +401,9 @@
             <span>レベル</span>
             <select id="math-level">
               <option value="all">すべて</option>
-              <option value="1">レベル1（基礎）</option>
-              <option value="2">レベル2（標準）</option>
-              <option value="3">レベル3（応用）</option>
+              <option value="1">小学校の復習</option>
+              <option value="2">中1の基本</option>
+              <option value="3">中1の発展</option>
             </select>
           </label>
           <label class="field">
@@ -507,6 +573,7 @@
 
 <script src="js/data.js"></script>
 <script src="js/math-data.js"></script>
+<script src="js/reading-data.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/app.js"></script>
 </body>
