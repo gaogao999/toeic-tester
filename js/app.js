@@ -121,6 +121,8 @@
     $$('.tab').forEach((t) => t.classList.toggle('is-active', t.dataset.view === name));
     window.scrollTo(0, 0);
 
+    scrollActiveTabIntoView();
+
     if (name === 'home') renderHome();
     if (name === 'flashcard') startFlashcards();
     if (name === 'quiz') resetQuizToSetup();
@@ -135,6 +137,90 @@
     const target = e.target.closest('[data-view]');
     if (target) showView(target.dataset.view);
   });
+
+  // ============================================================
+  // スワイプでのタブ移動
+  // ============================================================
+
+  const SWIPE_MIN_X = 60;      // これ以上横に動いたらスワイプとみなす
+  const SWIPE_MAX_Y = 60;      // 縦の移動がこれを超えたら、ページのスクロールとみなして無視する
+  const SWIPE_MAX_TIME = 600;  // ゆっくりした動きは無視する
+
+  // スワイプの終わりに click が続けて発生するので、その1回だけ無効にする
+  let suppressClickUntil = 0;
+  const swipe = { x: 0, y: 0, at: 0, active: false };
+
+  function tabNames() {
+    return $$('.tab').map((t) => t.dataset.view);
+  }
+
+  function moveTab(step) {
+    const names = tabNames();
+    const current = names.indexOf($('.tab.is-active').dataset.view);
+    const next = current + step;
+    if (next < 0 || next >= names.length) return false;
+    showView(names[next]);
+    return true;
+  }
+
+  document.addEventListener(
+    'touchstart',
+    (e) => {
+      swipe.active = false;
+      if (e.touches.length !== 1) return;
+      // 文字入力中と、横スクロールする場所では反応させない
+      if (e.target.closest('input, textarea, select, .tabs')) return;
+      swipe.x = e.touches[0].clientX;
+      swipe.y = e.touches[0].clientY;
+      swipe.at = Date.now();
+      swipe.active = true;
+    },
+    { passive: true }
+  );
+
+  document.addEventListener(
+    'touchend',
+    (e) => {
+      if (!swipe.active) return;
+      swipe.active = false;
+
+      const touch = e.changedTouches[0];
+      const dx = touch.clientX - swipe.x;
+      const dy = touch.clientY - swipe.y;
+
+      if (Date.now() - swipe.at > SWIPE_MAX_TIME) return;
+      if (Math.abs(dx) < SWIPE_MIN_X) return;
+      if (Math.abs(dy) > SWIPE_MAX_Y) return;
+      if (Math.abs(dy) > Math.abs(dx)) return;
+
+      // 左へ払えば次のタブ、右へ払えば前のタブ
+      if (moveTab(dx < 0 ? 1 : -1)) {
+        suppressClickUntil = Date.now() + 400;
+        scrollActiveTabIntoView();
+      }
+    },
+    { passive: true }
+  );
+
+  // スワイプ直後の click（カードのめくり等）を打ち消す
+  document.addEventListener(
+    'click',
+    (e) => {
+      if (Date.now() < suppressClickUntil) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    },
+    true
+  );
+
+  /** タブ全体が画面に収まらないので、選択中のタブが見えるところまで寄せる */
+  function scrollActiveTabIntoView() {
+    const active = $('.tab.is-active');
+    if (active && active.scrollIntoView) {
+      active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }
 
   // ============================================================
   // ホーム画面

@@ -973,3 +973,11 @@ body {
 .mock-history-score { font-weight: 700; }
 .mock-history-rate { text-align: right; color: var(--green); font-weight: 700; }
 .mock-history-time { text-align: right; color: var(--text-muted); }
+
+/* スワイプでタブを移動できるので、横方向のジェスチャを妨げないようにする */
+body { touch-action: pan-y; }
+.tabs { touch-action: pan-x; }
+.passage-text,
+.mock-passage,
+.word-list,
+.result-list { touch-action: pan-y; }
