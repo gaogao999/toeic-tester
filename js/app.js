@@ -304,6 +304,9 @@
   // 受験までのカウントダウンとカレンダー
   // ============================================================
 
+  // 受験日は固定。EIS Grade 8 の入学試験日
+  const EXAM_DATE = '2027-01-07';
+
   const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
 
   // 表示中の月。初期値は初回描画時に決める
@@ -329,13 +332,13 @@
 
   /** 試験日までの残り日数。過ぎていれば負の数 */
   function daysUntilExam() {
-    const exam = parseDateKey(Storage.getSettings().examDate);
+    const exam = parseDateKey(EXAM_DATE);
     const diff = exam.getTime() - startOfToday().getTime();
     return Math.round(diff / (1000 * 60 * 60 * 24));
   }
 
   function renderCountdown() {
-    const examDate = parseDateKey(Storage.getSettings().examDate);
+    const examDate = parseDateKey(EXAM_DATE);
     const days = daysUntilExam();
 
     const label = $('#countdown-label');
@@ -382,7 +385,7 @@
   function renderCalendar() {
     const today = startOfToday();
     const todayKey = dateKeyOf(today);
-    const examKey = Storage.getSettings().examDate;
+    const examKey = EXAM_DATE;
     const studied = Storage.getStudiedDates();
 
     const first = new Date(cal.year, cal.month, 1);
@@ -421,7 +424,6 @@
       cal.year = today.getFullYear();
       cal.month = today.getMonth();
     }
-    $('#exam-date').value = Storage.getSettings().examDate;
     renderCountdown();
     renderCalendar();
   }
@@ -445,18 +447,10 @@
     });
 
     $('#cal-exam').addEventListener('click', () => {
-      const exam = parseDateKey(Storage.getSettings().examDate);
+      const exam = parseDateKey(EXAM_DATE);
       cal.year = exam.getFullYear();
       cal.month = exam.getMonth();
       renderCalendar();
-    });
-
-    $('#exam-date').addEventListener('change', (e) => {
-      if (!e.target.value) return;
-      Storage.updateSettings({ examDate: e.target.value });
-      renderCountdown();
-      renderCalendar();
-      toast('試験日を更新しました');
     });
   }
 
