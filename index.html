@@ -18,6 +18,7 @@
     <button class="tab" data-view="quiz">クイズ</button>
     <button class="tab" data-view="reading">長文読解</button>
     <button class="tab" data-view="math">算数</button>
+    <button class="tab" data-view="mock">模擬試験</button>
     <button class="tab" data-view="list">単語一覧</button>
     <button class="tab" data-view="stats">学習記録</button>
   </nav>
@@ -32,6 +33,15 @@
       <span class="strip-days"><strong id="home-countdown">—</strong> 日</span>
       <span class="strip-more">カレンダー ›</span>
     </button>
+
+    <div class="panel today-panel">
+      <div class="today-head">
+        <h2 class="panel-title today-title">今日の学習メニュー</h2>
+        <span class="today-status" id="today-status"></span>
+      </div>
+      <div class="today-list" id="today-list"></div>
+      <p class="hint" id="today-note"></p>
+    </div>
 
     <div class="subjects">
       <div class="subject-card">
@@ -485,6 +495,86 @@
     </div>
   </section>
 
+  <!-- ============ 模擬試験 ============ -->
+  <section class="view" id="view-mock">
+    <div id="mock-setup">
+      <div class="panel">
+        <h2 class="panel-title">模擬試験</h2>
+        <p class="hint">本番と同じように、途中で答え合わせをせず最後にまとめて採点します。制限時間内に解き切る練習です。</p>
+        <div class="filters mock-filters">
+          <label class="field">
+            <span>出題</span>
+            <select id="mock-subject">
+              <option value="both">英語＋算数</option>
+              <option value="english">英語だけ</option>
+              <option value="math">算数だけ</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>規模</span>
+            <select id="mock-size">
+              <option value="short">短め（20問・15分）</option>
+              <option value="standard" selected>標準（30問・30分）</option>
+              <option value="full">本番想定（40問・45分）</option>
+            </select>
+          </label>
+        </div>
+        <p class="hint" id="mock-plan"></p>
+      </div>
+      <button class="btn btn-primary btn-lg start-math" id="mock-start">模擬試験を始める</button>
+
+      <div class="panel" id="mock-history-panel" hidden>
+        <h2 class="panel-title">これまでの結果</h2>
+        <div class="mock-history" id="mock-history"></div>
+      </div>
+    </div>
+
+    <div id="mock-body" hidden>
+      <div class="mock-bar">
+        <span class="mock-timer" id="mock-timer">00:00</span>
+        <span id="mock-counter">1 / 30</span>
+        <button class="btn btn-ghost mock-quit" id="mock-quit">中断</button>
+      </div>
+      <div class="progress-bar slim mock-progress"><div class="progress-fill" id="mock-progress"></div></div>
+
+      <div class="panel">
+        <p class="math-tag" id="mock-tag"></p>
+        <div class="mock-passage" id="mock-passage" hidden></div>
+        <p class="mock-question" id="mock-question"></p>
+
+        <div class="choices" id="mock-choices"></div>
+
+        <form class="answer-form" id="mock-form" hidden autocomplete="off">
+          <div class="math-input-row">
+            <input type="text" id="mock-input" class="answer-input" placeholder="答えを入力"
+                   inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" />
+            <span class="math-unit" id="mock-unit"></span>
+          </div>
+        </form>
+
+        <div class="mock-nav">
+          <button class="btn btn-ghost" id="mock-prev">← 前へ</button>
+          <button class="btn btn-primary" id="mock-next">次へ →</button>
+        </div>
+        <p class="hint center" id="mock-note">答えは最後にまとめて採点されます。飛ばして後から戻れます。</p>
+      </div>
+    </div>
+
+    <div id="mock-result" hidden>
+      <div class="panel result-panel">
+        <p class="result-emoji" id="mock-emoji">🎉</p>
+        <h2 class="result-score"><span id="mock-score">0</span> / <span id="mock-total">0</span> 正解</h2>
+        <p class="result-rate" id="mock-rate">正答率 0%</p>
+        <div class="mock-breakdown" id="mock-breakdown"></div>
+        <div class="result-list" id="mock-review"></div>
+        <div class="result-actions">
+          <button class="btn btn-primary" id="mock-again">もう一度</button>
+          <button class="btn btn-ghost" data-view="home">ホームへ</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ 単語一覧 ============ -->
   <section class="view" id="view-list">
     <div class="panel">
@@ -548,6 +638,12 @@
     <div class="panel">
       <h2 class="panel-title">直近14日間の学習量</h2>
       <div class="chart" id="chart"></div>
+    </div>
+
+    <div class="panel">
+      <h2 class="panel-title">分野別の正答率</h2>
+      <p class="hint">解いたことのある分野だけを、正答率の低い順に並べています。ここが弱点です。</p>
+      <div class="accuracy-groups" id="accuracy-groups"></div>
     </div>
 
     <div class="panel">

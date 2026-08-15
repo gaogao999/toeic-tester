@@ -127,6 +127,7 @@
     if (name === 'quiz') resetQuizToSetup();
     if (name === 'math') resetMathToSetup();
     if (name === 'reading') showReadingList();
+    if (name === 'mock') resetMockToSetup();
     if (name === 'list') renderListFromTop();
     if (name === 'stats') renderStats();
   }
@@ -170,11 +171,96 @@
     $('#home-progress-fill').style.width = `${percent}%`;
     $('#home-progress-text').textContent = `${learned} / ${WORD_DATA.length} 語（${percent}%）`;
 
+    renderTodayMenu();
     updateFilterCount();
   }
 
   function updateFilterCount() {
     $('#filter-count').textContent = `対象: ${getFilteredWords().length} 語`;
+  }
+
+  // ============================================================
+  // 今日の学習メニュー
+  // ============================================================
+
+  /**
+   * 残り日数と未習得の数から、今日やる量を決める。
+   * 極端な数にならないよう上限と下限を設けている。
+   */
+  function todayGoals() {
+    const days = Math.max(daysUntilExam(), 1);
+
+    const wordsLeft = WORD_DATA.filter((w) => !Storage.isLearned(w.id)).length;
+    const mathLeft = MATH_DATA.filter((p) => !Storage.isLearned(p.id)).length;
+    const readingLeft = READING_DATA.filter(
+      (r) => r.questions.some((q, i) => !Storage.isLearned(`${r.id}-${i + 1}`))
+    ).length;
+
+    const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
+
+    return [
+      {
+        key: 'word',
+        icon: '📖',
+        name: '単語',
+        goal: wordsLeft === 0 ? 10 : clamp(Math.ceil(wordsLeft / days), 5, 30),
+        unit: '語',
+        left: wordsLeft,
+        view: 'quiz'
+      },
+      {
+        key: 'math',
+        icon: '🔢',
+        name: '算数',
+        goal: mathLeft === 0 ? 5 : clamp(Math.ceil(mathLeft / days), 3, 20),
+        unit: '問',
+        left: mathLeft,
+        view: 'math'
+      },
+      {
+        key: 'reading',
+        icon: '📕',
+        name: '長文読解',
+        // 長文は1本あたりの設問数で数える。未読があれば1本、なければ復習1本
+        goal: readingLeft === 0 ? 4 : Math.min(...READING_DATA.map((r) => r.questions.length)),
+        unit: '問',
+        left: readingLeft,
+        view: 'reading'
+      }
+    ];
+  }
+
+  function renderTodayMenu() {
+    const counts = Storage.getTodayCounts();
+    const goals = todayGoals();
+    const doneCount = goals.filter((g) => counts[g.key] >= g.goal).length;
+
+    $('#today-status').textContent =
+      doneCount === goals.length ? '✓ 今日の分は達成' : `${doneCount} / ${goals.length} 達成`;
+    $('#today-status').classList.toggle('is-done', doneCount === goals.length);
+
+    $('#today-list').innerHTML = goals
+      .map((g) => {
+        const done = counts[g.key];
+        const complete = done >= g.goal;
+        const percent = Math.min((done / g.goal) * 100, 100);
+        return `<button class="today-item ${complete ? 'is-complete' : ''}" data-view="${g.view}">
+            <span class="today-icon">${complete ? '✓' : g.icon}</span>
+            <span class="today-main">
+              <span class="today-name">${g.name}</span>
+              <span class="progress-bar slim"><span class="progress-fill" style="width:${percent}%"></span></span>
+            </span>
+            <span class="today-count">${done} / ${g.goal} ${g.unit}</span>
+          </button>`;
+      })
+      .join('');
+
+    const days = daysUntilExam();
+    const wordsLeft = goals[0].left;
+    $('#today-note').textContent =
+      days > 0
+        ? `試験まで ${days} 日。未習得の単語 ${wordsLeft} 語をこのペースで割り振っています。`
+        : '試験日を過ぎました。';
   }
 
   /** 保存済みの設定を各入力欄に反映する */
@@ -1090,6 +1176,326 @@
   }
 
   // ============================================================
+  // 模擬試験
+  // ============================================================
+
+  const MOCK_SIZES = {
+    short: { total: 20, minutes: 15 },
+    standard: { total: 30, minutes: 30 },
+    full: { total: 40, minutes: 45 }
+  };
+
+  const mock = { questions: [], index: 0, answers: [], endAt: 0, timer: null, startedAt: 0 };
+
+  /** 単語の4択（英単語 → 意味）を作る */
+  function buildWordChoice(word) {
+    const distractors = shuffle(WORD_DATA.filter((w) => w.id !== word.id && w.meaning !== word.meaning))
+      .slice(0, 3);
+    const options = shuffle([word, ...distractors]);
+    return {
+      kind: 'word',
+      id: word.id,
+      tag: `単語 ／ ${word.category}`,
+      question: word.word,
+      choices: options.map((o) => o.meaning),
+      answer: options.findIndex((o) => o.id === word.id),
+      explanation: `${word.word} … ${word.meaning}${word.example ? `／${word.example}` : ''}`
+    };
+  }
+
+  function buildReadingQuestion(passage, q, i) {
+    const order = shuffle(q.choices.map((_, k) => k));
+    return {
+      kind: 'reading',
+      id: `${passage.id}-${i + 1}`,
+      tag: `長文読解 ／ ${passage.topic}`,
+      passage,
+      question: q.q,
+      choices: order.map((k) => q.choices[k]),
+      answer: order.indexOf(q.answer),
+      explanation: q.explanation
+    };
+  }
+
+  function buildMathQuestion(p) {
+    return {
+      kind: 'math',
+      id: p.id,
+      tag: `算数 ／ ${p.category}`,
+      question: p.question,
+      unit: p.unit,
+      answer: p.answer,
+      explanation: p.explanation
+    };
+  }
+
+  /** 出題内容を組み立てる。英語は単語と長文を混ぜ、長文は1本ぶんまとめて出す */
+  function buildMockQuestions(subject, total) {
+    const questions = [];
+
+    if (subject === 'math') {
+      return shuffle(MATH_DATA).slice(0, total).map(buildMathQuestion);
+    }
+
+    if (subject === 'english') {
+      const passage = shuffle(READING_DATA)[0];
+      passage.questions.forEach((q, i) => questions.push(buildReadingQuestion(passage, q, i)));
+      const words = shuffle(WORD_DATA).slice(0, Math.max(total - questions.length, 0));
+      words.forEach((w) => questions.push(buildWordChoice(w)));
+      return questions.slice(0, total);
+    }
+
+    // 英語＋算数。おおよそ英語6割・算数4割
+    const englishCount = Math.round(total * 0.6);
+    const mathCount = total - englishCount;
+
+    const passage = shuffle(READING_DATA)[0];
+    passage.questions.forEach((q, i) => questions.push(buildReadingQuestion(passage, q, i)));
+    shuffle(WORD_DATA)
+      .slice(0, Math.max(englishCount - questions.length, 0))
+      .forEach((w) => questions.push(buildWordChoice(w)));
+
+    shuffle(MATH_DATA).slice(0, mathCount).forEach((p) => questions.push(buildMathQuestion(p)));
+    return questions;
+  }
+
+  function updateMockPlan() {
+    const subject = $('#mock-subject').value;
+    const size = MOCK_SIZES[$('#mock-size').value];
+    const label =
+      subject === 'math' ? '算数のみ' : subject === 'english' ? '英語のみ（長文＋単語）' : '英語6割・算数4割';
+    $('#mock-plan').textContent = `${label}／全 ${size.total} 問／制限時間 ${size.minutes} 分`;
+  }
+
+  function resetMockToSetup() {
+    stopMockTimer();
+    $('#mock-body').hidden = true;
+    $('#mock-result').hidden = true;
+    $('#mock-setup').hidden = false;
+    updateMockPlan();
+    renderMockHistory();
+  }
+
+  function startMock() {
+    const subject = $('#mock-subject').value;
+    const size = MOCK_SIZES[$('#mock-size').value];
+
+    mock.questions = buildMockQuestions(subject, size.total);
+    mock.answers = new Array(mock.questions.length).fill(null);
+    mock.index = 0;
+    mock.startedAt = Date.now();
+    mock.endAt = Date.now() + size.minutes * 60 * 1000;
+
+    if (mock.questions.length === 0) {
+      toast('出題できる問題がありません');
+      return;
+    }
+
+    Storage.incrementSessions();
+    $('#mock-setup').hidden = true;
+    $('#mock-result').hidden = true;
+    $('#mock-body').hidden = false;
+
+    startMockTimer();
+    renderMockQuestion();
+  }
+
+  function startMockTimer() {
+    stopMockTimer();
+    const tick = () => {
+      const left = Math.max(0, Math.round((mock.endAt - Date.now()) / 1000));
+      const m = String(Math.floor(left / 60)).padStart(2, '0');
+      const sec = String(left % 60).padStart(2, '0');
+      $('#mock-timer').textContent = `${m}:${sec}`;
+      $('#mock-timer').classList.toggle('is-low', left <= 60);
+      if (left === 0) {
+        stopMockTimer();
+        toast('時間切れです。採点します');
+        finishMock();
+      }
+    };
+    tick();
+    mock.timer = setInterval(tick, 1000);
+  }
+
+  function stopMockTimer() {
+    if (mock.timer) clearInterval(mock.timer);
+    mock.timer = null;
+  }
+
+  function saveCurrentMockAnswer() {
+    const q = mock.questions[mock.index];
+    if (q.kind === 'math') mock.answers[mock.index] = $('#mock-input').value.trim() || null;
+  }
+
+  function renderMockQuestion() {
+    const q = mock.questions[mock.index];
+    const total = mock.questions.length;
+
+    $('#mock-counter').textContent = `${mock.index + 1} / ${total}`;
+    $('#mock-progress').style.width = `${((mock.index + 1) / total) * 100}%`;
+    $('#mock-tag').textContent = q.tag;
+
+    // 長文は本文を一緒に見せる
+    if (q.kind === 'reading') {
+      $('#mock-passage').hidden = false;
+      $('#mock-passage').innerHTML =
+        `<p class="mock-passage-title">${escapeHtml(q.passage.title)}</p>` +
+        q.passage.passage.split('\n').map((line) => `<p>${escapeHtml(line)}</p>`).join('');
+    } else {
+      $('#mock-passage').hidden = true;
+    }
+
+    $('#mock-question').textContent = q.question;
+
+    if (q.kind === 'math') {
+      $('#mock-choices').innerHTML = '';
+      $('#mock-form').hidden = false;
+      $('#mock-input').value = mock.answers[mock.index] || '';
+      $('#mock-unit').textContent = q.unit || '';
+      $('#mock-unit').hidden = !q.unit;
+      $('#mock-input').focus();
+    } else {
+      $('#mock-form').hidden = true;
+      const box = $('#mock-choices');
+      box.innerHTML = '';
+      q.choices.forEach((choice, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice' + (mock.answers[mock.index] === i ? ' is-picked' : '');
+        btn.textContent = `${'ABCD'[i]}. ${choice}`;
+        btn.addEventListener('click', () => {
+          mock.answers[mock.index] = i;
+          renderMockQuestion();
+        });
+        box.appendChild(btn);
+      });
+    }
+
+    $('#mock-prev').disabled = mock.index === 0;
+    $('#mock-next').textContent = mock.index === total - 1 ? '採点する' : '次へ →';
+    window.scrollTo(0, 0);
+  }
+
+  function moveMock(step) {
+    saveCurrentMockAnswer();
+    const next = mock.index + step;
+    if (next < 0) return;
+    if (next >= mock.questions.length) {
+      finishMock();
+      return;
+    }
+    mock.index = next;
+    renderMockQuestion();
+  }
+
+  function finishMock() {
+    saveCurrentMockAnswer();
+    stopMockTimer();
+
+    const byKind = { word: { c: 0, n: 0 }, reading: { c: 0, n: 0 }, math: { c: 0, n: 0 } };
+    const results = mock.questions.map((q, i) => {
+      const given = mock.answers[i];
+      const isCorrect =
+        q.kind === 'math'
+          ? given !== null && isMathCorrect(given, q.answer)
+          : given === q.answer;
+      Storage.recordAnswer(q.id, isCorrect);
+      if (isCorrect) Storage.setLearned(q.id, true);
+      byKind[q.kind].n += 1;
+      if (isCorrect) byKind[q.kind].c += 1;
+      return { q, given, isCorrect };
+    });
+
+    const correct = results.filter((r) => r.isCorrect).length;
+    const total = results.length;
+    const rate = Math.round((correct / total) * 100);
+    const minutes = Math.max(1, Math.round((Date.now() - mock.startedAt) / 60000));
+
+    saveMockHistory({ date: new Date().toISOString(), correct, total, rate, minutes });
+
+    $('#mock-body').hidden = true;
+    $('#mock-result').hidden = false;
+    $('#mock-score').textContent = correct;
+    $('#mock-total').textContent = total;
+    $('#mock-rate').textContent = `正答率 ${rate}%　／　所要 ${minutes} 分`;
+    $('#mock-emoji').textContent = rate >= 90 ? '🏆' : rate >= 70 ? '🎉' : rate >= 50 ? '💪' : '📖';
+
+    const names = { word: '単語', reading: '長文読解', math: '算数' };
+    $('#mock-breakdown').innerHTML = Object.entries(byKind)
+      .filter(([, v]) => v.n > 0)
+      .map(([k, v]) => {
+        const r = Math.round((v.c / v.n) * 100);
+        return `<div class="mock-break-row">
+            <span>${names[k]}</span>
+            <span class="mock-break-bar"><span style="width:${r}%"></span></span>
+            <span class="mock-break-num">${v.c}/${v.n}（${r}%）</span>
+          </div>`;
+      })
+      .join('');
+
+    $('#mock-review').innerHTML = results
+      .map((r, i) => {
+        const yourAnswer =
+          r.q.kind === 'math'
+            ? r.given || '（無回答）'
+            : r.given === null
+              ? '（無回答）'
+              : `${'ABCD'[r.given]}`;
+        const rightAnswer = r.q.kind === 'math' ? r.q.answer : `${'ABCD'[r.q.answer]}`;
+        return `<div class="result-item ${r.isCorrect ? 'ok' : 'ng'}">
+            <span>${r.isCorrect ? '⭕️' : '❌'}</span>
+            <b>${i + 1}. ${escapeHtml(r.q.tag.split(' ／ ')[0])}</b>
+            <span>${r.isCorrect ? escapeHtml(r.q.question.slice(0, 40)) : `あなた: ${escapeHtml(yourAnswer)} ／ 正解: ${escapeHtml(rightAnswer)}`}</span>
+          </div>`;
+      })
+      .join('');
+
+    window.scrollTo(0, 0);
+  }
+
+  // 模擬試験の結果は設定と一緒に保存しておく（直近5回ぶん）
+  function saveMockHistory(entry) {
+    const s = Storage.getSettings();
+    const list = [entry, ...(s.mockHistory || [])].slice(0, 5);
+    Storage.updateSettings({ mockHistory: list });
+  }
+
+  function renderMockHistory() {
+    const list = Storage.getSettings().mockHistory || [];
+    $('#mock-history-panel').hidden = list.length === 0;
+    $('#mock-history').innerHTML = list
+      .map((h) => {
+        const d = new Date(h.date);
+        return `<div class="mock-history-row">
+            <span>${d.getMonth() + 1}/${d.getDate()}</span>
+            <span class="mock-history-score">${h.correct}/${h.total}</span>
+            <span class="mock-history-rate">${h.rate}%</span>
+            <span class="mock-history-time">${h.minutes}分</span>
+          </div>`;
+      })
+      .join('');
+  }
+
+  function initMock() {
+    $('#mock-subject').addEventListener('change', updateMockPlan);
+    $('#mock-size').addEventListener('change', updateMockPlan);
+    $('#mock-start').addEventListener('click', startMock);
+    $('#mock-again').addEventListener('click', resetMockToSetup);
+    $('#mock-prev').addEventListener('click', () => moveMock(-1));
+    $('#mock-next').addEventListener('click', () => moveMock(1));
+    $('#mock-quit').addEventListener('click', () => {
+      if (confirm('模擬試験を中断しますか。ここまでの解答は採点されません。')) {
+        stopMockTimer();
+        resetMockToSetup();
+      }
+    });
+    $('#mock-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      moveMock(1);
+    });
+  }
+
+  // ============================================================
   // 単語一覧
   // ============================================================
 
@@ -1242,6 +1648,8 @@
     $('#stats-learned').textContent = WORD_DATA.filter((w) => Storage.isLearned(w.id)).length;
     $('#stats-mastered').textContent = WORD_DATA.filter((w) => Storage.isMastered(w.id)).length;
 
+    renderAccuracyByCategory();
+
     // 直近14日の棒グラフ
     const history = Storage.getHistory(14);
     const max = Math.max(1, ...history.map((h) => h.answered));
@@ -1268,6 +1676,69 @@
             <span class="box-num">${count}</span>
           </div>`;
       })
+      .join('');
+  }
+
+  /**
+   * 分野ごとの正答率を出す。
+   * items は { id, category } を持つ配列で、学習履歴から正解数と解答数を集計する。
+   */
+  function accuracyByCategory(items) {
+    const totals = new Map();
+    for (const item of items) {
+      const rec = Storage.getRecord(item.id);
+      const answered = rec.correct + rec.wrong;
+      if (answered === 0) continue;
+      const t = totals.get(item.category) || { correct: 0, answered: 0 };
+      t.correct += rec.correct;
+      t.answered += answered;
+      totals.set(item.category, t);
+    }
+    return [...totals.entries()]
+      .map(([category, t]) => ({
+        category,
+        correct: t.correct,
+        answered: t.answered,
+        rate: Math.round((t.correct / t.answered) * 100)
+      }))
+      .sort((a, b) => a.rate - b.rate); // 弱い順
+  }
+
+  function renderAccuracyByCategory() {
+    // 長文は「本」単位ではなく題材で集計する
+    const readingItems = READING_DATA.flatMap((r) =>
+      r.questions.map((q, i) => ({ id: `${r.id}-${i + 1}`, category: r.topic }))
+    );
+
+    const groups = [
+      { name: '📖 単語', rows: accuracyByCategory(WORD_DATA) },
+      { name: '📕 長文読解', rows: accuracyByCategory(readingItems) },
+      { name: '🔢 算数', rows: accuracyByCategory(MATH_DATA) }
+    ].filter((g) => g.rows.length > 0);
+
+    if (groups.length === 0) {
+      $('#accuracy-groups').innerHTML =
+        '<p class="hint">まだ解答がありません。学習を始めるとここに出ます。</p>';
+      return;
+    }
+
+    $('#accuracy-groups').innerHTML = groups
+      .map(
+        (g) => `<div class="accuracy-group">
+          <p class="accuracy-group-name">${g.name}</p>
+          ${g.rows
+            .map((r) => {
+              const tone = r.rate >= 80 ? 'high' : r.rate >= 60 ? 'mid' : 'low';
+              return `<div class="accuracy-row">
+                  <span class="accuracy-name">${escapeHtml(r.category)}</span>
+                  <span class="accuracy-track"><span class="accuracy-fill t-${tone}" style="width:${r.rate}%"></span></span>
+                  <span class="accuracy-rate t-${tone}">${r.rate}%</span>
+                  <span class="accuracy-count">${r.correct}/${r.answered}</span>
+                </div>`;
+            })
+            .join('')}
+        </div>`
+      )
       .join('');
   }
 
@@ -1322,6 +1793,7 @@
     initCountdown();
     initMath();
     initReading();
+    initMock();
     initFlashcards();
     initQuiz();
     initList();

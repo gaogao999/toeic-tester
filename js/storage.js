@@ -12,7 +12,8 @@ const Storage = (() => {
   const DEFAULT_STATE = {
     records: {}, // { [wordId]: { box, correct, wrong, lastStudied, nextDue, starred, learned } }
     stats: { totalAnswers: 0, totalCorrect: 0, sessions: 0 },
-    history: [], // [{ date: 'YYYY-MM-DD', answered: n, correct: n }]
+    // [{ date, answered, correct, word, math, reading }] — 後ろ3つは科目別の解答数
+    history: [],
     settings: {
       level: 'all',
       category: 'all',
@@ -65,6 +66,19 @@ const Storage = (() => {
     return `${y}-${m}-${d}`;
   }
 
+  /**
+   * IDから科目を判定する。
+   *   単語 … 1, 2, 3 …（数値）
+   *   算数 … m1, m2 …
+   *   長文 … r1-1, r1-2 …
+   */
+  function kindOf(id) {
+    const s = String(id);
+    if (s.startsWith('m')) return 'math';
+    if (s.startsWith('r')) return 'reading';
+    return 'word';
+  }
+
   function getRecord(wordId) {
     return (
       state.records[wordId] || {
@@ -104,11 +118,15 @@ const Storage = (() => {
     const key = todayKey();
     let day = state.history.find((h) => h.date === key);
     if (!day) {
-      day = { date: key, answered: 0, correct: 0 };
+      day = { date: key, answered: 0, correct: 0, word: 0, math: 0, reading: 0 };
       state.history.push(day);
     }
     day.answered += 1;
     if (isCorrect) day.correct += 1;
+
+    // 科目別の解答数（古い記録には無いので、無ければ0から数え始める）
+    const kind = kindOf(wordId);
+    day[kind] = (day[kind] || 0) + 1;
 
     save();
     return rec;
@@ -200,6 +218,17 @@ const Storage = (() => {
     return state.history.find((h) => h.date === dateKey) || null;
   }
 
+  /** 今日の科目別の解答数 */
+  function getTodayCounts() {
+    const day = getDay(todayKey());
+    return {
+      word: (day && day.word) || 0,
+      math: (day && day.math) || 0,
+      reading: (day && day.reading) || 0,
+      answered: (day && day.answered) || 0
+    };
+  }
+
   /** 今日を含む連続学習日数 */
   function getStreak() {
     let streak = 0;
@@ -259,6 +288,8 @@ const Storage = (() => {
     getHistory,
     getStudiedDates,
     getDay,
+    getTodayCounts,
+    kindOf,
     todayKey,
     getStreak,
     reset,
