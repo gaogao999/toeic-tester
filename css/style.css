@@ -14,8 +14,9 @@
   --shadow: 0 2px 12px rgba(29, 36, 51, 0.07);
 }
 
+/* 端末の設定がダークのとき。ただし利用者が明示的にライトを選んでいれば適用しない */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --bg: #151922;
     --surface: #1e2430;
     --surface-2: #262d3b;
@@ -29,6 +30,22 @@
     --red: #f0645f;
     --shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
   }
+}
+
+/* 利用者が明示的にダークを選んだとき */
+:root[data-theme='dark'] {
+  --bg: #151922;
+  --surface: #1e2430;
+  --surface-2: #262d3b;
+  --border: #333b4d;
+  --text: #e8ecf4;
+  --text-muted: #98a2b8;
+  --primary: #6b8afd;
+  --primary-dark: #5573e8;
+  --green: #4cbd76;
+  --orange: #f0a739;
+  --red: #f0645f;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 }
 
 * { box-sizing: border-box; }
