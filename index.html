@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TOEIC 単語トレーナー</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📘</text></svg>" />
+</head>
+<body>
+
+<header class="app-header">
+  <h1 class="app-title">📘 TOEIC 単語トレーナー</h1>
+  <nav class="tabs" id="tabs">
+    <button class="tab is-active" data-view="home">ホーム</button>
+    <button class="tab" data-view="flashcard">単語カード</button>
+    <button class="tab" data-view="quiz">クイズ</button>
+    <button class="tab" data-view="list">単語一覧</button>
+    <button class="tab" data-view="stats">学習記録</button>
+  </nav>
+</header>
+
+<main class="container">
+
+  <!-- ============ ホーム ============ -->
+  <section class="view is-active" id="view-home">
+    <div class="dashboard">
+      <div class="stat-card">
+        <span class="stat-label">収録単語</span>
+        <span class="stat-value" id="home-total">0</span>
+        <span class="stat-unit">語</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">学習済み</span>
+        <span class="stat-value" id="home-studied">0</span>
+        <span class="stat-unit">語</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">マスター</span>
+        <span class="stat-value accent-green" id="home-mastered">0</span>
+        <span class="stat-unit">語</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">今日の復習</span>
+        <span class="stat-value accent-orange" id="home-due">0</span>
+        <span class="stat-unit">語</span>
+      </div>
+    </div>
+
+    <div class="progress-block">
+      <div class="progress-head">
+        <span>全体の習得状況</span>
+        <span id="home-progress-text">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="home-progress-fill"></div></div>
+    </div>
+
+    <div class="panel">
+      <h2 class="panel-title">出題範囲の設定</h2>
+      <div class="filters">
+        <label class="field">
+          <span>レベル</span>
+          <select id="filter-level">
+            <option value="all">すべて</option>
+            <option value="600">600点目標</option>
+            <option value="730">730点目標</option>
+            <option value="860">860点目標</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>カテゴリ</span>
+          <select id="filter-category"></select>
+        </label>
+        <label class="field">
+          <span>対象</span>
+          <select id="filter-scope">
+            <option value="all">すべての単語</option>
+            <option value="due">復習期限の単語</option>
+            <option value="weak">苦手な単語</option>
+            <option value="starred">★ をつけた単語</option>
+            <option value="new">未学習の単語</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>クイズ出題数</span>
+          <select id="filter-quiz-length">
+            <option value="5">5問</option>
+            <option value="10" selected>10問</option>
+            <option value="20">20問</option>
+            <option value="9999">すべて</option>
+          </select>
+        </label>
+      </div>
+      <p class="hint" id="filter-count">対象: 0 語</p>
+    </div>
+
+    <div class="start-buttons">
+      <button class="btn btn-primary btn-lg" data-view="flashcard">単語カードで覚える</button>
+      <button class="btn btn-secondary btn-lg" data-view="quiz">クイズで確認する</button>
+    </div>
+  </section>
+
+  <!-- ============ 単語カード ============ -->
+  <section class="view" id="view-flashcard">
+    <div class="session-bar">
+      <span id="fc-counter">0 / 0</span>
+      <div class="progress-bar slim"><div class="progress-fill" id="fc-progress"></div></div>
+    </div>
+
+    <div class="empty-state" id="fc-empty" hidden>
+      <p>対象の単語がありません。ホームで出題範囲を変えてください。</p>
+      <button class="btn btn-secondary" data-view="home">ホームへ戻る</button>
+    </div>
+
+    <div id="fc-body">
+      <div class="card" id="flashcard">
+        <div class="card-inner" id="flashcard-inner">
+          <div class="card-face card-front">
+            <span class="badge-row">
+              <span class="badge" id="fc-level"></span>
+              <span class="badge badge-ghost" id="fc-category"></span>
+            </span>
+            <p class="card-word" id="fc-word">—</p>
+            <p class="card-phonetic" id="fc-phonetic"></p>
+            <p class="card-tip">タップして意味を表示</p>
+          </div>
+          <div class="card-face card-back">
+            <p class="card-pos" id="fc-pos"></p>
+            <p class="card-meaning" id="fc-meaning"></p>
+            <div class="card-example">
+              <p id="fc-example"></p>
+              <p class="ja" id="fc-example-ja"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-tools">
+        <button class="btn btn-icon" id="fc-speak" title="発音を聞く">🔊 発音</button>
+        <button class="btn btn-icon" id="fc-star" title="★ をつける">☆ 覚えにくい</button>
+      </div>
+
+      <div class="answer-buttons">
+        <button class="btn btn-danger" id="fc-again">まだ覚えていない</button>
+        <button class="btn btn-success" id="fc-known">覚えた</button>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="btn btn-ghost" id="fc-prev">← 前へ</button>
+        <button class="btn btn-ghost" id="fc-flip">意味を見る</button>
+        <button class="btn btn-ghost" id="fc-next">次へ →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ クイズ ============ -->
+  <section class="view" id="view-quiz">
+    <div class="empty-state" id="quiz-empty" hidden>
+      <p>クイズを作るには4語以上必要です。ホームで出題範囲を広げてください。</p>
+      <button class="btn btn-secondary" data-view="home">ホームへ戻る</button>
+    </div>
+
+    <div id="quiz-setup">
+      <div class="panel">
+        <h2 class="panel-title">出題形式を選ぶ</h2>
+        <div class="mode-grid">
+          <button class="mode-card" data-quiz-mode="en-ja">
+            <span class="mode-icon">🇬🇧→🇯🇵</span>
+            <span class="mode-name">英語 → 日本語</span>
+            <span class="mode-desc">英単語の意味を4択で選ぶ</span>
+          </button>
+          <button class="mode-card" data-quiz-mode="ja-en">
+            <span class="mode-icon">🇯🇵→🇬🇧</span>
+            <span class="mode-name">日本語 → 英語</span>
+            <span class="mode-desc">意味に合う英単語を4択で選ぶ</span>
+          </button>
+          <button class="mode-card" data-quiz-mode="fill">
+            <span class="mode-icon">✍️</span>
+            <span class="mode-name">例文穴埋め</span>
+            <span class="mode-desc">Part 5 形式で文脈から選ぶ</span>
+          </button>
+          <button class="mode-card" data-quiz-mode="listening">
+            <span class="mode-icon">🎧</span>
+            <span class="mode-name">リスニング</span>
+            <span class="mode-desc">読み上げを聞いて単語を選ぶ</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="quiz-body" hidden>
+      <div class="session-bar">
+        <span id="quiz-counter">0 / 0</span>
+        <div class="progress-bar slim"><div class="progress-fill" id="quiz-progress"></div></div>
+        <span class="score" id="quiz-score">正解 0</span>
+      </div>
+
+      <div class="panel quiz-panel">
+        <p class="quiz-prompt-label" id="quiz-label"></p>
+        <p class="quiz-question" id="quiz-question"></p>
+        <button class="btn btn-icon" id="quiz-replay" hidden>🔊 もう一度聞く</button>
+        <div class="choices" id="quiz-choices"></div>
+        <div class="quiz-feedback" id="quiz-feedback" hidden>
+          <p class="feedback-title" id="feedback-title"></p>
+          <p class="feedback-detail" id="feedback-detail"></p>
+          <p class="feedback-example" id="feedback-example"></p>
+          <button class="btn btn-primary" id="quiz-next">次の問題 →</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="quiz-result" hidden>
+      <div class="panel result-panel">
+        <p class="result-emoji" id="result-emoji">🎉</p>
+        <h2 class="result-score"><span id="result-correct">0</span> / <span id="result-total">0</span> 正解</h2>
+        <p class="result-rate" id="result-rate">正答率 0%</p>
+        <div class="result-list" id="result-list"></div>
+        <div class="result-actions">
+          <button class="btn btn-primary" id="result-retry">もう一度</button>
+          <button class="btn btn-secondary" id="result-wrong-only" hidden>間違えた単語だけ復習</button>
+          <button class="btn btn-ghost" data-view="home">ホームへ</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 単語一覧 ============ -->
+  <section class="view" id="view-list">
+    <div class="panel">
+      <div class="list-toolbar">
+        <input type="search" id="list-search" placeholder="単語・意味で検索" />
+        <select id="list-sort">
+          <option value="id">収録順</option>
+          <option value="alpha">アルファベット順</option>
+          <option value="weak">苦手順</option>
+          <option value="box">習得度が低い順</option>
+        </select>
+      </div>
+      <p class="hint" id="list-count"></p>
+      <div class="word-list" id="word-list"></div>
+    </div>
+  </section>
+
+  <!-- ============ 学習記録 ============ -->
+  <section class="view" id="view-stats">
+    <div class="dashboard">
+      <div class="stat-card">
+        <span class="stat-label">総解答数</span>
+        <span class="stat-value" id="stats-answers">0</span>
+        <span class="stat-unit">回</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">通算正答率</span>
+        <span class="stat-value accent-green" id="stats-rate">0%</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">連続学習</span>
+        <span class="stat-value accent-orange" id="stats-streak">0</span>
+        <span class="stat-unit">日</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">苦手な単語</span>
+        <span class="stat-value accent-red" id="stats-weak">0</span>
+        <span class="stat-unit">語</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2 class="panel-title">直近14日間の学習量</h2>
+      <div class="chart" id="chart"></div>
+    </div>
+
+    <div class="panel">
+      <h2 class="panel-title">習得段階の分布</h2>
+      <p class="hint">正解するほど右の箱へ進み、復習の間隔が延びます（1日 → 3日 → 7日 → 14日 → 30日）。</p>
+      <div class="box-dist" id="box-dist"></div>
+    </div>
+
+    <div class="panel">
+      <h2 class="panel-title">データの管理</h2>
+      <div class="data-actions">
+        <button class="btn btn-secondary" id="export-btn">学習データを書き出す</button>
+        <button class="btn btn-secondary" id="import-btn">学習データを読み込む</button>
+        <button class="btn btn-danger-ghost" id="reset-btn">学習記録をリセット</button>
+      </div>
+      <input type="file" id="import-file" accept="application/json" hidden />
+    </div>
+  </section>
+
+</main>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="js/data.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
