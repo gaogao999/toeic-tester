@@ -25,7 +25,20 @@ python3 -m http.server 8000   # → http://localhost:8000
 npx http-server -p 8000
 ```
 
-GitHub Pages に公開する場合は、リポジトリの Settings → Pages でこのブランチのルートを指定するだけで動作します。
+## GitHub Pages で公開する
+
+`.github/workflows/deploy-pages.yml` を用意しています。`main` に push すると自動で公開されます
+（Actions の画面から手動実行もできます）。ビルド工程はなく、リポジトリの中身がそのまま配信されます。
+
+公開先: `https://<ユーザー名>.github.io/toeic-tester/`
+
+**このリポジトリは private です。** GitHub Pages を使うには次のどちらかが必要です。
+
+- リポジトリを public にする
+- GitHub Pro などの有料プランに加入する（private リポジトリからの Pages 公開に必要）
+
+どちらの場合も、**公開されたページ自体はインターネット上の誰でも閲覧できます**
+（URL を知っている必要はありますが、認証はかかりません）。
 
 ## 機能
 
