@@ -1,5 +1,5 @@
 /**
- * TOEIC 単語トレーナー — 画面制御と学習ロジック
+ * EIS合格応援アプリ — 画面制御と学習ロジック
  */
 (() => {
   'use strict';
@@ -25,6 +25,14 @@
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
     })[c]);
   }
+
+  // 難易度の表示名。データ側の level はそのまま（600/750/900）で、表示だけを切り替える
+  const LEVEL_LABELS = {
+    600: 'レベル1（基礎）',
+    750: 'レベル2（標準）',
+    900: 'レベル3（応用）'
+  };
+  const levelLabel = (level) => LEVEL_LABELS[level] || `レベル${level}`;
 
   let toastTimer = null;
   function toast(message) {
@@ -210,7 +218,7 @@
     $('#flashcard-inner').classList.toggle('is-flipped', fc.flipped);
     $('#fc-word').textContent = w.word;
     $('#fc-phonetic').textContent = w.phonetic;
-    $('#fc-level').textContent = `${w.level}点`;
+    $('#fc-level').textContent = levelLabel(w.level);
     $('#fc-category').textContent = w.category;
     $('#fc-pos').textContent = w.pos;
     $('#fc-pos').hidden = !w.pos;
@@ -615,7 +623,7 @@
             <button class="star-btn" data-star-id="${w.id}" title="★ をつける">${rec.starred ? '★' : '☆'}</button>
           </div>
           <div class="word-detail" id="detail-${w.id}">
-            <div>${[w.phonetic, `${w.level}点レベル`, w.category].filter(Boolean).map(escapeHtml).join(' ／ ')}</div>
+            <div>${[w.phonetic, levelLabel(w.level), w.category].filter(Boolean).map(escapeHtml).join(' ／ ')}</div>
             ${w.note ? `<div>⚠ ${escapeHtml(w.note)}</div>` : ''}
             ${w.example ? `<div>${escapeHtml(w.example)}</div><div>${escapeHtml(w.exampleJa)}</div>` : ''}
             <div>正解 ${rec.correct} 回 ／ 不正解 ${rec.wrong} 回</div>

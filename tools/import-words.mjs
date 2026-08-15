@@ -192,7 +192,7 @@ function serialize(words) {
   );
 
   return `/**
- * TOEIC 頻出単語データ
+ * 英単語データ
  *
  * このファイルは tools/import-words.mjs によって生成・更新されます。
  * 手で編集しても構いませんが、再取り込みの際は既存の id・例文・カテゴリが引き継がれます。
@@ -206,7 +206,7 @@ function serialize(words) {
  *   note     : 補足（混同しやすい語など／空でも可）
  *   example  : 例文（英語／空でも可）
  *   exampleJa: 例文（日本語訳／空でも可）
- *   level    : 目標スコア帯 (600 / 750 / 900)
+ *   level    : 難易度 (600=レベル1 / 750=レベル2 / 900=レベル3)
  *   category : 出題されやすい場面
  */
 const WORD_DATA = [

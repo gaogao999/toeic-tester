@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>TOEIC 単語トレーナー</title>
+<title>EIS合格応援アプリ</title>
 <link rel="stylesheet" href="css/style.css" />
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📘</text></svg>" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>" />
 </head>
 <body>
 
 <header class="app-header">
-  <h1 class="app-title">📘 TOEIC 単語トレーナー</h1>
+  <h1 class="app-title">🎓 EIS合格応援アプリ</h1>
   <nav class="tabs" id="tabs">
     <button class="tab is-active" data-view="home">ホーム</button>
     <button class="tab" data-view="flashcard">単語カード</button>
@@ -62,9 +62,9 @@
           <span>レベル</span>
           <select id="filter-level">
             <option value="all">すべて</option>
-            <option value="600">600点目標</option>
-            <option value="750">750点目標</option>
-            <option value="900">900点目標</option>
+            <option value="600">レベル1（基礎）</option>
+            <option value="750">レベル2（標準）</option>
+            <option value="900">レベル3（応用）</option>
           </select>
         </label>
         <label class="field">
@@ -177,7 +177,7 @@
           <button class="mode-card" data-quiz-mode="fill">
             <span class="mode-icon">✍️</span>
             <span class="mode-name">例文穴埋め</span>
-            <span class="mode-desc">Part 5 形式で空所の語を打つ</span>
+            <span class="mode-desc">文脈に合う語を打つ</span>
           </button>
           <button class="mode-card" data-quiz-mode="listening">
             <span class="mode-icon">🎧</span>
