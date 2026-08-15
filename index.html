@@ -36,8 +36,8 @@
         <span class="stat-unit">語</span>
       </div>
       <div class="stat-card">
-        <span class="stat-label">マスター</span>
-        <span class="stat-value accent-green" id="home-mastered">0</span>
+        <span class="stat-label">覚えた ✓</span>
+        <span class="stat-value accent-green" id="home-learned">0</span>
         <span class="stat-unit">語</span>
       </div>
       <div class="stat-card">
@@ -75,6 +75,8 @@
           <span>対象</span>
           <select id="filter-scope">
             <option value="all">すべての単語</option>
+            <option value="learned">✓ 覚えた単語だけ</option>
+            <option value="unlearned">まだ覚えていない単語だけ</option>
             <option value="due">復習期限の単語</option>
             <option value="weak">苦手な単語</option>
             <option value="starred">★ をつけた単語</option>
@@ -119,6 +121,7 @@
             <span class="badge-row">
               <span class="badge" id="fc-level"></span>
               <span class="badge badge-ghost" id="fc-category"></span>
+              <span class="badge badge-check" id="fc-learned-badge" hidden>✓ 覚えた</span>
             </span>
             <p class="card-word" id="fc-word">—</p>
             <p class="card-phonetic" id="fc-phonetic"></p>
@@ -142,7 +145,7 @@
 
       <div class="answer-buttons">
         <button class="btn btn-danger" id="fc-again">まだ覚えていない</button>
-        <button class="btn btn-success" id="fc-known">覚えた</button>
+        <button class="btn btn-success" id="fc-known">✓ 覚えた</button>
       </div>
 
       <div class="nav-buttons">
@@ -156,33 +159,34 @@
   <!-- ============ クイズ ============ -->
   <section class="view" id="view-quiz">
     <div class="empty-state" id="quiz-empty" hidden>
-      <p>クイズを作るには4語以上必要です。ホームで出題範囲を広げてください。</p>
+      <p>対象の単語がありません。ホームで出題範囲を変えてください。</p>
       <button class="btn btn-secondary" data-view="home">ホームへ戻る</button>
     </div>
 
     <div id="quiz-setup">
       <div class="panel">
         <h2 class="panel-title">出題形式を選ぶ</h2>
+        <p class="hint">どの形式も、答えの英単語をキーボードで入力します。</p>
         <div class="mode-grid">
-          <button class="mode-card" data-quiz-mode="en-ja">
-            <span class="mode-icon">🇬🇧→🇯🇵</span>
-            <span class="mode-name">英語 → 日本語</span>
-            <span class="mode-desc">英単語の意味を4択で選ぶ</span>
-          </button>
           <button class="mode-card" data-quiz-mode="ja-en">
-            <span class="mode-icon">🇯🇵→🇬🇧</span>
-            <span class="mode-name">日本語 → 英語</span>
-            <span class="mode-desc">意味に合う英単語を4択で選ぶ</span>
+            <span class="mode-icon">🇯🇵→⌨️</span>
+            <span class="mode-name">意味 → 英単語</span>
+            <span class="mode-desc">日本語の意味を見て英単語を打つ</span>
           </button>
           <button class="mode-card" data-quiz-mode="fill">
             <span class="mode-icon">✍️</span>
             <span class="mode-name">例文穴埋め</span>
-            <span class="mode-desc">Part 5 形式で文脈から選ぶ</span>
+            <span class="mode-desc">Part 5 形式で空所の語を打つ</span>
           </button>
           <button class="mode-card" data-quiz-mode="listening">
             <span class="mode-icon">🎧</span>
             <span class="mode-name">リスニング</span>
-            <span class="mode-desc">読み上げを聞いて単語を選ぶ</span>
+            <span class="mode-desc">読み上げを聞いて単語を打つ</span>
+          </button>
+          <button class="mode-card" data-quiz-mode="spell">
+            <span class="mode-icon">⌨️</span>
+            <span class="mode-name">スペル練習</span>
+            <span class="mode-desc">単語を見ながら正確に打つ</span>
           </button>
         </div>
       </div>
@@ -199,9 +203,29 @@
         <p class="quiz-prompt-label" id="quiz-label"></p>
         <p class="quiz-question" id="quiz-question"></p>
         <button class="btn btn-icon" id="quiz-replay" hidden>🔊 もう一度聞く</button>
-        <div class="choices" id="quiz-choices"></div>
+
+        <form class="answer-form" id="quiz-form" autocomplete="off">
+          <input
+            type="text"
+            id="quiz-input"
+            class="answer-input"
+            placeholder="英単語を入力"
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+          />
+          <p class="answer-hint" id="quiz-hint"></p>
+          <div class="answer-actions">
+            <button type="button" class="btn btn-ghost" id="quiz-hint-btn">ヒント</button>
+            <button type="button" class="btn btn-ghost" id="quiz-skip">わからない</button>
+            <button type="submit" class="btn btn-primary" id="quiz-submit">答える</button>
+          </div>
+        </form>
+
         <div class="quiz-feedback" id="quiz-feedback" hidden>
           <p class="feedback-title" id="feedback-title"></p>
+          <p class="feedback-typed" id="feedback-typed"></p>
           <p class="feedback-detail" id="feedback-detail"></p>
           <p class="feedback-example" id="feedback-example"></p>
           <button class="btn btn-primary" id="quiz-next">次の問題 →</button>
@@ -229,6 +253,15 @@
     <div class="panel">
       <div class="list-toolbar">
         <input type="search" id="list-search" placeholder="単語・意味で検索" />
+        <select id="list-scope">
+          <option value="all">すべて表示</option>
+          <option value="learned">✓ 覚えたものだけ</option>
+          <option value="unlearned">まだのものだけ</option>
+          <option value="due">復習期限のもの</option>
+          <option value="weak">苦手なもの</option>
+          <option value="starred">★ をつけたもの</option>
+          <option value="new">未学習のもの</option>
+        </select>
         <select id="list-sort">
           <option value="id">収録順</option>
           <option value="alpha">アルファベット順</option>
@@ -261,6 +294,16 @@
       <div class="stat-card">
         <span class="stat-label">苦手な単語</span>
         <span class="stat-value accent-red" id="stats-weak">0</span>
+        <span class="stat-unit">語</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">✓ 覚えた</span>
+        <span class="stat-value accent-green" id="stats-learned">0</span>
+        <span class="stat-unit">語</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">マスター</span>
+        <span class="stat-value accent-green" id="stats-mastered">0</span>
         <span class="stat-unit">語</span>
       </div>
     </div>

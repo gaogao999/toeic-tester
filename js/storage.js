@@ -10,7 +10,7 @@ const Storage = (() => {
   const MAX_BOX = INTERVALS.length - 1;
 
   const DEFAULT_STATE = {
-    records: {}, // { [wordId]: { box, correct, wrong, lastStudied, nextDue, starred } }
+    records: {}, // { [wordId]: { box, correct, wrong, lastStudied, nextDue, starred, learned } }
     stats: { totalAnswers: 0, totalCorrect: 0, sessions: 0 },
     history: [], // [{ date: 'YYYY-MM-DD', answered: n, correct: n }]
     settings: { level: 'all', category: 'all', scope: 'all', quizLength: 10, autoSpeak: false }
@@ -62,7 +62,8 @@ const Storage = (() => {
         wrong: 0,
         lastStudied: null,
         nextDue: null,
-        starred: false
+        starred: false,
+        learned: false // 「覚えた」チェック
       }
     );
   }
@@ -100,6 +101,23 @@ const Storage = (() => {
 
     save();
     return rec;
+  }
+
+  /** 「覚えた」チェックの付け外し */
+  function setLearned(wordId, value) {
+    const rec = { ...getRecord(wordId) };
+    rec.learned = value;
+    state.records[wordId] = rec;
+    save();
+    return rec.learned;
+  }
+
+  function toggleLearned(wordId) {
+    return setLearned(wordId, !getRecord(wordId).learned);
+  }
+
+  function isLearned(wordId) {
+    return getRecord(wordId).learned;
   }
 
   function toggleStar(wordId) {
@@ -206,6 +224,9 @@ const Storage = (() => {
     INTERVALS,
     getRecord,
     recordAnswer,
+    setLearned,
+    toggleLearned,
+    isLearned,
     toggleStar,
     isDue,
     isWeak,
