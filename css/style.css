@@ -654,3 +654,75 @@ body {
 .countdown-strip:active { transform: scale(0.99); }
 .strip-days strong { font-size: 1.5rem; font-weight: 700; }
 .strip-more { font-size: 0.75rem; opacity: 0.85; }
+
+/* ---------- 2科目カード ---------- */
+.subjects {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.subject-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+.subject-name { margin: 0; font-size: 0.9rem; font-weight: 700; }
+.subject-count { margin: 0; font-size: 1.35rem; font-weight: 700; line-height: 1.1; }
+.subject-progress { margin: 0; font-size: 0.72rem; color: var(--text-muted); }
+.subject-actions { display: grid; gap: 6px; margin-top: 4px; }
+.subject-actions .btn { padding: 9px 8px; font-size: 0.82rem; }
+
+.section-title {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+/* ---------- 算数 ---------- */
+.start-math { width: 100%; }
+.hint.center { text-align: center; }
+
+.math-panel { min-height: 300px; }
+.math-tag {
+  margin: 0 0 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+.math-question {
+  margin: 0 0 18px;
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+.math-input-row { display: flex; align-items: center; gap: 10px; }
+.math-input-row .answer-input { flex: 1; }
+.math-unit {
+  flex-shrink: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.math-actions { grid-template-columns: 1fr 1.2fr; }
+
+.math-explanation {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
+@media (max-width: 380px) {
+  .subjects { grid-template-columns: 1fr; }
+}

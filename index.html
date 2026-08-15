@@ -16,6 +16,7 @@
     <button class="tab" data-view="countdown">受験まで</button>
     <button class="tab" data-view="flashcard">単語カード</button>
     <button class="tab" data-view="quiz">クイズ</button>
+    <button class="tab" data-view="math">算数</button>
     <button class="tab" data-view="list">単語一覧</button>
     <button class="tab" data-view="stats">学習記録</button>
   </nav>
@@ -31,6 +32,29 @@
       <span class="strip-more">カレンダー ›</span>
     </button>
 
+    <div class="subjects">
+      <div class="subject-card">
+        <p class="subject-name">📖 英語</p>
+        <p class="subject-count"><span id="subj-word-total">0</span> 語</p>
+        <div class="progress-bar slim"><div class="progress-fill" id="subj-word-bar"></div></div>
+        <p class="subject-progress" id="subj-word-progress">覚えた 0 語</p>
+        <div class="subject-actions">
+          <button class="btn btn-primary" data-view="flashcard">単語カード</button>
+          <button class="btn btn-secondary" data-view="quiz">クイズ</button>
+        </div>
+      </div>
+      <div class="subject-card">
+        <p class="subject-name">🔢 算数</p>
+        <p class="subject-count"><span id="subj-math-total">0</span> 問</p>
+        <div class="progress-bar slim"><div class="progress-fill" id="subj-math-bar"></div></div>
+        <p class="subject-progress" id="subj-math-progress">正解した 0 問</p>
+        <div class="subject-actions">
+          <button class="btn btn-primary" data-view="math">算数を解く</button>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">英語の学習状況</h2>
     <div class="dashboard">
       <div class="stat-card">
         <span class="stat-label">収録単語</span>
@@ -63,7 +87,7 @@
     </div>
 
     <div class="panel">
-      <h2 class="panel-title">出題範囲の設定</h2>
+      <h2 class="panel-title">英語の出題範囲</h2>
       <div class="filters">
         <label class="field">
           <span>レベル</span>
@@ -297,6 +321,104 @@
     </div>
   </section>
 
+  <!-- ============ 算数 ============ -->
+  <section class="view" id="view-math">
+    <div id="math-setup">
+      <div class="panel">
+        <h2 class="panel-title">算数の出題範囲</h2>
+        <div class="filters">
+          <label class="field">
+            <span>分野</span>
+            <select id="math-category"></select>
+          </label>
+          <label class="field">
+            <span>レベル</span>
+            <select id="math-level">
+              <option value="all">すべて</option>
+              <option value="1">レベル1（基礎）</option>
+              <option value="2">レベル2（標準）</option>
+              <option value="3">レベル3（応用）</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>出題数</span>
+            <select id="math-length">
+              <option value="5">5問</option>
+              <option value="10" selected>10問</option>
+              <option value="20">20問</option>
+              <option value="9999">すべて</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>対象</span>
+            <select id="math-scope">
+              <option value="all">すべての問題</option>
+              <option value="unlearned">まだ正解していない問題</option>
+              <option value="weak">間違えた問題</option>
+            </select>
+          </label>
+        </div>
+        <p class="hint" id="math-count">対象: 0 問</p>
+      </div>
+      <button class="btn btn-primary btn-lg start-math" id="math-start">算数を解く</button>
+      <p class="hint center">問題文は英語です。答えは数字だけを入力します。</p>
+    </div>
+
+    <div id="math-body" hidden>
+      <div class="session-bar">
+        <span id="math-counter">0 / 0</span>
+        <div class="progress-bar slim"><div class="progress-fill" id="math-progress"></div></div>
+        <span class="score" id="math-score">正解 0</span>
+      </div>
+
+      <div class="panel math-panel">
+        <p class="math-tag" id="math-tag"></p>
+        <p class="math-question" id="math-question"></p>
+
+        <form class="answer-form" id="math-form" autocomplete="off">
+          <div class="math-input-row">
+            <input
+              type="text"
+              id="math-input"
+              class="answer-input"
+              placeholder="答えを入力"
+              inputmode="decimal"
+              autocomplete="off"
+              autocorrect="off"
+              spellcheck="false"
+            />
+            <span class="math-unit" id="math-unit"></span>
+          </div>
+          <div class="answer-actions math-actions">
+            <button type="button" class="btn btn-ghost" id="math-skip">わからない</button>
+            <button type="submit" class="btn btn-primary" id="math-submit">答える</button>
+          </div>
+        </form>
+
+        <div class="quiz-feedback" id="math-feedback" hidden>
+          <p class="feedback-title" id="math-feedback-title"></p>
+          <p class="feedback-typed" id="math-feedback-answer"></p>
+          <p class="math-explanation" id="math-explanation"></p>
+          <button class="btn btn-primary" id="math-next">次の問題 →</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="math-result" hidden>
+      <div class="panel result-panel">
+        <p class="result-emoji" id="math-result-emoji">🎉</p>
+        <h2 class="result-score"><span id="math-result-correct">0</span> / <span id="math-result-total">0</span> 正解</h2>
+        <p class="result-rate" id="math-result-rate">正答率 0%</p>
+        <div class="result-list" id="math-result-list"></div>
+        <div class="result-actions">
+          <button class="btn btn-primary" id="math-retry">もう一度</button>
+          <button class="btn btn-secondary" id="math-wrong-only" hidden>間違えた問題だけ</button>
+          <button class="btn btn-ghost" data-view="home">ホームへ</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ 単語一覧 ============ -->
   <section class="view" id="view-list">
     <div class="panel">
@@ -384,6 +506,7 @@
 <div class="toast" id="toast" hidden></div>
 
 <script src="js/data.js"></script>
+<script src="js/math-data.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/app.js"></script>
 </body>

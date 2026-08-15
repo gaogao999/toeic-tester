@@ -19,7 +19,11 @@ const Storage = (() => {
       scope: 'all',
       quizLength: 10,
       autoSpeak: false,
-      examDate: '2027-01-07' // 受験日（EIS Grade 8 入学試験）
+      examDate: '2027-01-07', // 受験日（EIS Grade 8 入学試験）
+      mathLevel: 'all',
+      mathCategory: 'all',
+      mathScope: 'all',
+      mathLength: 10
     }
   };
 

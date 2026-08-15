@@ -121,6 +121,7 @@
     if (name === 'countdown') renderCountdownView();
     if (name === 'flashcard') startFlashcards();
     if (name === 'quiz') resetQuizToSetup();
+    if (name === 'math') resetMathToSetup();
     if (name === 'list') renderListFromTop();
     if (name === 'stats') renderStats();
   }
@@ -143,6 +144,15 @@
 
     const days = daysUntilExam();
     $('#home-countdown').textContent = days >= 0 ? days : '—';
+
+    // 2科目（英語・算数）の進み具合
+    const mathSolved = MATH_DATA.filter((p) => Storage.isLearned(p.id)).length;
+    $('#subj-word-total').textContent = WORD_DATA.length;
+    $('#subj-word-progress').textContent = `覚えた ${learned} 語`;
+    $('#subj-word-bar').style.width = `${(learned / WORD_DATA.length) * 100}%`;
+    $('#subj-math-total').textContent = MATH_DATA.length;
+    $('#subj-math-progress').textContent = `正解した ${mathSolved} 問`;
+    $('#subj-math-bar').style.width = `${(mathSolved / MATH_DATA.length) * 100}%`;
 
     $('#home-total').textContent = WORD_DATA.length;
     $('#home-studied').textContent = studied;
@@ -714,6 +724,192 @@
   }
 
   // ============================================================
+  // 算数
+  // ============================================================
+
+  const mathQuiz = { questions: [], index: 0, correct: 0, results: [], answered: false };
+
+  function getFilteredMath() {
+    const s = Storage.getSettings();
+    return MATH_DATA.filter((p) => {
+      if (s.mathLevel !== 'all' && String(p.level) !== String(s.mathLevel)) return false;
+      if (s.mathCategory !== 'all' && p.category !== s.mathCategory) return false;
+      if (s.mathScope === 'unlearned') return !Storage.isLearned(p.id);
+      if (s.mathScope === 'weak') return Storage.getRecord(p.id).wrong > 0;
+      return true;
+    });
+  }
+
+  function updateMathCount() {
+    $('#math-count').textContent = `対象: ${getFilteredMath().length} 問`;
+  }
+
+  /** 答えの表記ゆれを吸収する。分数（3/4）も受け付ける */
+  function toNumber(text) {
+    const t = String(text).trim().replace(/[,\s]/g, '').replace(/^\+/, '');
+    if (/^-?\d+(\.\d+)?$/.test(t)) return Number(t);
+    const frac = t.match(/^(-?\d+)\/(\d+)$/);
+    if (frac) return Number(frac[1]) / Number(frac[2]);
+    return NaN;
+  }
+
+  function isMathCorrect(input, answer) {
+    const a = toNumber(input);
+    const b = toNumber(answer);
+    if (Number.isFinite(a) && Number.isFinite(b)) return Math.abs(a - b) < 1e-9;
+    return String(input).trim().toLowerCase() === String(answer).trim().toLowerCase();
+  }
+
+  function resetMathToSetup() {
+    updateMathCount();
+    $('#math-body').hidden = true;
+    $('#math-result').hidden = true;
+    $('#math-setup').hidden = false;
+  }
+
+  function startMath(override) {
+    const settings = Storage.getSettings();
+    const source = override || shuffle(getFilteredMath());
+    mathQuiz.questions = source.slice(0, override ? source.length : settings.mathLength);
+    mathQuiz.index = 0;
+    mathQuiz.correct = 0;
+    mathQuiz.results = [];
+
+    if (mathQuiz.questions.length === 0) {
+      toast('出題できる問題がありません');
+      return;
+    }
+
+    Storage.incrementSessions();
+    $('#math-setup').hidden = true;
+    $('#math-result').hidden = true;
+    $('#math-body').hidden = false;
+    renderMathQuestion();
+  }
+
+  function renderMathQuestion() {
+    const p = mathQuiz.questions[mathQuiz.index];
+    mathQuiz.answered = false;
+
+    $('#math-counter').textContent = `${mathQuiz.index + 1} / ${mathQuiz.questions.length}`;
+    $('#math-progress').style.width = `${(mathQuiz.index / mathQuiz.questions.length) * 100}%`;
+    $('#math-score').textContent = `正解 ${mathQuiz.correct}`;
+    $('#math-tag').textContent = `${p.category} ／ ${levelLabel(p.level)}`;
+    $('#math-question').textContent = p.question;
+    $('#math-unit').textContent = p.unit;
+    $('#math-unit').hidden = !p.unit;
+
+    const input = $('#math-input');
+    input.value = '';
+    input.disabled = false;
+    input.classList.remove('is-correct', 'is-wrong');
+    $('#math-form').hidden = false;
+    $('#math-feedback').hidden = true;
+    input.focus();
+  }
+
+  function gradeMath(typed) {
+    const p = mathQuiz.questions[mathQuiz.index];
+    const isCorrect = typed.trim() !== '' && isMathCorrect(typed, p.answer);
+
+    mathQuiz.answered = true;
+    Storage.recordAnswer(p.id, isCorrect);
+    if (isCorrect) {
+      Storage.setLearned(p.id, true);
+      mathQuiz.correct += 1;
+    }
+    mathQuiz.results.push({ problem: p, isCorrect, typed: typed.trim() });
+
+    const input = $('#math-input');
+    input.disabled = true;
+    input.classList.add(isCorrect ? 'is-correct' : 'is-wrong');
+
+    $('#math-score').textContent = `正解 ${mathQuiz.correct}`;
+    $('#math-feedback-title').textContent = isCorrect ? '⭕️ 正解' : '❌ 不正解';
+    $('#math-feedback-answer').textContent = isCorrect
+      ? ''
+      : `正解: ${p.answer}${p.unit ? ' ' + p.unit : ''}${typed.trim() ? `（あなたの入力: ${typed.trim()}）` : ''}`;
+    $('#math-explanation').textContent = p.explanation;
+    $('#math-next').textContent =
+      mathQuiz.index === mathQuiz.questions.length - 1 ? '結果を見る →' : '次の問題 →';
+    $('#math-feedback').hidden = false;
+    $('#math-next').focus();
+  }
+
+  function nextMathQuestion() {
+    if (mathQuiz.index === mathQuiz.questions.length - 1) {
+      showMathResult();
+      return;
+    }
+    mathQuiz.index += 1;
+    renderMathQuestion();
+  }
+
+  function showMathResult() {
+    const total = mathQuiz.questions.length;
+    const rate = Math.round((mathQuiz.correct / total) * 100);
+
+    $('#math-body').hidden = true;
+    $('#math-result').hidden = false;
+    $('#math-result-correct').textContent = mathQuiz.correct;
+    $('#math-result-total').textContent = total;
+    $('#math-result-rate').textContent = `正答率 ${rate}%`;
+    $('#math-result-emoji').textContent =
+      rate === 100 ? '🏆' : rate >= 80 ? '🎉' : rate >= 50 ? '💪' : '📖';
+
+    $('#math-result-list').innerHTML = mathQuiz.results
+      .map(
+        (r) => `<div class="result-item ${r.isCorrect ? 'ok' : 'ng'}">
+          <span>${r.isCorrect ? '⭕️' : '❌'}</span>
+          <b>${escapeHtml(r.problem.category)}</b>
+          <span>${escapeHtml(r.isCorrect ? r.problem.question : `正解 ${r.problem.answer}`)}</span>
+        </div>`
+      )
+      .join('');
+
+    const wrong = mathQuiz.results.filter((r) => !r.isCorrect).map((r) => r.problem);
+    $('#math-wrong-only').hidden = wrong.length === 0;
+    $('#math-wrong-only').onclick = () => startMath(wrong);
+  }
+
+  function initMath() {
+    $('#math-category').innerHTML =
+      '<option value="all">すべて</option>' +
+      MATH_CATEGORIES.map((c) => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+
+    const s = Storage.getSettings();
+    $('#math-category').value = s.mathCategory;
+    $('#math-level').value = s.mathLevel;
+    $('#math-scope').value = s.mathScope;
+    $('#math-length').value = String(s.mathLength);
+
+    const bind = (sel, key, cast) => {
+      $(sel).addEventListener('change', (e) => {
+        Storage.updateSettings({ [key]: cast ? cast(e.target.value) : e.target.value });
+        updateMathCount();
+      });
+    };
+    bind('#math-category', 'mathCategory');
+    bind('#math-level', 'mathLevel');
+    bind('#math-scope', 'mathScope');
+    bind('#math-length', 'mathLength', Number);
+
+    $('#math-start').addEventListener('click', () => startMath());
+    $('#math-retry').addEventListener('click', () => startMath());
+    $('#math-next').addEventListener('click', nextMathQuestion);
+    $('#math-skip').addEventListener('click', () => {
+      if (!mathQuiz.answered) gradeMath('');
+    });
+
+    // Enter で採点 → もう一度 Enter で次の問題へ
+    $('#math-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (mathQuiz.answered) nextMathQuestion();
+      else gradeMath($('#math-input').value);
+    });
+  }
+
+  // ============================================================
   // 単語一覧
   // ============================================================
 
@@ -944,6 +1140,7 @@
     Speech.init();
     initFilters();
     initCountdown();
+    initMath();
     initFlashcards();
     initQuiz();
     initList();
