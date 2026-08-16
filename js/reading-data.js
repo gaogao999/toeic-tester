@@ -6131,6 +6131,2055 @@ const READING_DATA = [
         explanation: '夜空については、数千の星が見える・それは宇宙のごく一部・数え切れないほど星があると書かれているが、「宇宙人が実在する証明になる」とは書かれていない。'
       }
     ]
+  },
+  {
+    id: 'r97',
+    title: '映画クラブのポスター係',
+    level: 4,
+    topic: '手紙・メール',
+    words: 169,
+    passage:
+      'Dear Mrs. Simpson, I\'m sorry I could not attend the film club meeting today. I had an appointment that my mother wouldn\'t allow me to miss. I really wanted to go and am sure that I\'ll be able to make the next one.' + '\n' +
+      'Anyway, I\'m wondering which students decided to work on the posters for our next event. As I remember from our last meeting, Janet was interested in making them. There were a number of others interested, too. Nothing was decided, though, and I\'m wondering what decision was reached.' + '\n' +
+      'I\'m asking because I\'m really interested in helping to create the posters. I would be happy to help other students or to work on my own. If there are already too many students working on posters, I\'d be happy to do something else for the club. I really like being a member and would be satisfied if I could do anything to help. Thanks for your time, Mrs. Simpson. Sorry again that I couldn\'t attend the meeting. Sincerely, Becky',
+    glossary: [
+      { w: 'attend', m: '出席する' },
+      { w: 'appointment', m: '予約・約束' },
+      { w: 'satisfied', m: '満足した' }
+    ],
+    questions: [
+      {
+        q: 'Why did Becky write this e-mail?',
+        choices: [
+          'To find out if she can work on the posters',
+          'To tell Mrs. Simpson that she had an appointment',
+          'To ask Mrs. Simpson about the club\'s next event',
+          'To explain that she\'ll be missing all the meetings'
+        ],
+        answer: 0,
+        explanation: '第3段落の I\'m asking because I\'m really interested in helping to create the posters（ポスター作りを手伝いたくて尋ねている）が目的。欠席の報告や謝罪は前置きにすぎない。'
+      },
+      {
+        q: 'In the passage, the word allow is closest in meaning to',
+        choices: [
+          'loan',
+          'give',
+          'permit',
+          'prevent'
+        ],
+        answer: 2,
+        explanation: 'allow は「許す」。母が欠席を許さなかった用事、という文脈なので permit（許可する）が最も近い。prevent（妨げる）は逆の意味。'
+      },
+      {
+        q: 'In the passage, the word others refers to',
+        choices: [
+          'events',
+          'students',
+          'projects',
+          'meetings'
+        ],
+        answer: 1,
+        explanation: '直前の文に Janet was interested in making them（ジャネットが作りたがっていた）とあり、others はそれに続く「他にも興味を持った人たち」つまり生徒（students）を指す。'
+      },
+      {
+        q: 'What would Becky likely do for the club?',
+        choices: [
+          'Make it a bigger club with more events',
+          'Make sure Janet makes the posters for it',
+          'Take over the poster-making project for it',
+          'Help it by making posters or in another way'
+        ],
+        answer: 3,
+        explanation: '最終段落で「他の生徒を手伝っても一人でやってもよいし、係が埋まっていれば別の仕事でもよい」と述べている。ポスター作りか別の形かでクラブを手伝う、が本文どおり。'
+      }
+    ]
+  },
+  {
+    id: 'r98',
+    title: 'フランスでの海外生活プログラム',
+    level: 4,
+    topic: '学校生活',
+    words: 318,
+    passage:
+      'Twenty-five students from Walling School are currently living in France. They are there for three months as part of a living-abroad project. The 16- and 17-year-old students are living with French families and attending a French school. Most of the students have taken French language classes for 3 or 4 years and are finally getting an opportunity to use their French.' + '\n' +
+      'Not only are students learning a new language, but they\'re learning about a new culture, too. Students have been particularly surprised about the French attitude towards food. "They won\'t leave anything on their plate," says Vanessa Athol. "They aren\'t wasteful at all." Vanessa has vowed to be more careful with waste when she returns to the United States.' + '\n' +
+      'The group\'s chaperone, Mrs. Smith, has been pleased with the students\' acquisition of language. "Even the most timid are trying their best to speak. The students are learning a lot. I\'m very impressed," she said. Mrs. Smith added that she thinks living with a French family makes a difference because students are forced to speak French when they are at home. When students live in a hotel or group house with other American students, they miss out on the opportunity to learn about French culture and to speak French. We\'re all very grateful to the French families who are hosting us."' + '\n' +
+      'The French families are happy to have the students, as they are getting to learn about American culture. Both groups will be celebrating the exchange at a large potluck dinner at the end of the stay. There will be a slide show of memories and the students will speak about their experiences. Currently, the American students are periodically posting pictures and student essays on the Walling School website. "Living in France is an experience I\'ll never forget," writes student Tina Davis. "I know I\'ll want to eat these croissants and this Camembert for the rest of my life!"',
+    glossary: [
+      { w: 'chaperone', m: '引率者' },
+      { w: 'acquisition', m: '習得' },
+      { w: 'potluck', m: '持ち寄り料理の' }
+    ],
+    questions: [
+      {
+        q: 'What would be the most suitable headline for this article?',
+        choices: [
+          'French Families Love America',
+          'Student Tina Davis Lives in France',
+          'Walling School Website Posts Student Essays',
+          'Walling School Students Stay Abroad in France'
+        ],
+        answer: 3,
+        explanation: '記事全体は Walling School の25人がフランスで3か月暮らすプログラムの報告。生徒の海外滞在を伝える見出しが最も適切。他の選択肢は記事の一部分にすぎない。'
+      },
+      {
+        q: 'What is suggested about the culture in France?',
+        choices: [
+          'It scares the students.',
+          'It requires fluency in French.',
+          'It can be learned from a book.',
+          'It\'s different from the culture in America.'
+        ],
+        answer: 3,
+        explanation: '第2段落で生徒たちが「フランスの食に対する姿勢に驚いた」とある。驚くのは自国の文化と違うからで、アメリカと文化が異なることが示唆されている。'
+      },
+      {
+        q: 'Based on the article, what does Mrs. Smith probably think about the French language?',
+        choices: [
+          'It\'s more beautiful than Spanish.',
+          'It is very important for international communication.',
+          'It\'s best to learn it from a French family in France.',
+          'It is something each and every American student needs to know.'
+        ],
+        answer: 2,
+        explanation: '第3段落でスミス先生は「フランス人家庭で暮らすと家でもフランス語を話さざるを得ないので違いが出る」と述べている。フランスの家庭から学ぶのが一番、が先生の考え。'
+      },
+      {
+        q: 'In the passage, the word vowed is closest in meaning to',
+        choices: [
+          'saved',
+          'received',
+          'changed',
+          'promised'
+        ],
+        answer: 3,
+        explanation: 'vow は「誓う」。ヴァネッサが帰国後は無駄遣いに気をつけると誓った、という文脈なので promised（約束した）が最も近い。'
+      },
+      {
+        q: 'In the passage, the word acquisition is closest in meaning to',
+        choices: [
+          'gaining',
+          'speaking',
+          'purchase',
+          'responsibility'
+        ],
+        answer: 0,
+        explanation: 'acquisition は「習得」。言語の習得に satisfied という文脈なので gaining（得ること）が最も近い。purchase（購入）は買い物の意味なので不適。'
+      },
+      {
+        q: 'According to the article, how will the students conclude their stay?',
+        choices: [
+          'They will take a French exam.',
+          'They will have a party together.',
+          'They will visit Paris and have great fun.',
+          'They will stay in a hostel or group house.'
+        ],
+        answer: 1,
+        explanation: '最終段落に「滞在の最後に大きな持ち寄りディナーで交流を祝う」とある。一緒にパーティーをする、が本文どおり。'
+      }
+    ]
+  },
+  {
+    id: 'r99',
+    title: 'パンデミックの歴史',
+    level: 4,
+    topic: '科学',
+    words: 326,
+    passage:
+      'A pandemic is an infectious disease that spreads across a large region, continent, or throughout the world. A pandemic is not simply a disease that exists around the world. It must also be contagious, spreading from person to person. There are pandemics in the world today such as SARS and H1N1 (popularly known as swine flu), but there have been many throughout history that have had major effects on various populations. Pandemics have the capability of killing huge portions of a place\'s people. In 1347, the Black Death, a plague in Europe, spread and killed 75 million people, a whopping one-third of Europe\'s population.' + '\n' +
+      'When European explorers began encountering other places in the world, they tended to spread diseases to local population. One notable example is the complete destruction of the Guanches on the Canary Islands. The majority of tribe members were killed by disease brought by Spanish invaders in the 15th century. In fact, many countries and cultures faced destructive pandemics after international exploration became possible. It is believed that Columbus and his crew brought a strain of syphilis back with them to Europe from the New World. In Europe, the virus was able to mutate because of the location\'s different conditions. Additionally, Europeans that were sent to work in Asia were killed by disease. Intercultural mixing, an exposure to new viruses, and the transportation of diseases led to many pandemics across the world. Today, one of the biggest pandemics in the world is HIV/AIDS. The introduction of AIDS in 1969 has led to the infection of many people. The first case in the U.S. was reported in 1981 in Los Angeles. Since then, AIDS has claimed many lives. In particular, Africa has suffered from the virus. These days, up to 25% of the South and East African populations may be infected, which makes AIDS an undying and pervasive pandemic. Many efforts are being made to help prevent the spread of AIDS through proper education.',
+    glossary: [
+      { w: 'contagious', m: '伝染性の' },
+      { w: 'mutate', m: '変異する' },
+      { w: 'pervasive', m: '蔓延する' }
+    ],
+    questions: [
+      {
+        q: 'Which title best summarizes the main idea of the passage?',
+        choices: [
+          'The Spread of HIV/AIDS',
+          'Europeans Creating Pandemics',
+          'Infection and the Death of Africans',
+          'The Problem of Pandemics in Our World'
+        ],
+        answer: 3,
+        explanation: '本文はパンデミックの定義から始まり、黒死病・大航海時代の疫病・エイズまで、世界におけるパンデミックの問題全体を扱っている。個別の話題は例にすぎない。'
+      },
+      {
+        q: 'In the passage, the word contagious is closest in meaning to',
+        choices: [
+          'glowing',
+          'catchable',
+          'expressible',
+          'dangerous'
+        ],
+        answer: 1,
+        explanation: 'contagious は「伝染性の」。spreading from person to person（人から人へ広がる）と直後に説明されているので catchable（うつりやすい）が最も近い。'
+      },
+      {
+        q: 'In the passage, the word them refers to',
+        choices: [
+          'strains of syphilis',
+          'Columbus and his crew',
+          'destructive pandemics',
+          'Europe and the New World'
+        ],
+        answer: 1,
+        explanation: 'them は Columbus and his crew brought a strain of syphilis back with them の中の語で、持ち帰った主体であるコロンブスと乗組員を指す。'
+      },
+      {
+        q: 'In the passage, the words undying and pervasive are closest in meaning to',
+        choices: [
+          'critical and illegal',
+          'legitimate and affirming',
+          'unstoppable and affecting few',
+          'unstoppable and affecting all'
+        ],
+        answer: 3,
+        explanation: 'undying and pervasive は「終わらず蔓延する」。直前の「南・東アフリカの人口の25%が感染しているかもしれない」から、止められず広く影響する、の意味。'
+      },
+      {
+        q: 'Based on the passage, what was probably true about syphilis?',
+        choices: [
+          'It was easy to cure in its early stages.',
+          'It hadn\'t been a European problem before Columbus.',
+          'It killed many native populations, including many in Africa.',
+          'It was a large-scale pandemic that spread around the world.'
+        ],
+        answer: 1,
+        explanation: '第2段落に「コロンブス一行が梅毒をヨーロッパへ持ち帰ったと考えられている」とある。つまりそれ以前のヨーロッパには梅毒の問題はなかったと推測できる。'
+      },
+      {
+        q: 'The author mentions all of the following EXCEPT',
+        choices: [
+          'the Black Death in medieval Europe',
+          'the problem of AIDS in Africa',
+          'the nature of Asian diseases',
+          'the Guanche population in the Canary Islands'
+        ],
+        answer: 2,
+        explanation: '黒死病・アフリカのエイズ・グアンチェ族は本文で言及されているが、「アジアの病気の性質」は述べられていない（ヨーロッパ人がアジアで病死したとあるだけ）。'
+      },
+      {
+        q: 'What have people done to try to prevent AIDS in Africa?',
+        choices: [
+          'Set up hospitals',
+          'Educated the people',
+          'Brought Africans to other places',
+          'Complained to 25% of the population'
+        ],
+        answer: 1,
+        explanation: '最終文に「適切な教育を通じてエイズの拡大を防ぐ努力がなされている」とある。人々を教育した、が本文どおり。'
+      },
+      {
+        q: 'Why did the Guanches in the Canary Islands disappear?',
+        choices: [
+          'The tribe caught a bad strain of syphilis.',
+          'The tribe was uneducated about pandemics.',
+          'Europeans deliberately infected the people.',
+          'The Spanish brought disease when they landed on the island.'
+        ],
+        answer: 3,
+        explanation: '第2段落に「グアンチェ族の大半は15世紀にスペインの侵略者が持ち込んだ病気で殺された」とある。スペイン人が上陸時に病気を持ち込んだから。'
+      }
+    ]
+  },
+  {
+    id: 'r100',
+    title: '初出場のフットボールの試合',
+    level: 4,
+    topic: '手紙・メール',
+    words: 277,
+    passage:
+      'Dear Mike, Today we had an amazing football game. It was wet and cold but our quarterback had a great game anyway. He played spectacularly but the other team also played well. In the fourth quarter the score was tied up and my coach called me in to play defense. I hadn\'t played all game so I was pretty nervous. Then, on the very first play, the other team ran the ball right at me. I made a decent tackle and stopped the running back short of the first down. The ball was back in our possession.' + '\n' +
+      'Everyone was really impressed and said it was an excellent tackle. I was happy with my performance. But as soon as our offense was on the field, we lost the ball and had to go right back out. This time the other team\'s quarterback took the ball and passed it right over the middle. I dove to my left and caught the ball on my fingertips. It was an interception! I was so excited that I forgot to give the ball back to the referee and my coach had to take it from me on the sideline. He said I could keep it after the game. After that we scored and won the game. The coach said I was the most valuable player of the game and said that I would be starting next week. I thought I would write you a quick e-mail letting you know how the game went. After all, you\'re the one who inspired me to start playing football! I hope you are having a good day and I\'ll talk to you soon. Yours truly, Andrew',
+    glossary: [
+      { w: 'possession', m: '保有・ボール保持' },
+      { w: 'interception', m: 'パスの奪取' },
+      { w: 'inspire', m: '刺激を与える' }
+    ],
+    questions: [
+      {
+        q: 'Which of the following is true about Andrew?',
+        choices: [
+          'He scored all the points in the game.',
+          'He played really well in the first quarter.',
+          'He is friends with the referee of the football game.',
+          'He was content with his performance as a defenseman.'
+        ],
+        answer: 3,
+        explanation: '第2段落冒頭に I was happy with my performance（自分のプレーに満足した）とあり、守備での活躍が描かれている。content は happy の言い換え。'
+      },
+      {
+        q: 'According to the e-mail, what did Andrew get after the game?',
+        choices: [
+          'The ball from the game',
+          'An e-mail from his friend',
+          'Team uniforms from the coach',
+          'A gold star for his MVP performance'
+        ],
+        answer: 0,
+        explanation: 'インターセプトしたボールについてコーチが He said I could keep it after the game（試合後に持っていていいと言った）と述べている。試合球をもらった、が本文どおり。'
+      }
+    ]
+  },
+  {
+    id: 'r101',
+    title: 'エバーグレーズを脅かすビルマニシキヘビ',
+    level: 4,
+    topic: '環境',
+    words: 205,
+    passage:
+      'Alligators have always been the most dangerous predators of the Florida Everglades but their long-held position is now being challenged by a growing population of Burmese pythons.' + '\n' +
+      'The Burmese python, a giant snake measuring up to 20 feet long and weighing up to 200 pounds, is very popular among exotic pet owners. However, as the deadly snakes grow, they become more difficult to cage and handle. To avoid dealing with the snakes, the owners irresponsibly release them into the wild. Since the Everglades is quite similar to the python\'s native environment of Southeast Asia, they survive and prosper without difficulty. The issue with the Burmese pythons is their choice of meals. They eat alligators and endangered birds, which creates a strain on an already fragile ecosystem. Recently a 13-foot-long Burmese python was found with a 5-foot alligator bursting from its stomach. The python died trying to eat the alligator but a larger one would have easily won the struggle. With over 30,000 Burmese pythons now living in the Everglades, a solution to stop this invasive species is necessary. If the pythons are left unchecked, there is a strong possibility they will wipe out a variety of species necessary for the functioning of the Everglades ecosystem.',
+    glossary: [
+      { w: 'predator', m: '捕食者' },
+      { w: 'invasive species', m: '侵略的外来種' },
+      { w: 'fragile', m: '壊れやすい' }
+    ],
+    questions: [
+      {
+        q: 'Based on the article, why are the Burmese pythons found in the Everglades?',
+        choices: [
+          'Their old environment changed.',
+          'They were no longer being hunted by people.',
+          'They migrated to the Everglades from another place.',
+          'They were thrown away by their frustrated owners.'
+        ],
+        answer: 3,
+        explanation: '第2段落に「ヘビが大きくなると扱いにくくなり、飼い主が無責任にも野生に放してしまう」とある。持て余した飼い主に捨てられたから、が本文どおり。'
+      },
+      {
+        q: 'What in particular creates a strain on Everglades ecosystem?',
+        choices: [
+          'The Burmese python\'s ability to swim',
+          'The diet of Burmese pythons',
+          'Alligators eating Burmese pythons',
+          'The number of Burmese pythons living in the Everglades'
+        ],
+        answer: 1,
+        explanation: 'The issue with the Burmese pythons is their choice of meals（問題は食べるもの）に続けて、ワニや絶滅危惧種の鳥を食べて生態系に負担をかけるとある。食性（diet）が原因。'
+      }
+    ]
+  },
+  {
+    id: 'r102',
+    title: 'エイブラハム・リンカーン',
+    level: 4,
+    topic: '伝記',
+    words: 234,
+    passage:
+      'Abraham Lincoln is one of the most famous presidents ever elected in the United States. He is also one of only two American presidents to ever be assassinated. He was born in 1809 in Kentucky on the western frontier. He worked hard and was considered a very strong man. He was self-educated and eventually became a lawyer in the country region of Kentucky.' + '\n' +
+      'After that, he started his career in politics. He was elected to the Illinois Legislature. Lincoln was very outspoken against slavery. In 1860 his anti-slavery campaign won him the Republican nomination for president. He won the election but the American Civil War began shortly after. During the war, Lincoln declared the "Emancipation Proclamation," a speech which introduced the law he is most famous for. This law stated that slavery in America was to be abolished; all slaves were to be freed.' + '\n' +
+      'After the North was victorious over the southern states, Lincoln was very happy to finally get to govern his country in relative peace. However, Lincoln\'s presidency and life would not last much longer. On April 14th, 1865, while attending a play in Washington, D.C., Abraham Lincoln was shot in the back of the head by John Wilkes Booth. Booth, believing the Civil War was still being fought, assassinated the president to further the cause of the Confederate Army. He was tracked down and killed ten days later by Unionist soldiers.',
+    glossary: [
+      { w: 'assassinate', m: '暗殺する' },
+      { w: 'abolish', m: '廃止する' },
+      { w: 'victorious', m: '勝利した' }
+    ],
+    questions: [
+      {
+        q: 'Based on the passage, which of the following is true about Abraham Lincoln?',
+        choices: [
+          'He started his career in Illinois as a lawyer.',
+          'He and John Wilkes Booth knew each other.',
+          'He was a Democrat but soon became independent.',
+          'He was killed at a theater by John Wilkes Booth.'
+        ],
+        answer: 3,
+        explanation: '最終段落に「ワシントンD.C.で観劇中にジョン・ウィルクス・ブースに頭を撃たれた」とある。劇場でブースに殺された、が本文どおり。他の選択肢は本文にない。'
+      },
+      {
+        q: 'What did Abraham Lincoln do before he went into politics?',
+        choices: [
+          'He worked on the western frontier.',
+          'He worked as a lawyer in Kentucky.',
+          'He was a soldier in the countryside.',
+          'He worked to fight slavery in Washington, D.C.'
+        ],
+        answer: 1,
+        explanation: '第1段落末尾に「独学でケンタッキーの田舎の弁護士になった」とあり、その直後に After that, he started his career in politics と続く。政界入りの前は弁護士。'
+      }
+    ]
+  },
+  {
+    id: 'r103',
+    title: 'アーツ・アンド・クラフツ運動',
+    level: 4,
+    topic: '文化',
+    words: 276,
+    passage:
+      'The Arts and Crafts Movement in America came as a response to industrialization in the late 19th and early 20th century. Before the Arts and Crafts Movement, the world was excited about the possibilities offered by machines. Machines were advanced. They could make good-quality products quickly, cheaply, and efficiently. However, when humans seemed too reliant on machines, people became worried and wanted to return to an earlier time. This idea started the Arts and Crafts Movement. Instead of emphasizing very ornate and decorated pieces, the Arts and Crafts Movement was concerned with being true to materials, honest craftsmanship, and simple folk traditions. This movement mainly affected architecture and home furnishings. Simplicity became important - both on the exterior and in the interior of a home. Good, solid craftsmanship was praised. Factories began to produce goods and furniture that were given finishing touches by skilled workers.' + '\n' +
+      'The Arts and Crafts Movement in America was different from the movement in Britain. The British saw the movement as purely anti-industrial while Americans saw the movement as a way to promote the perfect middle-class home. These Americans believed that a simple home would help the American people to think logically and clearly. The simplicity of the American home would prevent people\'s minds from being complicated by complex decoration.' + '\n' +
+      'The remains of the Arts and Crafts Movement can still be seen today. Some say that the Arts and Crafts Movement was a prelude to modernism, which uses simple forms without a lot of decoration. Indeed, much of the architecture and interior design in America today is built on ideas of simplicity in structure, which came from the Arts and Crafts Movement.',
+    glossary: [
+      { w: 'ornate', m: '装飾過多の' },
+      { w: 'craftsmanship', m: '職人の技' },
+      { w: 'prelude', m: '前ぶれ・序章' }
+    ],
+    questions: [
+      {
+        q: 'Which of the following is true of the Arts and Crafts Movement?',
+        choices: [
+          'It emphasized ornate and decorative pieces.',
+          'It mainly affected the middle class in Britain.',
+          'It appeared as resistance to industrialization and machinery.',
+          'It was publicized by many newspapers and in famous museums.'
+        ],
+        answer: 2,
+        explanation: '冒頭に came as a response to industrialization（工業化への反動として起こった）とある。機械への依存を心配した人々が始めた運動なので、工業化・機械への抵抗が正しい。'
+      },
+      {
+        q: 'What did the Americans believe about the Arts and Crafts Movement?',
+        choices: [
+          'The British were responsible for starting it.',
+          'Simple homes no longer existed in America.',
+          'Complex decoration was ugly and distasteful for homes.',
+          'The artistic movement could help simplify the lives of the people.'
+        ],
+        answer: 3,
+        explanation: '第2段落に「アメリカ人は簡素な家がアメリカ人の思考を論理的で明晰にすると信じた」とある。運動が人々の生活を簡素にしてくれる、という考えが本文どおり。'
+      }
+    ]
+  },
+  {
+    id: 'r104',
+    title: '試験週間の食堂の営業時間',
+    level: 4,
+    topic: 'お知らせ',
+    words: 153,
+    passage:
+      'This week our cafeteria is going to have a different schedule. As all of you know, exam week is a very stressful time. We recognize this and want students to have more flexibility in planning their meal times. This semester we\'ll be keeping the cafeteria open longer so that students can find time to eat. We wish you luck during finals and hope that you can enjoy the food (there won\'t be any changes to the menu).' + '\n' +
+      'Below are the exam week hours for the cafeteria.' + '\n' +
+      'Breakfast — Open 7:00 A.M. / Closed 10:30 A.M.' + '\n' +
+      'Lunch — Open 11:30 A.M. / Closed 2:00 P.M.' + '\n' +
+      'Dinner — Open 5:00 P.M. / Closed 7:30 P.M.' + '\n' +
+      'After-hours* — Open 8:00 P.M. / Closed 10:00 P.M.' + '\n' +
+      '*After-hours snacks will not include hot meals, but there will be cold cuts for sandwiches and a salad bar open for any students studying late or kept on campus for athletics.',
+    glossary: [
+      { w: 'flexibility', m: '柔軟性' },
+      { w: 'cold cuts', m: '薄切りの冷製肉' },
+      { w: 'athletics', m: '運動部活動' }
+    ],
+    questions: [
+      {
+        q: 'The students are allowed to eat at all of the following times EXCEPT',
+        choices: [
+          '3:00 P.M.',
+          '12:00 P.M.',
+          '7:00 A.M.',
+          '9:30 P.M.'
+        ],
+        answer: 0,
+        explanation: '営業時間表では昼食は2:00 P.M.まで、夕食は5:00 P.M.から。3:00 P.M.はどの時間帯にも入っておらず食事できない。他の時刻はすべて営業時間内。'
+      },
+      {
+        q: 'Which of the following is NOT true?',
+        choices: [
+          'Students are in an exam period.',
+          'The cafeteria hours have been rescheduled.',
+          'The cafeteria will have more options during after-hours.',
+          'The cafeteria will not be changing the menu composition.'
+        ],
+        answer: 2,
+        explanation: '注意書きに「夜食に温かい料理はないが、サンドイッチ用のコールドカットとサラダバーがある」とある。選択肢が増えるわけではないので「夜食は選択肢が多い」が誤り。'
+      }
+    ]
+  },
+  {
+    id: 'r105',
+    title: 'フロリダ旅行からの手紙',
+    level: 4,
+    topic: '手紙・メール',
+    words: 302,
+    passage:
+      'Dear Mom & Dad, I just wanted to tell you guys how much fun I have been having on vacation in Florida. It has been really awesome staying with Jimmy\'s family and we have been doing so many amazing things. Last night we went out to eat at a seafood restaurant and ate fried shrimp and flounder. The food was really fresh and tasted great. Then we went to a video arcade and got to play all the video games that we wanted. It was really fun and Jimmy and I met some really nice kids there.' + '\n' +
+      'Tomorrow we are going scuba-diving. We have been taking lessons in the pool every afternoon. The hotel has its own instructors to help us learn how to use the equipment. We also have been going to the beach every morning to look for shells. I\'ve found some beautiful ones that I\'ll take home to show you. Jimmy\'s mom gets up while it\'s still dark and brings us with her to see the sunrise. The sunrise looks so beautiful over the water. I wish you could see it.' + '\n' +
+      'So far though, my favorite thing we have done was to go on a boat cruise. We went out on a big boat and got to see all sorts of fish in the water. We saw a family of dolphins too, which was really cool because they were jumping out of the water and getting really high. Then we saw some really beautiful little islands. The captain even let me and Jimmy steer the boat for a little bit.' + '\n' +
+      'I am excited to see you guys again. I have so many stories for you. Florida is great, but I miss home and I miss you. I hope all is well and I will see you soon. Love, Adam.',
+    glossary: [
+      { w: 'flounder', m: 'カレイ・ヒラメ' },
+      { w: 'instructor', m: '指導員' },
+      { w: 'steer', m: '（船などを）操縦する' }
+    ],
+    questions: [
+      {
+        q: 'Adam mentions finishing all of the following activities EXCEPT',
+        choices: [
+          'scuba-diving',
+          'going on a boat cruise',
+          'looking for shells',
+          'playing games at an arcade'
+        ],
+        answer: 0,
+        explanation: 'スキューバダイビングは Tomorrow we are going scuba-diving（明日行く予定）で、まだ終えていない。貝殻探し・アーケード・クルーズはすでにした活動。'
+      },
+      {
+        q: 'Adam and Jimmy did all of the following EXCEPT',
+        choices: [
+          'driving a boat',
+          'eating fried shrimp and flounder',
+          'meeting some friends in an arcade',
+          'taking scuba-diving lessons on the beach'
+        ],
+        answer: 3,
+        explanation: 'レッスンは We have been taking lessons in the pool（プールで受けている）とあり、浜辺でではない。船の操縦・エビとカレイの食事・アーケードでの友達作りは本文にある。'
+      }
+    ]
+  },
+  {
+    id: 'r106',
+    title: 'ベンジャミン・フランクリン',
+    level: 4,
+    topic: '伝記',
+    words: 207,
+    passage:
+      'Benjamin Franklin is one of the most famous Americans to have ever lived. He is recognized by many historians for his contributions to American independence. Franklin was born in 1706 in Boston, Massachusetts, but lived most of his life in Philadelphia. He attended school, but by the age of ten, he had already dropped out to work with his father. He continued his education on his own and was well-known for reading many books. Benjamin Franklin was one of the most respected politicians of his day. He was part of the committee that drafted the Declaration of Independence and was also the United States\' first ambassador to France.' + '\n' +
+      'Outside of politics, he was a renowned inventor and scientist. He was a leading figure of the American Enlightenment. His work with electricity, as well as many other inventions, made him a very wealthy and celebrated person. He invented things like the lightning rod but he never requested a patent. He felt that his inventions should be used by everyone around him and believed that all other inventors should feel the same way about their creations. He was already very wealthy from his books, so to him, scientific research was just out of curiosity rather than for financial success.',
+    glossary: [
+      { w: 'ambassador', m: '大使' },
+      { w: 'renowned', m: '名高い' },
+      { w: 'patent', m: '特許' }
+    ],
+    questions: [
+      {
+        q: 'Which of the following is NOT true about Benjamin Franklin?',
+        choices: [
+          'He worked in France.',
+          'He was a famous inventor.',
+          'He received many patents.',
+          'He invented the lightning rod.'
+        ],
+        answer: 2,
+        explanation: '第2段落に He invented things like the lightning rod but he never requested a patent（避雷針を発明したが特許は申請しなかった）とある。「多くの特許を受けた」が事実と異なる。'
+      },
+      {
+        q: 'All of the following were jobs of Benjamin Franklin EXCEPT',
+        choices: [
+          'an author',
+          'a scientist',
+          'a banker',
+          'a politician'
+        ],
+        answer: 2,
+        explanation: '著述家（books で富を得た）・科学者・政治家はいずれも本文にあるが、銀行家（banker）だったという記述はない。'
+      }
+    ]
+  },
+  {
+    id: 'r107',
+    title: '新石器革命',
+    level: 4,
+    topic: '歴史',
+    words: 209,
+    passage:
+      'The Neolithic Revolution is the term for the first Agricultural Revolution. Around the year 8000 B.C., humans began to make permanent settlements. This was a gigantic change in the way humans lived and would have large ramifications for human society. Before the Neolithic Revolution, people lived in hunter-gatherer societies that were nomadic. This means that they did not have a fixed home but constantly searched for animals to hunt and plants to eat.' + '\n' +
+      'The Neolithic Revolution happened when people began domesticating plants and animals. In order to eat fruits and vegetables, they planted seeds, watered plants, and harvested the crop. Not only were they able to grow their food, but they also found ways to store it. To have meat, milk, and eggs, they tamed animals such as pigs, chickens, and cows. They kept animals and planted gardens close to their homes so they would not have to move around. The Neolithic Revolution also brought about changes in how people acted. With a stable population that existed in one place, these settlements needed new forms of leadership and government. People could also occupy different positions in society as not everyone was needed to farm and raise animals. These settled societies allowed the development of new culture, arts, and architecture.',
+    glossary: [
+      { w: 'settlement', m: '定住地' },
+      { w: 'nomadic', m: '遊牧の' },
+      { w: 'domesticate', m: '家畜化する' }
+    ],
+    questions: [
+      {
+        q: 'According to the passage, which of the following is NOT true of the Neolithic Revolution?',
+        choices: [
+          'This revolution changed the ruling system of society.',
+          'People at that time were satisfied with changes the revolution brought.',
+          'After the revolution, some people got engaged in jobs other than farming.',
+          'Before the revolution, people used to move around to hunt animals to survive.'
+        ],
+        answer: 1,
+        explanation: '統治の変化・農業以外の職業・狩猟のための移動生活はすべて本文にあるが、「当時の人々が変化に満足していた」という記述はどこにもない。'
+      },
+      {
+        q: 'The author mentions all of the following EXCEPT',
+        choices: [
+          'people tamed pigs, chickens, and cows',
+          'people began planting and harvesting crops',
+          'people knew how to keep their food for later',
+          'the animals became close companions to the people'
+        ],
+        answer: 3,
+        explanation: '豚・鶏・牛の家畜化、作物の栽培と収穫、食料の保存はすべて第2段落にあるが、「動物が人間の親しい仲間になった」という記述はない（食料のために飼っただけ）。'
+      }
+    ]
+  },
+  {
+    id: 'r108',
+    title: '試験でのカンニング問題',
+    level: 4,
+    topic: '学校生活',
+    words: 188,
+    passage:
+      'A major issue recently has been people cheating on their school exams. In the last week alone, four students have been caught with answer sheets prepared before the test. It is very sad to see students acting so dishonestly and even sadder to see them fail their exams because of cheating. Moreover, the cheat sheets that have been taken are very well made. Clearly, students have put in a great deal of effort to create them. If students had just focused on studying instead of trying to cheat, they probably would have done well on their own. The faculty is holding meetings this week to find out what they can do to fix this problem. They have already decided to fail any student who is caught cheating and are considering additional actions. Realistically, the students need to help themselves. Students at this school need to realize how dishonest and unfair it is to cheat. Everyone needs to follow the rules for the rest of exams. That means that students shouldn\'t have cheat sheets, shouldn\'t look at the papers of others, and shouldn\'t use any other methods of cheating.',
+    glossary: [
+      { w: 'cheat', m: 'カンニングをする' },
+      { w: 'faculty', m: '教員団' },
+      { w: 'dishonest', m: '不正直な' }
+    ],
+    questions: [
+      {
+        q: 'What is suggested about the cheat sheets?',
+        choices: [
+          'They weren\'t made by the students.',
+          'The faculty is interested in making more.',
+          'The teachers took them and examined them.',
+          'They are the only form of cheating at the school.'
+        ],
+        answer: 2,
+        explanation: 'the cheat sheets that have been taken are very well made（没収されたカンニングペーパーはよくできている）と評しているので、教師が取り上げて中身を確かめたことがわかる。'
+      },
+      {
+        q: 'What does the author imply about the students using cheat sheets?',
+        choices: [
+          'They are not prepared enough for their exams.',
+          'They should have to leave school after the exams:',
+          'They are shamelessly hurting the school\'s reputation.',
+          'They spent their time and effort doing the wrong thing.'
+        ],
+        answer: 3,
+        explanation: '「カンニングの準備ではなく勉強に力を注いでいれば、自力でも良い点が取れただろう」とある。時間と労力を間違ったことに使った、というのが筆者の言いたいこと。'
+      }
+    ]
+  },
+  {
+    id: 'r109',
+    title: '大雪による臨時休校のお知らせ',
+    level: 4,
+    topic: 'お知らせ',
+    words: 157,
+    passage:
+      'Classes will be canceled again tomorrow because of another snowstorm that is quickly approaching from the north. We will have to make up for the missed days in the spring so students will not miss any important lessons. Weather reports show that some places on the east coast have already gotten nearly a meter of snow and are experiencing high winds. All students are advised to go straight home after school. Students, teachers, and parents should stay off the roads tonight because the storm will be arriving in the late evening and lasting until tomorrow afternoon. During the last snowstorm, there were a number of car accidents caused by snowy and icy roads, so please be careful. Hopefully school will resume on Thursday, but this will depend on the severity of the storm. Listen to your radio or watch the news on Wednesday night and Thursday morning so you know whether or not to come to school.',
+    glossary: [
+      { w: 'make up for', m: '埋め合わせる' },
+      { w: 'severity', m: '深刻さ' },
+      { w: 'resume', m: '再開する' }
+    ],
+    questions: [
+      {
+        q: 'What can be inferred from the notice about the location of the school?',
+        choices: [
+          'Snowstorms are fairly common in the region.',
+          'The location usually gets rain instead of snow.',
+          'There have never been big snowstorms in the area.',
+          'Classes do not get canceled often because of weather.'
+        ],
+        answer: 0,
+        explanation: '「また休校（canceled again）」「前回の吹雪では事故が多発」とあり、休校も吹雪も繰り返し起きている。この地域では吹雪がよくあることだと推測できる。'
+      },
+      {
+        q: 'Based on the notice, what is probably true about the snowstorm?',
+        choices: [
+          'It won\'t be very strong.',
+          'It will cause some car accidents.',
+          'It\'s going to occur on a Saturday.',
+          'It will be the worst storm of the winter.'
+        ],
+        answer: 1,
+        explanation: '前回の吹雪で snowy and icy roads による車の事故が多発したとある。今回も夜通し続く吹雪なので、事故がいくつか起こるだろうと推測するのが自然。'
+      }
+    ]
+  },
+  {
+    id: 'r110',
+    title: '火星の素顔',
+    level: 4,
+    topic: '科学',
+    words: 295,
+    passage:
+      'Mars is the fourth planet from the Sun and the seventh largest planet in our Solar System. It is sometimes called "the Red Planet" because the iron oxide on the surface makes it look red. In many ways, Mars is very similar to Earth. It has volcanoes, valleys, and deserts just like Earth. Because of these similarities, many scientists believe that the surface environment of Mars may not always have been so hostile to life. Some of them think that water exists on Mars, which would make it possible for life to exist there.' + '\n' +
+      'Mars\' surface area is about the same as the land surface area of Earth. There are plains made from lava flows, and the highest known mountain and largest known canyon in the Solar System are on Mars. The mountain, Olympus Mons, is almost 3 times as tall as Mount Everest. The canyon, called Valles Marineris, is 4,000 kilometers long, 200 kilometers wide and up to 7 kilometers deep. Mars has a lot of impact craters, which are the result of large objects hitting the planet\'s surface. Therefore, scientists argue that very large objects hit Mars about 4 billion years ago. This theory would explain why Mars\' surface looks the way it does. Mars is located very close to the asteroid belt, which lies between the orbits of Mars and Jupiter, so it is more likely to be hit by asteroids. However, Mars still has fewer craters than the Moon. This is because Mars has a more substantial atmosphere than the Moon. Scientists know about Mars\' surface because they have been able to send spaceships with high-resolution cameras to Mars, as well as robots to collect rock samples. Still, there is much more to find out. Scientists hope to visit Mars someday.',
+    glossary: [
+      { w: 'hostile', m: '生存に適さない・敵対的な' },
+      { w: 'crater', m: 'クレーター' },
+      { w: 'substantial', m: 'しっかりした・かなりの' }
+    ],
+    questions: [
+      {
+        q: 'What does the author imply about Mars?',
+        choices: [
+          'Mars is covered with a vast ocean.',
+          'Scientists will go to Mars very soon.',
+          'Early Mars may have been friendlier to life.',
+          'Water on Earth is much less abundant than it is on Mars.'
+        ],
+        answer: 2,
+        explanation: '第1段落に「火星の表面環境は昔から生命に過酷だったわけではないかもしれないと多くの科学者が考えている」とある。昔の火星は生命により友好的だったかもしれない、が本文の含意。'
+      },
+      {
+        q: 'Which of the following can be inferred from the passage?',
+        choices: [
+          'Photographs of Mars have been taken.',
+          'Almost all asteroids are round and bowl-shaped.',
+          'Impact craters caused significant climate changes to Mars.',
+          'There are lakes and oceans not only on Mars but on the Moon.'
+        ],
+        answer: 0,
+        explanation: '最終部に「高解像度カメラを積んだ宇宙船を送って表面を知った」とある。つまり火星の写真が撮影されてきたことが推測できる。'
+      }
+    ]
+  },
+  {
+    id: 'r111',
+    title: 'ピルグリムとアメリカの始まり',
+    level: 4,
+    topic: '歴史',
+    words: 286,
+    passage:
+      'The United States of America is a very unique country. Most American citizens have ancestors that were immigrants or are immigrants themselves. In the past, many people moved to America for religious freedom and new opportunities. This did not happen automatically. Instead, a series of events led to the settlement and development of the United States. One of the most important and famous events was the settlement of Plymouth, Massachusetts by a group known as the Pilgrims.' + '\n' +
+      'The Pilgrims are early Protestant Christian settlers from England. They moved to America in 1620 from England to escape religious persecution. Their king wanted them to worship at the Church of England, an Anglican church. However, they did not believe in this form of Christianity and wanted to "purify" Christian religious practices. They believed in a personal relationship with God and valued simplicity. They were frustrated with their country\'s views about religion and decided to leave.' + '\n' +
+      'The Pilgrims took a ship called the Mayflower to "the New World." They landed at Plymouth and set up a settlement. Life there was very hard - the winters were long and cold, they did not know how and what to eat, and their settlement was unstable. The natives helped them to persevere. The Pilgrims were able to survive and start a new society where they could worship how they wanted. Later, many others would join them in the New World looking for religious freedom.' + '\n' +
+      'The Pilgrims are important and instructive because they were the first familial settlement in North America. They were the first to try to start a new life and new society in the New World. Americans observe the holiday called Thanksgiving in order to honor their struggle and survival.',
+    glossary: [
+      { w: 'persecution', m: '迫害' },
+      { w: 'persevere', m: '耐え抜く' },
+      { w: 'familial', m: '家族による' }
+    ],
+    questions: [
+      {
+        q: 'Based on the passage, what is probably true about the people in the United States of America?',
+        choices: [
+          'They are all very religious.',
+          'All the people came from England',
+          'Many of them don\'t celebrate Thanksgiving.',
+          'Most people are not ethnically Native American.'
+        ],
+        answer: 3,
+        explanation: '冒頭に「アメリカ市民の多くは移民の子孫か移民自身」とある。つまり大半の人は先住民の血筋ではないと推測できる。全員が信心深い・全員英国出身は言いすぎ。'
+      },
+      {
+        q: 'Based on the passage, what is suggested about Thanksgiving?',
+        choices: [
+          'It celebrates the Pilgrims\' hard work.',
+          'It is only celebrated by immigrant families.',
+          'It is a religious holiday from the Anglican Church.',
+          'It reminds people to be more resourceful than the Pilgrims.'
+        ],
+        answer: 0,
+        explanation: '最終段落に「感謝祭は彼らの苦闘と生存をたたえるために祝われる」とある。ピルグリムの苦労をたたえる祝日、が本文どおり。'
+      }
+    ]
+  },
+  {
+    id: 'r112',
+    title: '望遠鏡の宿題と宇宙人',
+    level: 4,
+    topic: '日常生活',
+    words: 368,
+    passage:
+      '"Take this telescope home and look at the night sky from your backyard. I want you to write down everything interesting you see and next week we will talk about it in class," Mr. Anderson said at the end of our astronomy class.' + '\n' +
+      'I asked my best friend Courtney if she wanted to come over to my house on Saturday to watch the stars with me. She agreed and we decided we would camp out all night.' + '\n' +
+      '"Tonight is going to be very clear," my mom said as she helped us set the tent up. We sat watching the sky for several hours. "Adam, what is that?" Courtney asked, sounding very confused. I looked into the telescope and saw that a large, circular airplane was getting closer and closer to us. It had thousands of rotating lights and I could see two small, green men leaning over the controls.' + '\n' +
+      '"It is coming right for us!" I shouted.' + '\n' +
+      'The flying saucer landed and the two spacemen got out with smiles on their long, flat faces. They shook our hands as we stood unable to speak. "We are from the planet Kepron 12 and we have been sent to teach you about the universe," said the smaller of the two aliens with a very odd-sounding accent. Courtney and I spent the rest of the night learning about the universe from our new friends until they had to leave.' + '\n' +
+      '"Good luck in your astronomy class next week," the taller alien said. "I hope that we can meet again and maybe you can visit our home."' + '\n' +
+      'We both said we would like to and waved to them as they flew away. The next couple of days went by slowly because we were excited to give our report. On Thursday, our chance finally came.' + '\n' +
+      'Mr. Anderson, however, laughed and said, "You guys have great imaginations! But your assignment was supposed to be on things that you actually saw." He would not listen to us and told us to repeat the task next weekend.' + '\n' +
+      'We didn\'t mind though. Courtney and I both knew that sometime in the future our friends would be back. One day, we will prove to everyone that we were right.',
+    glossary: [
+      { w: 'telescope', m: '望遠鏡' },
+      { w: 'flying saucer', m: '空飛ぶ円盤' },
+      { w: 'assignment', m: '課題' }
+    ],
+    questions: [
+      {
+        q: 'What is the best title for the story?',
+        choices: [
+          'The Truth About Kepron 12',
+          'A Difficult Astronomy Assignment',
+          'Two Students Encountering Two Aliens',
+          'Teachers Who Don\'t Believe Their Students'
+        ],
+        answer: 2,
+        explanation: '物語の中心は、星を観察していた二人が二人の宇宙人に出会い、一晩宇宙について教わる出来事。「二人の生徒が二人の宇宙人に出会う」が全体をよく表す。'
+      },
+      {
+        q: 'Why does Adam invite Courtney to his house on Saturday?',
+        choices: [
+          'To meet his mom',
+          'To do schoolwork',
+          'To meet his friends',
+          'To camp out and eat pizza'
+        ],
+        answer: 1,
+        explanation: 'アンダーソン先生が出した「夜空を観察して記録する」宿題のため。my best friend Courtney に声をかけて一緒に観察することにした。'
+      },
+      {
+        q: 'What is suggested about Mr. Anderson\'s opinion of the report?',
+        choices: [
+          'It is creatively made up but not acceptable as homework.',
+          'It is similar to an assignment that he completed in high school.',
+          'It isn\'t unusual for students to present reports like this.',
+          'It might be true, but the students didn\'t use a telescope.'
+        ],
+        answer: 0,
+        explanation: '先生は You guys have great imaginations!（想像力は見事だ）と笑いつつ、実際に見たものについてやり直せと言った。よくできた作り話だが宿題としては認めない、という評価。'
+      },
+      {
+        q: 'According to the story, all of the following are true EXCEPT',
+        choices: [
+          'The shorter alien spoke with a strange accent.',
+          'Adam and Courtney visited Kepron 12.',
+          'Adam and Courtney learned about the cosmos from the aliens.',
+          'Mr. Anderson told Adam and Courtney to redo their work.'
+        ],
+        answer: 1,
+        explanation: '背の高い方の宇宙人は「また会えて、君たちがうちの星に来られたら」と言っただけで、二人が Kepron 12 を訪れた事実はない。他の選択肢はすべて本文にある。'
+      }
+    ]
+  },
+  {
+    id: 'r113',
+    title: 'ミツバチはどうやって蜜を作るか',
+    level: 4,
+    topic: '生物',
+    words: 365,
+    passage:
+      'Everyone knows that honeybees make honey, but how do they actually do it? Honeybees live in colonies, which means that they live with lots of other bees. Beehives, nests made of wax, are the places where they live and store their honey.' + '\n' +
+      'Honeybees drink nectar from flowers or other sweet deposits from plants or trees. The honey made by these bees is used to supply the colony with food during the cold winter when there are no flowers to drink from. Thus, these bees not only consume the nectar for nourishment but also bring it home. They have a special organ called a honey stomach which used to carry the food to their colony.' + '\n' +
+      'When honeybees come back home, they regurgitate what they have put in their honey stomachs. Other honeybees in the hive come along and help them. They repeatedly eat and regurgitate many times until the product becomes somewhat digested. Next, the bees move the syrupy product into open honeycomb cells. Then they beat their wings to fan it to prevent fermentation. The fanning makes the water evaporate so that the product gets thick enough. Now it cannot easily be attacked by bacteria. Finally, it can be called honey. After this process, honeybees seal up the honeycomb cells with wax until they are hungry. The most impressive part of this process is how seamlessly a bee colony works together. In a colony, there are female worker bees, male drones, and one queen bee. Although there are both male and females in the hive, the majority of the work is done by females. The female worker bees are in charge of taking care of the hive and creating honey. When they are young, they take care of feeding the young bee larvae. When they are older, they go out and bring nectar back to the hive, where they begin making honey. The male drones are responsible for fertilizing the eggs, but require little energy as they spend their time waiting around the hive. The single queen bee is responsible for the colony\'s survival. She is the only female that can lay eggs. The wonderful substance called honey would not exist without the bees\' teamwork.',
+    glossary: [
+      { w: 'nectar', m: '花の蜜' },
+      { w: 'regurgitate', m: '吐き戻す' },
+      { w: 'fermentation', m: '発酵' }
+    ],
+    questions: [
+      {
+        q: 'What is the main topic of the passage?',
+        choices: [
+          'The role of the female honeybee',
+          'Preventing fermentation in honey',
+          'Why honeybees build huge wax nests',
+          'How a honeybee colony works to make honey'
+        ],
+        answer: 3,
+        explanation: '本文は蜜の作り方の工程と、働きバチ・雄バチ・女王バチの分業を描き、最後を「ハチのチームワークなしに蜜はない」と結ぶ。コロニーが協力して蜜を作る仕組みが主題。'
+      },
+      {
+        q: 'What can be inferred from the passage about honey?',
+        choices: [
+          'It\'s not always the same color.',
+          'It is only liked by a minority of people.',
+          'Watery honey can go bad easily.',
+          'It is created and cared for by the queen bee.'
+        ],
+        answer: 2,
+        explanation: '「羽であおいで水分を蒸発させ、十分濃くなると細菌に襲われにくくなる」とある。裏を返せば、水っぽい蜜は傷みやすいと推測できる。'
+      },
+      {
+        q: 'What do honeybees do to prevent fermentation?',
+        choices: [
+          'Blow air on the honey by waving their wings',
+          'Overproduce honey using their legs',
+          'Feed the larvae the unfermented honey',
+          'Bring the honey to the honeycomb cells'
+        ],
+        answer: 0,
+        explanation: 'they beat their wings to fan it to prevent fermentation（発酵を防ぐために羽ばたいて風を送る）とある。羽で風を送る、が本文どおり。'
+      },
+      {
+        q: 'According to the passage, which of the following is NOT true of honeybees?',
+        choices: [
+          'They work together in their colony.',
+          'They produce honey through a complex process.',
+          'The queen bee is responsible for making honey.',
+          'The worker bees work both inside and outside of their hive.'
+        ],
+        answer: 2,
+        explanation: '蜜作りを担うのは雌の働きバチで、女王バチの仕事は産卵（コロニーの存続）。「女王バチが蜜作りに責任を持つ」が本文と食い違う。'
+      }
+    ]
+  },
+  {
+    id: 'r114',
+    title: 'ボクシング大会のための欠席願い',
+    level: 4,
+    topic: '手紙・メール',
+    words: 188,
+    passage:
+      'Dear Mr. Andrews, I am very sorry but I will not be able to attend class on next Wednesday and Friday. As you know, I am on the school boxing team and I have been chosen by Coach McMahon to represent our school at the state boxing finals. I was wondering if you could give me my assignments in advance for the week. I\'ve been enjoying what we\'ve been working on a lot and really do not want to get behind. The tournament will be in Andover beginning on the 27th. I will also be staying in a hotel and training for two days before the competition. Hopefully I\'ll have some extra time to work. Anyway, I am very excited to represent our school. The coach thinks that I have the potential to take first place in my weight class, and I hope it\'s possible! Just as importantly, I hope you\'ll be willing to give me the work in advance so I can do well at the competition AND in school.' + '\n' +
+      'Thanks for everything, Mr. Andrews. I apologize again for having to miss those classes. Sincerely, James Howe',
+    glossary: [
+      { w: 'represent', m: '代表する' },
+      { w: 'in advance', m: '前もって' },
+      { w: 'potential', m: '潜在能力' }
+    ],
+    questions: [
+      {
+        q: 'In the passage, the word represent is closest in meaning to',
+        choices: [
+          'show',
+          'enable',
+          'run for',
+          'act for'
+        ],
+        answer: 3,
+        explanation: 'represent our school は「学校を代表する」。学校の代わりとして行動する、という意味なので act for（〜の代理を務める）が最も近い。'
+      },
+      {
+        q: 'In the passage, the word potential is closest in meaning to',
+        choices: [
+          'choice',
+          'power',
+          'inspiration',
+          'responsibility'
+        ],
+        answer: 1,
+        explanation: 'potential は「潜在能力」。コーチが「優勝できる力があると思っている」という文脈なので power（力）が最も近い。'
+      }
+    ]
+  },
+  {
+    id: 'r115',
+    title: 'バレンタインデーのダンスパーティー',
+    level: 4,
+    topic: 'お知らせ',
+    words: 197,
+    passage:
+      'On Friday, February 15th, the Craftsbury Academy Student Council invites you to attend the annual Valentine\'s Day Dance and Fundraiser in the school gymnasium. Who: Grades 6, 7, and 8 students (students are encouraged to bring guests from other schools) Where: Craftsbury Common Gymnasium When: Friday, February 15th, 7 P.M. until 11:30 P.M. Ticket Price: $5 or more!!' + '\n' +
+      'Although the dance will cost 5 dollars per person, any extra money would be appreciated because the money will be going to the 8th grade\'s trip to Washington, D.C. Tickets can be bought from homeroom representatives. The theme for the dance is Valentine\'s Day, so please feel free to bring a date. There will be plenty of slow dances for you two to get close! There will also be a pie-eating contest for those not afraid to get a little dirty. Don\'t forget to bring your appetite and a 2-dollar entrance fee. DJ Whibley will be playing the best tracks all night long. If you would like to request your favorite songs, you can add them to the song list that\'s on the door of the Student Council\'s office.' + '\n' +
+      'It\'s going to be an awesome night. Don\'t miss it!',
+    glossary: [
+      { w: 'fundraiser', m: '資金集めの催し' },
+      { w: 'appreciated', m: 'ありがたく思われる' },
+      { w: 'appetite', m: '食欲' }
+    ],
+    questions: [
+      {
+        q: 'In the passage, the word appreciated is closest in meaning to',
+        choices: [
+          'unused',
+          'insufficient',
+          'calculated',
+          'well received'
+        ],
+        answer: 3,
+        explanation: 'appreciated は「ありがたく思われる」。上乗せの寄付は8年生の修学旅行資金になるので歓迎される、という文脈。well received（喜んで受け取られる）が最も近い。'
+      },
+      {
+        q: 'In the passage, the word appetite is closest in meaning to',
+        choices: [
+          'money',
+          'hunger',
+          'girlfriend',
+          'foodstuff'
+        ],
+        answer: 1,
+        explanation: 'appetite は「食欲」。パイ早食いコンテストに「食欲を忘れずに持ってきて」という文脈なので hunger（空腹・食欲）が最も近い。'
+      }
+    ]
+  },
+  {
+    id: 'r116',
+    title: '独立後のラテンアメリカ',
+    level: 4,
+    topic: '歴史',
+    words: 223,
+    passage:
+      'By 1825, most Latin American countries gained independence from Spain and Portugal. At this time, world power was held by Western countries such as Great Britain, France, and the United States. These countries, particularly the United States, invested a large amount of money in Latin America. Because of this, Latin America became dependent on the United States politically and economically.' + '\n' +
+      'In addition to foreign intervention, Latin America suffered from inner conflicts. Many countries were formed, but these newly formed countries split up because of struggle over control of the state. Latin American national resources were exported to other countries. This allowed for a group of very rich people to develop, but this group did not care about creating democracies in their countries.' + '\n' +
+      'The political and economic troubles resulted in caudillos. Caudillo is a Spanish word that refers to a leader whose power is connected to his military skill. They took over the unstable and corrupt democracies in place. Most politicians were conservative and believed that the old system — of a very rich group who ruled all - was the best system. During this time, Latin America was in a position to supply the world with many raw materials, and politicians and officials were mainly interested in making sure their countries had a place in the world economy, rather than solving domestic disunion.',
+    glossary: [
+      { w: 'intervention', m: '介入' },
+      { w: 'caudillo', m: 'カウディーリョ（軍事指導者）' },
+      { w: 'disunion', m: '分裂' }
+    ],
+    questions: [
+      {
+        q: 'In the passage, the word conflicts is closest in meaning to',
+        choices: [
+          'truths',
+          'powers',
+          'experiences',
+          'disagreements'
+        ],
+        answer: 3,
+        explanation: 'conflicts は「争い・対立」。inner conflicts（国内の争い）として、国の支配をめぐる struggle が続く文脈なので disagreements（不和・対立）が最も近い。'
+      },
+      {
+        q: 'In the passage, the word unstable is closest in meaning to',
+        choices: [
+          'weak',
+          'strong',
+          'large',
+          'shaky'
+        ],
+        answer: 3,
+        explanation: 'unstable は「不安定な」。カウディーリョが乗っ取った democracies を形容する語で、shaky（ぐらついた）が最も近い。weak は意味が広すぎる。'
+      }
+    ]
+  },
+  {
+    id: 'r117',
+    title: '花はどうして生まれたか',
+    level: 4,
+    topic: '生物',
+    words: 299,
+    passage:
+      'Plants on Earth have not always been the way they are today. In fact, the beautiful flowers and fruit-bearing plants that are a part of our world did not evolve until long after the initial development of plants. The first plants on Earth were aquatic and the simple adaptation of spores allowed them to move onto land. These spore-bearing plants could simply produce › spores, which are genetic copies, to scatter around them. Eventually, plants grew casings and coverings to protect the spores from environmental damage. These protections were seeds. For a long time, it was a great mystery as to how flowering plants developed from these seed-bearing plants. Today, scientists are able to explain it on the molecular level, which is difficult for most people to understand. It is obvious, however, that the development of flowering plants was directly related to the need to have animals and insects involved in the process of reproduction. Animals and insects that are attracted to the scents and colors of flowers serve as pollinators and aid in the reproduction process. One theory is that flowers evolved in an isolated setting, such as on an island. In a very specific setting, a plant could develop a symbiotic relationship with an animal or an insect. This sort of relationship can lead to an evolutionary development and change. For example, a huge water lily in the Amazon traps diving beetles by closing while the beetles are sucking its nectar. This is done to make sure that the beetles are covered with pollen. After one night, the water lily releases the insects and turns from white to pink. This pink color is not attractive to the beetles. As the beetles go off to look for other white water lilies, they fertilize the flowers on their way.',
+    glossary: [
+      { w: 'spore', m: '胞子' },
+      { w: 'pollinator', m: '花粉を運ぶ生き物' },
+      { w: 'symbiotic', m: '共生の' }
+    ],
+    questions: [
+      {
+        q: 'In the passage, the word initial is closest in meaning to',
+        choices: [
+          'basic',
+          'earliest',
+          'scientific',
+          'interesting'
+        ],
+        answer: 1,
+        explanation: 'initial は「最初の」。the initial development of plants（植物の最初の発達）という文脈なので earliest（最も早い）が最も近い。'
+      },
+      {
+        q: 'In the passage, the word isolated is closest in meaning to',
+        choices: [
+          'condensed',
+          'evolutionary',
+          'set apart',
+          'experimented on'
+        ],
+        answer: 2,
+        explanation: 'isolated は「孤立した」。such as on an island（島のような）と例が続くので set apart（切り離された）が最も近い。'
+      }
+    ]
+  },
+  {
+    id: 'r118',
+    title: 'ハリー・ポッターの映画を見て',
+    level: 4,
+    topic: '手紙・メール',
+    words: 185,
+    passage:
+      'Dear Jackie, Last weekend I went to the movies and saw the new Harry Potter movie. I was afraid I wouldn\'t like it, but it was great! The scenes were vivid and I really liked all the actors that were playing my favorite characters. They did a great job behaving just like the characters in the book.' + '\n' +
+      'It was really fun to compare how I imagined the book with the way the director did on film. He did a great job and it was nice seeing it all happening on the big screen. His version of the three-headed dog was exactly what I imagined in my head while I was reading! After the movie, my friends and I all went out to eat. They bought me dinner because I paid for their movie tickets. Anyway, I\'m so happy that there are going to be more Harry Potter movies in the future. I can\'t wait to go and see them. Maybe we can go together if you\'re ever back in New York. Have you seen the movie yet? If so, what did you think? Sincerely, Jane',
+    glossary: [
+      { w: 'vivid', m: '鮮やかな' },
+      { w: 'character', m: '登場人物' },
+      { w: 'version', m: '解釈・版' }
+    ],
+    questions: [
+      {
+        q: 'In the passage, the word They refers to',
+        choices: [
+          'movie actors',
+          'film directors',
+          'movie scenes',
+          'book characters'
+        ],
+        answer: 0,
+        explanation: 'They did a great job behaving just like the characters in the book（本の登場人物そっくりに演じた）の主語なので、直前の「お気に入りの登場人物を演じた俳優たち」を指す。'
+      },
+      {
+        q: 'In the passage, the word He refers to',
+        choices: [
+          'a movie star',
+          'his imagination',
+          'the film director',
+          'a movie character'
+        ],
+        answer: 2,
+        explanation: 'He did a great job の He は、前文の「本の想像と the way the director did on film を比べるのが楽しかった」の director（映画監督）を指す。'
+      }
+    ]
+  },
+  {
+    id: 'r119',
+    title: '自由時間にビリヤード台を',
+    level: 4,
+    topic: '学校生活',
+    words: 351,
+    passage:
+      'During my last couple of years as a student here at Union High, I have noticed that there is nothing to do during our occasional free periods. Hanging around in the hallways or in the library with friends isn\'t productive or relaxing. The student body council noticed this as well and brought it to the attention of Mr. Swanson and the rest of the faculty. A meeting to discuss the issue occurred last Friday, February 10th, in the all-school meeting room. The faculty not only agreed that there wasn\'t much to do during these free periods, but also seemed determined to find a solution. The student body council and the faculty talked about different ideas for a long time. The faculty had noticed that some students don\'t like using their free periods for studying. Instead, they spend their time disrupting the students who want to study by being noisy in the library. By the end of the meeting, the faculty had decided to put a pool table and a ping pong table in our student lobby at the start of next semester.' + '\n' +
+      'I know some people will be concerned about getting their work done with these potential distractions, but I believe this will help us all in enjoying our time at school. I agree that it\'s important to complete our work but it is just as important to enjoy ourselves and to relax with our friends. School is already such a stressful place. It makes many students feel worried and anxious. We want our school to be a friendly place so that students want to come every day. Students should remember that this change will make the library a lot quieter. Because of this, the students who want to study will be able to do so in peace. To all the students at Union High, I sincerely hope that you enjoy the new additions to our lobby. Hopefully they will make our free periods a lot more relaxing. If you happen to have one of the same free periods as I do, then please challenge me to a game of pool!',
+    glossary: [
+      { w: 'free period', m: '空き時間' },
+      { w: 'disrupt', m: '邪魔をする' },
+      { w: 'distraction', m: '気を散らすもの' }
+    ],
+    questions: [
+      {
+        q: 'In the passage, the word they refers to',
+        choices: [
+          'some students',
+          'students studying in the library',
+          'faculty members',
+          'student body council members'
+        ],
+        answer: 0,
+        explanation: 'they spend their time disrupting the students who want to study の they は、直前の文の some students don\'t like using their free periods for studying（空き時間に勉強したがらない一部の生徒）を指す。'
+      },
+      {
+        q: 'In the passage, the word they refers to',
+        choices: [
+          'free periods',
+          'new additions',
+          'our friends',
+          'all the students'
+        ],
+        answer: 1,
+        explanation: 'Hopefully they will make our free periods a lot more relaxing の they は、直前の文の the new additions to our lobby（ロビーへの新しい設備＝ビリヤード台と卓球台）を指す。'
+      }
+    ]
+  },
+  {
+    id: 'r120',
+    title: 'サハラ砂漠の生き物',
+    level: 4,
+    topic: '環境',
+    words: 246,
+    passage:
+      'The Sahara Desert is the world\'s largest hot desert. The Sahara is in North Africa and is as large as the United States. Many people think that an area like this has no animals or plant life, but they are incorrect. In fact, the Sahara Desert has many different "ecoregions." Each ecoregion has different plants and animals living there. The biggest ecoregion is called the "Sahara Desert ecoregion." In this area, the climate is extremely dry and extremely hot. The landscape is sandy and dusty with many high dunes.' + '\n' +
+      'Because the Sahara Desert ecoregion is so hot and dry, there are very few plants and animals. Scientists estimate that there are only 500 species of plants. This is not very much when thinking of how enormous the region is. These plants include acacia trees, palms, spiny shrubs, and grasses. The Sahara is also home to 70 species of mammals. Twenty of these are large mammals. There are about 90 species of birds and around 100 reptiles. The biggest threat to plants and animals in this environment is drying up. Because of this, plants have the ability to recover their health after their leaves have dried out completely. Animals can lose 30-60% of their body mass and still survive. Most animals do not get their water from drinking like in other ecosystems. Instead, they have adapted to get their water through metabolic processes. This is why they can survive in a place like the Sahara Desert ecosystem.',
+    glossary: [
+      { w: 'ecoregion', m: '生態区' },
+      { w: 'dune', m: '砂丘' },
+      { w: 'metabolic', m: '代謝の' }
+    ],
+    questions: [
+      {
+        q: 'In the passage, the word they refers to',
+        choices: [
+          'animals',
+          'people',
+          'areas',
+          'plant lives'
+        ],
+        answer: 1,
+        explanation: 'Many people think that an area like this has no animals or plant life, but they are incorrect の they は、文の主語である Many people（多くの人々）を指す。'
+      },
+      {
+        q: 'In the passage, the word these refers to',
+        choices: [
+          'dry homes',
+          'desert species',
+          'large mammals',
+          'seventy kinds of mammals'
+        ],
+        answer: 3,
+        explanation: 'The Sahara is also home to 70 species of mammals. Twenty of these are large mammals の these は、直前の「70種の哺乳類」を指す。そのうち20種が大型、という意味。'
+      }
+    ]
+  },
+  {
+    id: 'r121',
+    title: 'ピラミッドの謎',
+    level: 4,
+    topic: '歴史',
+    words: 328,
+    passage:
+      'Pyramids are structures that were built by many ancient civilizations. Pyramids have been found in China, France, Mexico, Greece, India, and Egypt.' + '\n' +
+      'The purposes of these ancient pyramids are not all the same. Some were built for rituals, some for ceremony, and others as tombs for the nobility. The most famous and notable pyramids are the Great Pyramids in Giza, Egypt. They are three pyramids which were built by three pharaohs around 5,000 years ago. The oldest one is considered one of the Seven Wonders of the World.' + '\n' +
+      'The structures of these pyramids required serious engineering and careful architectural planning, along with many skilled laborers. Not only are the pyramids massive in size, but they were also built in relation to the night sky. One of the narrow tunnels from the King\'s burial chamber in the oldest pyramid points directly to a constellation associated with Osiris, the Egyptian god of resurrection. Also, a tunnel from the Queen\'s burial chamber points to a star associated with Isis, the wife of Osiris. This is an impressive architectural feat. The pyramids were built from colossal blocks made from huge stones chiseled with copper from stone quarries. These blocks were then moved into position, although there is archeological disagreement about what methods ancient builders used to do this. It is difficult for archeologists to figure out how Ancient Egyptians could move these heavy stones. Without modern technology, it is hard to imagine how it was possible. Even so, we can get hints from artifacts left behind by Ancient Egyptians. Ancient drawings have revealed that the sheer number of workers could have made this possible. These pictures show that many men pulling a stone could have moved it. The writings of Herodotus also provide information about how the pyramids were built, citing a system of stairs and cranes. Scientists continue to study the pyramids in hopes of eliminating some of the mystery. Still, there are many questions about the pyramids that go unanswered.',
+    glossary: [
+      { w: 'ritual', m: '儀式' },
+      { w: 'constellation', m: '星座' },
+      { w: 'colossal', m: '巨大な' }
+    ],
+    questions: [
+      {
+        q: 'In the passage, the word Some refers to',
+        choices: [
+          'the rituals',
+          'the purposes',
+          'the pyramids',
+          'the civilizations'
+        ],
+        answer: 2,
+        explanation: 'The purposes of these ancient pyramids are not all the same. Some were built for rituals の Some は「ピラミッドのあるものは」の意味。目的ではなくピラミッド自体を指す。'
+      },
+      {
+        q: 'In the passage, the word it refers to',
+        choices: [
+          'a man',
+          'a stone',
+          'a worker',
+          'a drawing'
+        ],
+        answer: 1,
+        explanation: 'many men pulling a stone could have moved it の it は、同じ文の a stone（引いていた石）を指す。大勢で引けば石を動かせた、という意味。'
+      }
+    ]
+  },
+  {
+    id: 'r122',
+    title: 'アル・カポネの実像',
+    level: 4,
+    topic: '伝記',
+    words: 265,
+    passage:
+      'Al "Scarface" Capone will forever be famous for his place in American movies, but who was the real man behind the Hollywood creation? Alphonse Gabriel Capone was born in Brooklyn, New York in 1899. Capone was a promising student but had trouble following the rules. At the age of fourteen he was expelled for causing violence at school. After that, he never went back. As a young man he joined local gangs and used his wit and courage to work himself up. It didn\'t take long before he became a major force in the world of organized crime.' + '\n' +
+      'When alcohol was made illegal in the U.S., Capone started to make a lot of money. He moved to Chicago, where he brought alcohol down from Canada to sell for a very large profit in the United States. He made lots of money and he also made lots of enemies. He was attacked so many times that he had a bulletproof car built for himself. When he was arrested years later, the car was taken and used by President Roosevelt as his limousine. In 1931, Capone was indicted for violation of income tax laws. He had made and spent a lot of money but failed to ever pay any government taxes. He was convicted and was sentenced to 1l years in jail, some of which were served in the famous Alcatraz prison. It was to be the end of his crime days. When he was finally released from prison, he was too sick to continue his life of crime. He died in 1947 while living in Florida.',
+    glossary: [
+      { w: 'expel', m: '退学させる' },
+      { w: 'indict', m: '起訴する' },
+      { w: 'conviction', m: '有罪判決' }
+    ],
+    questions: [
+      {
+        q: 'Why is Capone\'s causing violence at school mentioned in paragraph 1?',
+        choices: [
+          'To define the school rules in his time',
+          'To explain why he owned a bulletproof car',
+          'To show how famous a character he was in American movies',
+          'To give an example of how he had trouble following the rules'
+        ],
+        answer: 3,
+        explanation: '直前に Capone was a promising student but had trouble following the rules（有望だが規則を守れなかった）とあり、退学の一件はその具体例として挙げられている。'
+      },
+      {
+        q: 'Why does the author talk about Capone\'s bringing alcohol from Canada in paragraph 2?',
+        choices: [
+          'To justify Capone\'s life of crime',
+          'To explain how he became rich',
+          'To show why Capone was indicted',
+          'To prove that Capone did not pay taxes'
+        ],
+        answer: 1,
+        explanation: '第2段落は「禁酒法で大金を稼ぎ始めた」ことの説明としてカナダからの酒の密輸を挙げている。どうやって金持ちになったかを説明するため。'
+      }
+    ]
+  },
+  {
+    id: 'r123',
+    title: '集団の中の人間心理',
+    level: 4,
+    topic: '社会',
+    words: 237,
+    passage:
+      'Studies about social groups are a very interesting aspect of psychology because they show how differently people act when they are influenced by the thoughts and emotions of others. Studies have found that different people respond differently to group situations. When placed in a group, some people tend to dominate; they are natural leaders. However, the majority of people take a passive role.' + '\n' +
+      'When in a group, most people rarely work as hard as they do alone. This phenomenon is known as "social loafing." There are several explanations for why it occurs, but mainly it\'s because the responsibility and the reward are divided in more ways. People are more willing to let others do the work for them and rely on other people. When people are alone, they have to take care of themselves. This gives them incentive to work harder. Also, when people are in groups they tend to adopt the opinions of the people that they are with. Time and again studies have shown that people forget themselves and act on the will of the group rather than sticking to their own principles. This is called the "conformity pressure," and very few people can honestly say that they do not fall prey to this. If someone is in a group of people who love the theatre, they will not tell them how much they hate it for fear of being left out of the group.',
+    glossary: [
+      { w: 'dominate', m: '支配する' },
+      { w: 'social loafing', m: '社会的手抜き' },
+      { w: 'conformity', m: '同調' }
+    ],
+    questions: [
+      {
+        q: 'Why does the author mention the responsibility and the reward being divided in more ways?',
+        choices: [
+          'To clarify group work\'s effectiveness',
+          'To explain the cause of social loafing',
+          'To discuss the benefits and drawbacks of groups',
+          'To show how group work negatively affects people'
+        ],
+        answer: 1,
+        explanation: '「責任と報酬がより多くに分割される」は、直前の social loafing（集団だと手を抜く現象）が起こる主な理由として挙げられている。原因の説明。'
+      },
+      {
+        q: 'Why is someone in a group that loves the theatre mentioned in the passage?',
+        choices: [
+          'To indicate people stick to their principles',
+          'To describe the result of conformity pressure',
+          'To explain to whom conformity pressure occurs',
+          'To give an example of how conformity pressure works'
+        ],
+        answer: 3,
+        explanation: '演劇好きの集団の例は、直前で説明した conformity pressure（同調圧力）が実際にどう働くかを示す具体例。仲間外れを恐れて本音を言わない、という働き方を示す。'
+      }
+    ]
+  },
+  {
+    id: 'r124',
+    title: '鳥の声の使い分け',
+    level: 4,
+    topic: '生物',
+    words: 226,
+    passage:
+      'Bird vocalization is the term used to describe the sounds that birds make. There are many different types of bird vocalization, but they are mainly divided into two general categories: songs and calls. They are distinguished from one another by length, inflection, and context.' + '\n' +
+      'Birds make these sounds for a variety of reasons. Songs which are relatively long and more continuous usually indicate mating, while short and simple calls are often used for alerting the flock of danger and keeping the flock together. Commonly, the male bird is the one that delivers songs in order to attract the female. It is very likely that the quality of songs is connected to a bird\'s genetic health. Calls are used as alarms to warn of predators or bad weather. These alarms can be understood not only by birds of the same species, but also other birds and animals. Sometimes calls are used for finding individual birds, evident from adult birds that use calls to find their chicks. There are many other bird sounds that have unclear purposes. For example, "duetting" is the term for when two birds call at the same time using the same sounds. Some species of birds can sing so in sync that it is impossible to distinguish the two birds. Scientists present numerous theories, but the reason why certain birds do duetting remains unclear.',
+    glossary: [
+      { w: 'vocalization', m: '発声' },
+      { w: 'inflection', m: '抑揚' },
+      { w: 'duetting', m: 'デュエット（同時鳴き）' }
+    ],
+    questions: [
+      {
+        q: 'The author mentions songs and calls in paragraph 2 in order to',
+        choices: [
+          'introduce the idea of long songs and short calls',
+          'give an example of the different types of bird calls',
+          'demonstrate how beautiful bird songs are to the human ear',
+          'show that those two types of sounds have different purposes'
+        ],
+        answer: 3,
+        explanation: '第2段落は「長い歌は求愛、短い鳴き声は警戒や群れの維持」と対比している。二種類の声が異なる目的を持つことを示すための言及。'
+      },
+      {
+        q: 'Why does the author mention the male bird in paragraph 2?',
+        choices: [
+          'To show that males are better at singing',
+          'To give an example of what animals can do to mate',
+          'To give details about how bird songs aid reproduction',
+          'To show that mating songs are more important than alarm calls'
+        ],
+        answer: 2,
+        explanation: '「ふつう雄が歌って雌を引きつける」「歌の質は遺伝的な健康と結びついている」とあり、歌が繁殖にどう役立つかの詳細を述べるために雄鳥に触れている。'
+      }
+    ]
+  },
+  {
+    id: 'r125',
+    title: '減りゆく両生類',
+    level: 4,
+    topic: '環境',
+    words: 248,
+    passage:
+      'Amphibians are an animal group that includes frogs, toads, salamanders, and newts. These animals live in and out of the water. The number of amphibians on our planet is declining rapidly in both local mass extinctions and population crashes. This is a cause for concern as many scientists believe that humans are responsible.' + '\n' +
+      'Since the 1980s, scientists have noticed a decline in amphibian populations. Although many animals are affected by humans, amphibians have been hit particularly hard. Some scientists believe this is because of their two-stage life cycle. Unlike most animals, amphibians live their lives in two distinct stages. The first is aquatic and the second is terrestrial. This means that amphibians are sensitive to environmental changes in the water and on land. They also have permeable skin, which means that toxins and chemicals can easily get into their bodies.' + '\n' +
+      'At first, some scientists did not believe that human pollution was the cause for changes in amphibian populations. These scientists believed that every species on Earth goes through natural cycles and changes and that there was not enough long-term data to prove that humans were the problem. In recent years, this has changed. Almost all biologists are concerned about the decline in amphibian populations. They are worried not only because many amphibians may go extinct, but also because these extinctions will affect other plants and animals in ecosystems. They believe that the decline in amphibian populations is a warning to humans to stop polluting and clean up Earth.',
+    glossary: [
+      { w: 'amphibian', m: '両生類' },
+      { w: 'terrestrial', m: '陸生の' },
+      { w: 'permeable', m: '透過性の' }
+    ],
+    questions: [
+      {
+        q: 'Why does the author mention the two-stage life cycle in paragraph 2?',
+        choices: [
+          'To show that amphibians are complicated animals',
+          'To draw a conclusion about how different animals live',
+          'To question scientists\' ability to study amphibians',
+          'To explain why amphibians are more at risk than other animals'
+        ],
+        answer: 3,
+        explanation: '二段階の生活環は「水中と陸上の両方の環境変化に敏感」という説明につながる。両生類が他の動物より危険にさらされやすい理由を説明するための言及。'
+      },
+      {
+        q: 'The author discusses amphibian extinctions affecting other plants and animals in paragraph 3 in order to',
+        choices: [
+          'tell readers to worry about amphibians',
+          'illustrate that the extinction of any kind of animal is bad',
+          'show that amphibian extinctions are not the only concern',
+          'provide an example of other plants and animals going extinct'
+        ],
+        answer: 2,
+        explanation: '「絶滅だけでなく、それが生態系の他の動植物に影響することも心配している」とある。両生類の絶滅そのものだけが問題ではないと示すための言及。'
+      }
+    ]
+  },
+  {
+    id: 'r126',
+    title: 'マサダ砦の物語',
+    level: 4,
+    topic: '歴史',
+    words: 298,
+    passage:
+      'Mount Masada is an important location in Hebrew history, as it was the last stronghold of Jewish resistance in the Roman Empire. According to legend, the Roman Empire laid siege to Masada in 72 A.D. where the palace fortress of the Jewish people was located. The Romans assumed that their enemies would surrender quickly, but the people of Masada held out for 2 years. Rather than be taken by the Romans, the rebels remained true to their faith and people. They committed suicide in order to evade the troops. In reference to the battle of Masada, historians only have one historical record to go by, the work of Josephus, who wrote in the first century A.D. According to Josephus, there were approximately 1,000 people living in the fortress during the siege. The Romans, however, could only find 7 alive, 2 women and 5 children, when they finally entered the fortress by breaking down the gate. In 1842, the legendary location was found, but it wasn\'t until 1963 that Israeli archeologist Yigael Yadin began excavating the site. Yadin and his team found the remains of many building sites which were originally storehouses, homes, and Jewish chapels called synagogues.' + '\n' +
+      'Today, visitors can climb Masada on the treacherous "Snake Path" or ride a cable car to the top. Masada is located on the edge of the desert fronting the Dead Sea, which is very dry and almost completely isolated. Because of this, it stayed undiscovered for almost two thousand years. Visitors are usually very surprised that ancient people were able to build the city atop this lofty mountain and survive for two years without descending for food or water. Masada has a tragic history, but is an incredible and interesting place, one that is worth visiting if you\'re ever in Israel.',
+    glossary: [
+      { w: 'stronghold', m: 'とりで' },
+      { w: 'siege', m: '包囲' },
+      { w: 'excavate', m: '発掘する' }
+    ],
+    questions: [
+      {
+        q: 'What is the purpose of the passage?',
+        choices: [
+          'To explain how the Jewish people of Masada perished',
+          'To persuade readers to visit Mount Masada in the Israeli desert',
+          'To introduce a legendary place called Masada in ancient history',
+          'To point out the importance of Yigael Yadin, a Masada\'s archeologist'
+        ],
+        answer: 2,
+        explanation: '本文はマサダの伝説・発掘・現在の観光までを紹介する読み物。古代史の伝説的な場所マサダを紹介すること、が全体の目的。'
+      },
+      {
+        q: 'In the passage, the word They refers to',
+        choices: [
+          'the rebels',
+          'the locations',
+          'the Romans',
+          'the archeologists'
+        ],
+        answer: 0,
+        explanation: 'They committed suicide in order to evade the troops の They は、直前の文の the rebels（ローマに降伏しなかった反乱者たち）を指す。'
+      },
+      {
+        q: 'In the passage, the word excavating is closest in meaning to',
+        choices: [
+          'studying',
+          'digging',
+          'pointing',
+          'protecting'
+        ],
+        answer: 1,
+        explanation: 'excavate は「発掘する」。考古学者が遺跡を掘り起こす文脈なので digging（掘ること）が最も近い。'
+      },
+      {
+        q: 'Why does the author mention the desert fronting the Dead Sea?',
+        choices: [
+          'To prove that Masada is worth visiting',
+          'To explain why Masada stayed hidden for a long time',
+          'To emphasize how difficult it is to access Masada',
+          'To illustrate the beautiful scenery visitors can enjoy at Masada'
+        ],
+        answer: 1,
+        explanation: '「死海に面した砂漠の端にあり、ほぼ完全に孤立している。そのため二千年近く発見されなかった」とある。長く隠れたままだった理由の説明。'
+      }
+    ]
+  },
+  {
+    id: 'r127',
+    title: 'コンタクトレンズの歩み',
+    level: 4,
+    topic: '技術',
+    words: 310,
+    passage:
+      'Millions of people use contact lenses worldwide. They were made to replace glasses and are very useful because sometimes glasses are inconvenient. In sports, for instance, many athletes wear contact lenses instead of using obnoxious sports goggles because they are much safer. Contact lenses can also be used to correct some conditions that glasses are not capable of fixing. People also use them if they want to change the color of their eyes. One can wear contact lenses every day, or they can be used only once, for example, to have red eyes with a vampire costume. The idea of wearing contact lenses for better vision was first thought of by Leonardo da Vinci in the 1500s. He made sketches but there is no evidence that his design was ever realized. Throughout the 1800s many scientists played with the idea of contact lenses but no one perfected the use of them. The first models were very uncomfortable so they could not be worn for long periods of time. They were not flexible and did not let oxygen get to the eyes so in some cases they caused more problems than they fixed. The earlier versions were also very fragile and expensive, which made them not usable for many people. It wasn\'t until the late 1900s that contact lenses started to be effective and affordable enough for everyone to use. They became more and more popular as people became aware that there was an alternative to wearing glasses. In recent years, people have been developing even more advanced contact lenses. Now they can not only fix poor vision, but can improve good vision. Although contact lenses have become extremely popular over the last few decades, laser technology now allows people to improve their eyesight through a relatively quick, inexpensive, and painless procedure. One day, this technology may phase out contact lenses.',
+    glossary: [
+      { w: 'obnoxious', m: '不快な・邪魔な' },
+      { w: 'fragile', m: '壊れやすい' },
+      { w: 'phase out', m: '段階的になくす' }
+    ],
+    questions: [
+      {
+        q: 'The author\'s main purpose is to',
+        choices: [
+          'give a brief history of contact lenses',
+          'persuade readers of the convenience of contact lenses',
+          'explain how contact lenses improve people\'s vision',
+          'prove the risk of wearing contact lenses for better looks'
+        ],
+        answer: 0,
+        explanation: '本文はダ・ヴィンチの構想から現代のレーザー手術まで、コンタクトレンズの歴史を順に述べている。簡単な歴史を伝えること、が主目的。'
+      },
+      {
+        q: 'In the passage, the word alternative is closest in meaning to',
+        choices: [
+          'option',
+          'upgrade',
+          'solution',
+          'purchase'
+        ],
+        answer: 0,
+        explanation: 'alternative は「代わりの選択肢」。眼鏡の代わりがあると人々が知った、という文脈なので option（選択肢）が最も近い。'
+      },
+      {
+        q: 'In the passage, the word They refers to',
+        choices: [
+          'the eyes',
+          'the scientists',
+          'the drawings',
+          'the first models'
+        ],
+        answer: 3,
+        explanation: 'They were not flexible and did not let oxygen get to the eyes の They は、直前の文の The first models（初期のコンタクトレンズ）を指す。'
+      },
+      {
+        q: 'Why does the author mention athletes in the passage?',
+        choices: [
+          'To explain that some sports do not allow glasses',
+          'To show that athletes are concerned for their health',
+          'To illustrate the development of today\'s contact lenses',
+          'To give an example of the usefulness of contact lenses'
+        ],
+        answer: 3,
+        explanation: 'スポーツ選手の例は「眼鏡では不便な場面がある」ことの実例。コンタクトレンズの有用性を示すために挙げられている。'
+      }
+    ]
+  },
+  {
+    id: 'r128',
+    title: 'モリーの放課後スケジュール',
+    level: 4,
+    topic: '日常生活',
+    words: 88,
+    passage:
+      'Molly was having trouble finding time to do her schoolwork because of all her activities, so she decided to make a schedule showing when she has free time. Writing everything down showed her that she has more time than she thought.' + '\n' +
+      'Molly\'s After-School Activities' + '\n' +
+      'Monday — 3:00-4:30 P.M.: Soccer Practice / 6:30-7:00 P.M.: Clarinet Lesson.' + '\n' +
+      'Tuesday — 3:00-4:30 P.M.: Volunteering at Shelter (every other week) / 5:00-6:00 P.M.: Math Tutoring.' + '\n' +
+      'Wednesday — 3:00-4:30 P.M.: Soccer Practice.' + '\n' +
+      'Thursday — 5:00-6:00 P.M.: Math Tutoring.' + '\n' +
+      'Friday — 3:00-4:30 P.M.: Soccer Practice.',
+    glossary: [
+      { w: 'schedule', m: '予定表' },
+      { w: 'tutoring', m: '個別指導' },
+      { w: 'every other week', m: '隔週で' }
+    ],
+    questions: [
+      {
+        q: 'What activities does Molly do more than once a week?',
+        choices: [
+          'Having a math tutoring session and volunteering',
+          'Volunteering and having a clarinet lesson',
+          'Having a math tutoring session and going to soccer practice',
+          'Having a clarinet lesson and going to soccer practice'
+        ],
+        answer: 2,
+        explanation: '表からサッカー練習は月・水・金の週3回、数学の個別指導は火・木の週2回。週に2回以上あるのはこの二つ。クラリネットは週1回、ボランティアは隔週。'
+      },
+      {
+        q: 'What would Molly probably be doing on Tuesday at 4:45 P.M.?',
+        choices: [
+          'Going to math tutoring',
+          'Volunteering at the shelter',
+          'Staying home for the night',
+          'Preparing for soccer practice'
+        ],
+        answer: 0,
+        explanation: '火曜のボランティアは4:30に終わり、数学の個別指導が5:00に始まる。4:45はその間なので、個別指導へ向かっているところだと考えられる。'
+      },
+      {
+        q: 'At what time is Molly\'s musical activity?',
+        choices: [
+          '3:00 P.M. on Friday',
+          '4:30 P.M. on Tuesday',
+          '6:30 P.M. on Monday',
+          '5:00 P.M. on Wednesday'
+        ],
+        answer: 2,
+        explanation: '音楽の活動はクラリネットのレッスンで、表では月曜の6:30〜7:00。'
+      },
+      {
+        q: 'What will happen every other week?',
+        choices: [
+          'Molly will go to soccer practice on Friday.',
+          'Molly won\'t need math tutoring on Tuesday.',
+          'Molly might miss her clarinet lesson on Monday.',
+          'Molly will volunteer at the shelter on Tuesday.'
+        ],
+        answer: 3,
+        explanation: '表の脚注に *signifies every other week（＊は隔週の意味）とあり、＊が付いているのは火曜のボランティア。隔週で起こるのは火曜に保護施設でボランティアをすること。'
+      }
+    ]
+  },
+  {
+    id: 'r129',
+    title: '作文コンテストの添削のお願い',
+    level: 4,
+    topic: '手紙・メール',
+    words: 228,
+    passage:
+      'Dear Mr. Stevens, I\'m proud to tell you that I\'ve finally finished my essay for the city contest. I feel really satisfied with it. I was just about to submit it when I saw that I\'m required to turn in a copy that\'s been graded by an English teacher.' + '\n' +
+      'Since you recommended the contest to me, I was hoping that you\'d be willing to take a look at the essay. The essay wasn\'t written specifically for your class, but I know you\'ll give me useful feedback. It\'s not very long and I\'d really appreciate it. If you don\'t think you have time to do it, do you have any recommendations for a teacher that might? The contest rules aren\'t specific. They simply say that the essay has to be graded by an English teacher teaching in the Waring school system. I just moved to Waring at the start of this year, so I don\'t know any teachers besides you. I think my old teachers would be happy to grade it, but they don\'t work in Waring. Plus, I\'m not in contact with them anymore.' + '\n' +
+      'I\'d be happy to e-mail you my essay or print out a copy and give it to you at school. I understand that you\'re busy, but hope that you can help me out. I\'d really like to enter this contest. Thank you.' + '\n' +
+      'Sincerely, Jessica',
+    glossary: [
+      { w: 'submit', m: '提出する' },
+      { w: 'grade', m: '採点する' },
+      { w: 'feedback', m: '講評' }
+    ],
+    questions: [
+      {
+        q: 'Why did Jessica write this e-mail?',
+        choices: [
+          'To be friendly with her teacher',
+          'To win a very important contest',
+          'To get her essay graded by a teacher',
+          'To remind the teacher that she\'s a new student'
+        ],
+        answer: 2,
+        explanation: '「提出には英語教師の採点済みの写しが必要だとわかった」ので先生に見てほしい、というのが用件。作文を先生に採点してもらうため、が目的。'
+      },
+      {
+        q: 'In the passage, the word specific is closest in meaning to',
+        choices: [
+          'good',
+          'exact',
+          'correct',
+          'helpful'
+        ],
+        answer: 1,
+        explanation: 'specific は「具体的な・明確な」。コンテストの規定が細かく決まっていない、という文脈なので exact（正確な・厳密な）が最も近い。'
+      },
+      {
+        q: 'In the passage, the word them refers to',
+        choices: [
+          'old teachers',
+          'all teachers',
+          'contest judges',
+          'Mr. Stevens and Jessica'
+        ],
+        answer: 0,
+        explanation: 'I think my old teachers would be happy to grade it, but they don\'t work in Waring... I\'m not in contact with them anymore の them は、前の学校の先生たち（old teachers）を指す。'
+      },
+      {
+        q: 'According to the e-mail, which of the following is NOT true of Jessica?',
+        choices: [
+          'She changed school early this year.',
+          'Her essay was written while she was in Waring.',
+          'She has asked other teachers to grade her essay.',
+          'Mr. Stevens encouraged her to join a city writing contest.'
+        ],
+        answer: 2,
+        explanation: 'ジェシカは「あなた以外の先生を知らない」と書いており、他の先生に採点を頼んだ事実はない。転校・ウォリングで書いた作文・先生の勧めはすべて本文にある。'
+      }
+    ]
+  },
+  {
+    id: 'r130',
+    title: '州大会三連覇とエースの旅立ち',
+    level: 4,
+    topic: '学校生活',
+    words: 292,
+    passage:
+      'Last week, the girls\' Bromson Hill soccer team won the state championship, confirming that the team is the best in the league. This is the third year that Bromson Hill has won, exciting both the team and the fans. This year, the team was challenged in a close game against Freeport. The final score was 3-2. All three goals were scored by senior Alison Levin, who was elected MVP of the league after the championship. Indeed, Levin\'s four years at Bromson Hill have shown that she is a star.' + '\n' +
+      'Levin is humble about her skill, making sure that everyone knew it was the team, not her, who led Bromson Hill to victory. "We couldn\'t have done it without each other," she said. "There are 11 players on the field and each one is important." As for the MVP award, Levin simply felt ecstatic. "My eyes teared up when they called my name," she said. Once she was on the stage to collect her award, she announced to the audience, "I\'d like to thank my team and my coach for this honor. It\'s been a great year!" Bromson Hill\'s coach Jessica Wallis along with Levin\'s teammates feel a bit differently about Alison, whom they call "Al." "Al is number one in the league. She\'ll be shy about it, but we owe this win to her. She\'s been an inspiration to all of us on the team. It will be sad to see her go next year," said Brittany Clark, a defender that plays for Bromson Hill. Although Alison will miss the Bromson Hill team, she\'s excited about the prospect of playing in college. Alison will be playing for the University of Virgil women\'s team, which is one of the best in the country.',
+    glossary: [
+      { w: 'humble', m: '謙虚な' },
+      { w: 'ecstatic', m: '有頂天の' },
+      { w: 'prospect', m: '見込み・期待' }
+    ],
+    questions: [
+      {
+        q: 'What would be the most suitable headline for the article?',
+        choices: [
+          'Bromson Hill Star Leads Team to Win',
+          'Coach Jessica Wallis Is Proud of Victory',
+          'Bromson Hill Is the Best in the League',
+          'University of Virgil Accepts Bromson Hill Student'
+        ],
+        answer: 0,
+        explanation: '記事は3得点すべてを挙げて MVP になったアリソン・レヴィンを中心に優勝を伝えている。「ブロムソン・ヒルのスターがチームを勝利に導く」が最も内容に合う見出し。'
+      },
+      {
+        q: 'What is suggested about Alison Levin in the article?',
+        choices: [
+          'She isn\'t a prideful person.',
+          'She respects her coach, Jessica.',
+          'She didn\'t deserve the MVP award.',
+          'She believes that the victory was hers.'
+        ],
+        answer: 0,
+        explanation: 'Levin is humble about her skill（自分の実力に謙虚）で、勝利はチームのものだと強調している。うぬぼれた人ではない、が本文から言えること。'
+      },
+      {
+        q: 'Based on her comments, what is Brittany Clark probably worried about?',
+        choices: [
+          'Alison doing poorly in college',
+          'The coach getting angry at the team',
+          'The team losing strength next year',
+          'Getting extremely depressed without Alison'
+        ],
+        answer: 2,
+        explanation: 'クラークは「来年彼女がいなくなるのは寂しい」と述べている。エースが抜けた来年、チームの力が落ちることを心配していると考えられる。'
+      },
+      {
+        q: 'In the passage, the word ecstatic is closest in meaning to',
+        choices: [
+          'joyful',
+          'grateful',
+          'doubtful',
+          'dissatisfied'
+        ],
+        answer: 0,
+        explanation: 'ecstatic は「有頂天の」。MVP に名前を呼ばれて目が潤んだ、という喜びの文脈なので joyful（喜びに満ちた）が最も近い。'
+      },
+      {
+        q: 'In the passage, the word prospect is closest in meaning to',
+        choices: [
+          'fear',
+          'success',
+          'surprise',
+          'expectation'
+        ],
+        answer: 3,
+        explanation: 'prospect は「見込み・これからの期待」。大学でプレーすることへの excited という文脈なので expectation（期待）が最も近い。'
+      },
+      {
+        q: 'Why does the author mention that Alison Levin\'s eyes teared up at the league awards ceremony?',
+        choices: [
+          'To show that she felt a lot of emotion',
+          'To explain her anger that her team wasn\'t recognized',
+          'To describe the pain in her leg at the last soccer game',
+          'To prove that she was unhappy about winning the award'
+        ],
+        answer: 0,
+        explanation: '目が潤んだ描写は、受賞の瞬間に彼女が強い感情を抱いたことを示すためのもの。怒りや痛み、不満の描写ではない。'
+      }
+    ]
+  },
+  {
+    id: 'r131',
+    title: 'ダンスチームの一年',
+    level: 4,
+    topic: '学校生活',
+    words: 404,
+    passage:
+      'Sandy and I could not believe how lucky we were to get picked for the dance team. We both tried out but never expected to make it.' + '\n' +
+      'Sandy was so excited that when she saw the roster she dragged me across the whole school and made me late for math class just to show it to me. "I\'m so happy, I\'m so happy!" she kept saying over and over and I was too. Being on the dance team was a lot of hard work. We had tough practices every day after school for three hours. We would start with stretches and then go into our routines. "Let\'s go! Move it!" our coach would yell.' + '\n' +
+      'He was a good coach, but he was strict. He made all of us work very hard. Over time, Sandy and I improved. Our coach noticed.' + '\n' +
+      '"You girls have done a great job so far this year. I want to send you to New York City to represent our school in the state championships. I think you will be a great team, but I need you to keep working hard," he said smiling.' + '\n' +
+      'We both started shouting in exultation and the other girls congratulated us. It was a big moment.' + '\n' +
+      'Through the next weeks we trained harder than ever before and pretty soon it was the weekend of the championships.' + '\n' +
+      '"Are you ready?" Our coach asked us on the trip to the city. "I am feeling great!" I said, but Sandy did not say anything. We both waited for a moment and then she said, "I am very nervous. What if we make a mistake?"' + '\n' +
+      'Our coach laughed and said, "Of course you will make a mistake but just try hard, do the best you can, and I will be happy. Mistakes happen but you need to keep going. That\'s what is important."' + '\n' +
+      'The tournament was great but there were a lot of really good dancers so we didn\'t win. Our parents were still excited though, and our coach was happy. After the competition we got to have dinner in the big city and our coach gave us medals, even though we didn\'t win anything.' + '\n' +
+      '"What are these for?" I asked.' + '\n' +
+      '"For being great dancers and for all of the hard work that you girls have done," he said beaming, "and for making me the happiest coach in the State of New York. I cannot wait for next year\'s competition."',
+    glossary: [
+      { w: 'roster', m: 'メンバー表' },
+      { w: 'routine', m: '（ダンスの）一連の振り付け' },
+      { w: 'exultation', m: '大喜び' }
+    ],
+    questions: [
+      {
+        q: 'What is the story mainly about?',
+        choices: [
+          'The New York City dance championship',
+          'The hardship of being dance team members',
+          'The two girl students\' dance team experience',
+          'The two girl students being chosen as best dancers of the year'
+        ],
+        answer: 2,
+        explanation: '物語は二人がチームに選ばれてから、猛練習・州大会出場・敗退とメダルまでを描く。二人の少女のダンスチームでの経験、が全体の主題。'
+      },
+      {
+        q: 'Why does Sandy drag the author across the whole school?',
+        choices: [
+          'To meet the team coach',
+          'To get to the daily dance practice',
+          'To show that they both made the team',
+          'To try out for the dance team together'
+        ],
+        answer: 2,
+        explanation: 'サンディは the roster（メンバー表）を見せるために作者を引っ張っていった。二人ともチームに入れたことを見せるため。'
+      },
+      {
+        q: 'In the passage, what does the author mean by go into our routines?',
+        choices: [
+          'Do hard exercises',
+          'Practice for the championship',
+          'Start practicing their dances',
+          'Finish stretching their bodies'
+        ],
+        answer: 2,
+        explanation: 'go into our routines は「ストレッチのあと振り付けの練習に入る」という流れの中の表現。自分たちのダンスの練習を始める、という意味。'
+      },
+      {
+        q: 'Which word best describes the girls\' reaction to being sent to New York City?',
+        choices: [
+          'Excited',
+          'Nervous',
+          'Interested',
+          'Disappointed'
+        ],
+        answer: 0,
+        explanation: 'ニューヨーク行きを告げられた二人は shouting in exultation（大喜びで叫んだ）。Excited（興奮した・喜んだ）が最もよく合う。'
+      },
+      {
+        q: 'Based on his comments, what does the coach think about the competition?',
+        choices: [
+          'If the girls work hard, they will win.',
+          'Their losing the competition would be a big disappointment.',
+          'It\'s most important to try their best.',
+          'The girls will win if they don\'t make any mistakes.'
+        ],
+        answer: 2,
+        explanation: 'コーチは「ミスはするものだ。一生懸命やって全力を尽くせば私は満足だ」と言っている。全力を尽くすことが一番大事、というのがコーチの考え。'
+      },
+      {
+        q: 'What will probably happen to Sandy and the author next year?',
+        choices: [
+          'They will win easily.',
+          'They will stop dancing.',
+          'They will compete again.',
+          'They will help the coach.'
+        ],
+        answer: 2,
+        explanation: 'コーチは最後に「来年の大会が待ちきれない」と言っており、二人も続ける様子。来年また出場するだろうと推測できる。'
+      }
+    ]
+  },
+  {
+    id: 'r132',
+    title: 'ビッグベンド国立公園',
+    level: 4,
+    topic: '環境',
+    words: 227,
+    passage:
+      'Big Bend National Park in the southwest of Texas is one of the most majestic desert areas in the United States. It is part of the Chihuahua, which is one of the largest deserts in North America and stretches over both America and Mexico.' + '\n' +
+      'Big Bend Park is home to mountains, rivers, basins, valleys, as well as many plants and animals. It is not as popular of a national park as some others. This may be because it takes an extremely long time to get there. Big Bend National Park is hundreds of miles from the nearest legitimate town or airport. When people go there, they need to make sure that their cars have plenty of gas. There is a large risk of running out. When visitors get to the park, they are usually happy that they drove all the way. The park is 1,252 square miles of desert beauty. There are beautiful cactus blooms as well as glorious sunsets. The hiking trails are magnificent. Visitors can stay in a lodge that is run by the park or camp with their own equipment. However, visitors should be careful. Even though the park is incredibly hot during the day, the lack of moisture in the air makes the heat dissipate at night. The nights at Big Bend are surprisingly cold. It\'s important to bring a warm sleeping bag.',
+    glossary: [
+      { w: 'majestic', m: '雄大な' },
+      { w: 'basin', m: '盆地' },
+      { w: 'dissipate', m: '消散する' }
+    ],
+    questions: [
+      {
+        q: 'Which title best summarizes the main idea of the passage?',
+        choices: [
+          'A Place of Desert Flowers',
+          'Cactus Blooms at Big Bend',
+          'A National Park to Be Visited',
+          'A Desert That Is Cold at Night'
+        ],
+        answer: 2,
+        explanation: '本文は公園の魅力（山や川、サボテンの花、夕日、ハイキング）と行き方の注意を紹介する読み物。「訪れるべき国立公園」が全体をよく表す題。夜の寒さや花は一部の話題。'
+      },
+      {
+        q: 'In the passage, the word lodge is closest in meaning to',
+        choices: [
+          'bed',
+          'inn',
+          'cavern',
+          'restaurant'
+        ],
+        answer: 1,
+        explanation: 'lodge は「ロッジ・宿泊小屋」。公園が運営する宿に泊まれる、という文脈なので inn（宿屋）が最も近い。'
+      },
+      {
+        q: 'In the passage, the word dissipate is closest in meaning to',
+        choices: [
+          'destroy',
+          'disturb',
+          'discover',
+          'disappear'
+        ],
+        answer: 3,
+        explanation: 'dissipate は「消散する」。空気が乾いているため熱が夜に消えていく、という文脈なので disappear（消える）が最も近い。'
+      },
+      {
+        q: 'Why does Big Bend get cold at night?',
+        choices: [
+          'Precipitation usually comes at night.',
+          'It is too arid to hold the heat in the air.',
+          'The air is too clear and breathable for warmth.',
+          'Deserts like Big Bend experience harsh winters.'
+        ],
+        answer: 1,
+        explanation: '「空気中の水分が少ないため熱が夜に消散する」とある。乾燥しすぎて空気が熱を保てないから、が本文どおり。'
+      },
+      {
+        q: 'Which of the following is NOT mentioned about staying overnight at Big Bend?',
+        choices: [
+          'It\'s better to stay in the lodge.',
+          'There are generally two different ways to sleep.',
+          'Visitors can bring their own camping equipment.',
+          'It\'s too cold outside without a warm sleeping bag.'
+        ],
+        answer: 0,
+        explanation: '「ロッジに泊まるか自前の装備でキャンプするか」と二つの方法を並べているだけで、ロッジの方がよいとは述べていない。'
+      },
+      {
+        q: 'Why don\'t people visit Big Bend more often?',
+        choices: [
+          'It is too cold for most visitors.',
+          'A lot of people don\'t want to visit Texas.',
+          'Most cars aren\'t strong enough to get there.',
+          'It is very far away from a town or an airport.'
+        ],
+        answer: 3,
+        explanation: '「最寄りのまともな町や空港から何百マイルも離れていて、行くのに非常に時間がかかる」ことが人気が出ない理由として挙げられている。'
+      }
+    ]
+  },
+  {
+    id: 'r133',
+    title: 'イルカのコミュニケーション',
+    level: 4,
+    topic: '生物',
+    words: 259,
+    passage:
+      'Dolphins are one of the most intelligent species on the planet, which makes them a very interesting animal to scientists. In their natural habitats, dolphins use various vocalization techniques. They whistle and squeak to recognize members of their pod, identify and protect their young, and call out warnings of danger. They also make clicking sounds used for echolocation to find food and obstacles in dark and murky waters. Amazingly, the whistling sound that the bottlenose dolphin makes has been found to have a similar pattern to human language. They always make conversational sounds when they greet each other. If you listen to dolphins\' squeaks and squeals, it will sound like they are having a conversation.' + '\n' +
+      'Dolphins usually use both sound and body language to communicate with each other. It is through gesture and body language, however, that most of their communication with humans comes. Dolphins can be trained to perform complicated tricks. This suggests they have a high level of intelligence and communication capacity. If they work for a long time with a trainer, they are able to recognize and understand human commands. A lot of dolphin communication has been studied using dolphins in captive environments. These studies have been criticized because some marine biologists believe that dolphins living in aquariums or research centers cannot be considered "normal." Even so, most believe that studying dolphin communication in captivity is useful for beginning to understand the complexity of dolphin communication. After all, dolphins are one of the most intelligent animals. Their ability to communicate is impressive and worthy of study.',
+    glossary: [
+      { w: 'echolocation', m: '反響定位' },
+      { w: 'captive', m: '飼育下の' },
+      { w: 'capacity', m: '能力' }
+    ],
+    questions: [
+      {
+        q: 'What would be the most suitable title for the passage?',
+        choices: [
+          'Intelligent Mammals in Captivity',
+          'Complex Patterns in Dolphin Life',
+          'Dolphins\' Social Tendencies with Humans',
+          'Communications in Dolphins'
+        ],
+        answer: 3,
+        explanation: '本文は鳴き声・身振り・人間との意思疎通・飼育下での研究と、一貫してイルカのコミュニケーションを扱っている。「イルカのコミュニケーション」が最も適切な題。'
+      },
+      {
+        q: 'What are the common ways for a dolphin to communicate?',
+        choices: [
+          'Swimming speeds',
+          'Human voice imitation',
+          'Squeaking and squealing sounds',
+          'Vocalizations and body language'
+        ],
+        answer: 3,
+        explanation: 'Dolphins usually use both sound and body language to communicate（音と身振りの両方を使う）とある。発声と身振り、が本文どおり。'
+      },
+      {
+        q: 'According to paragraph 4, what do some marine biologists think about captive dolphins?',
+        choices: [
+          'They can\'t be considered accurate subjects for biological studies.',
+          'They can communicate exactly the same as humans do.',
+          'They easily demonstrate how dolphins act in the wild.',
+          'Their relationships are too personal with marine biologists.'
+        ],
+        answer: 0,
+        explanation: '「水族館や研究センターのイルカは『普通』とはみなせない」という批判が紹介されている。生物学の研究対象として正確とは言えない、という考え。'
+      },
+      {
+        q: 'In the passage, the word vocalization is closest in meaning to',
+        choices: [
+          'closing eyes',
+          'creating words',
+          'making gestures',
+          'producing sounds'
+        ],
+        answer: 3,
+        explanation: 'vocalization は「発声」。ホイッスルやクリック音などの音を出す技術の話なので producing sounds（音を出すこと）が最も近い。'
+      },
+      {
+        q: 'All of the following are true about dolphin communication EXCEPT',
+        choices: [
+          'dolphins\' clicking sounds are sometimes used to greet humans',
+          'dolphins\' squeals and squeaks sound conversational to the human ear',
+          'communication using sounds and gestures occurs between dolphins',
+          'body language and gestures are used for communication with humans'
+        ],
+        answer: 0,
+        explanation: 'クリック音は「暗く濁った水中で食べ物や障害物を見つける反響定位」に使うとあり、人間へのあいさつに使うという記述はない。他の選択肢はすべて本文にある。'
+      },
+      {
+        q: 'In the passage, the word most refers to',
+        choices: [
+          'a few bottlenose dolphins',
+          'a lot of bottlenose dolphins',
+          'the minority of marine biologists',
+          'the majority of marine biologists'
+        ],
+        answer: 3,
+        explanation: 'Even so, most believe that... の most は、直前の文で批判をしている some marine biologists と対比された「海洋生物学者の大多数」を指す。'
+      },
+      {
+        q: 'In the passage, the word capacity is closest in meaning to',
+        choices: [
+          'ability',
+          'probability',
+          'simplicity',
+          'productivity'
+        ],
+        answer: 0,
+        explanation: 'capacity は「能力」。高い知能とコミュニケーション能力を示唆する、という文脈なので ability（能力）が最も近い。'
+      },
+      {
+        q: 'Why do dolphins use their communication skills with each other?',
+        choices: [
+          'To prove that they are happy and useful in captivity',
+          'To make beautiful music and to find food',
+          'To recognize, protect and communicate with each other',
+          'To trick humans into thinking they are intelligent'
+        ],
+        answer: 2,
+        explanation: '第1段落に「仲間を識別し、子を守り、危険を知らせるために鳴く」とある。互いを認識し、守り、意思疎通するため、が本文どおり。'
+      }
+    ]
+  },
+  {
+    id: 'r134',
+    title: 'サカガウィアと探検隊',
+    level: 4,
+    topic: '伝記',
+    words: 364,
+    passage:
+      'Sacagawea was a Shoshone woman who accompanied the first United States expedition to the Pacific Coast. She acted as an interpreter and guide for William Clark and Meriwether Lewis, who were sent to explore the Western United States by President Thomas Jefferson. It is believed that Sacagawea was born in a Shoshone village located near today\'s Idaho in 1788. She was kidnapped at age 12 by a tribe called the Hidatsa who lived near today\'s North Dakota. When she was 13 years old, she was married to a Canadian trader named Toussaint Charbonneau who was living in the village.' + '\n' +
+      'During the winter of 1804, Lewis and Clark arrived near the Hidatsa village and built a fort. There, they tried to find people who could help them on their journey. Lewis and Clark decided to hire Charbonneau, knowing that his wife Sacagawea spoke Shoshone. They knew that she could help them when they met the Shoshone later on in their trip. At this time, Sacagawea was pregnant with her first child. She gave birth to a little boy just before embarking on the journey. He would participate in all of the travels and later be adopted by William Clark.' + '\n' +
+      'Sacagawea was able to reunite with her people during the expedition. When the group reached the Shoshone village, she found that the chief was her long-lost brother. Clark\'s journal entry tells of their powerful reunion. Indeed, Clark\'s journal hints many times that Sacagawea had a profound effect on the expedition. Clearly, her presence as native guide and as the trip\'s only woman was very important to both Lewis and Clark. It is known that she overcame a lot of obstacles and served as a loyal and keen interpreter for Lewis and Clark. In fact, not much is known about Sacagawea except her role in the expedition. There is little hard evidence to support various beliefs about how she lived after the journey and how and when she died. Sacagawea, however, was used as an icon of American feminism in the early 20th century to arouse the sense of self-worth of women. Because of her ability and accomplishments, she is still admired in the United States today.',
+    glossary: [
+      { w: 'expedition', m: '探検隊' },
+      { w: 'interpreter', m: '通訳' },
+      { w: 'profound', m: '深い・重大な' }
+    ],
+    questions: [
+      {
+        q: 'Which title best expresses the main idea of the passage?',
+        choices: [
+          'Sacagawea\'s Devotion to the Shoshone Tribe',
+          'Early American Feminism in the Sacagawea Legend',
+          'The Life of Sacagawea Shown in William Clark\'s Journal',
+          'Sacagawea and Her Role in the Lewis and Clark Expedition'
+        ],
+        answer: 3,
+        explanation: '本文はルイスとクラークの探検におけるサカガウィアの通訳・案内役としての働きを中心に描く。「サカガウィアとルイス・クラーク探検隊における役割」が主題に合う。'
+      },
+      {
+        q: 'In the passage, the word interpreter is closest in meaning to',
+        choices: [
+          'doctor',
+          'mother',
+          'writer',
+          'translator'
+        ],
+        answer: 3,
+        explanation: 'interpreter は「通訳」。ショショーニ語を話せることが雇われた理由なので translator（翻訳者・通訳）が最も近い。'
+      },
+      {
+        q: 'Why did Lewis and Clark want a Shoshone-speaking guide?',
+        choices: [
+          'They were interested in making a profit from trading.',
+          'They needed someone who had a relationship with the chief.',
+          'They knew they would meet the Shoshone during their travels.',
+          'They wanted to learn the language so the Shoshone would cooperate.'
+        ],
+        answer: 2,
+        explanation: 'They knew that she could help them when they met the Shoshone later on in their trip（旅の途中でショショーニ族に会うとわかっていた）とある。'
+      },
+      {
+        q: 'The author mentions all of the following EXCEPT',
+        choices: [
+          'Sacagawea becoming a mother',
+          'the marriage of Charbonneau and Sacagawea',
+          'Sacagawea reuniting with the Shoshone people',
+          'Thomas Jefferson\'s specific goals for the journey'
+        ],
+        answer: 3,
+        explanation: '出産・シャルボノーとの結婚・ショショーニ族との再会はすべて本文にあるが、ジェファーソン大統領の具体的な目的は「西部を探検させた」以上に述べられていない。'
+      },
+      {
+        q: 'What does the author say about Sacagawea\'s death?',
+        choices: [
+          'It made her a heroine.',
+          'It doesn\'t have a clear story.',
+          'It was written about by Clark.',
+          'It occurred while she was running away.'
+        ],
+        answer: 1,
+        explanation: '「旅の後どう生き、いつどのように死んだかについては、確かな証拠がほとんどない」とある。死ははっきりした記録がない、が本文どおり。'
+      },
+      {
+        q: 'In the passage, the word He refers to',
+        choices: [
+          'Shoshone chief',
+          'Sacagawea\'s son',
+          'Sacagawea\'s brother',
+          'Sacagawea\'s husband'
+        ],
+        answer: 1,
+        explanation: 'She gave birth to a little boy just before embarking on the journey. He would participate in all of the travels の He は、直前で生まれた男の子（サカガウィアの息子）を指す。'
+      },
+      {
+        q: 'Why does the author mention Sacagawea\'s role in 20th-century feminism?',
+        choices: [
+          'To discuss Sacagawea\'s unique female abilities',
+          'To show that Sacagawea inspired American women',
+          'To explain why Sacagawea is on many American coins',
+          'To remind readers that Sacagawea is only a legend'
+        ],
+        answer: 1,
+        explanation: '「20世紀初頭、女性の自尊心を呼び起こすためのアメリカのフェミニズムの象徴として使われた」とある。サカガウィアがアメリカの女性を勇気づけたことを示すため。'
+      },
+      {
+        q: 'Based on the passage, what is probably true about Lewis and Clark?',
+        choices: [
+          'They learned the Shoshone language.',
+          'They never met with Thomas Jefferson.',
+          'They were grateful for Sacagawea\'s help.',
+          'They didn\'t make it across the United States.'
+        ],
+        answer: 2,
+        explanation: 'クラークの日記が「サカガウィアが探検に重大な影響を与えたと何度もほのめかしている」ことや息子を養子にしたことから、二人が彼女の助けに感謝していたと推測できる。'
+      }
+    ]
   }
 ];
 
