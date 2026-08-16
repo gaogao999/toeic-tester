@@ -49,7 +49,7 @@ index.html
 | --- | --- | --- |
 | `js/data.js` | 単語・熟語 | 5,122（うち熟語 204） |
 | `js/math-data.js` | 算数 | 149 |
-| `js/reading-data.js` | 長文読解 | 16 本 / 78 問 |
+| `js/reading-data.js` | 長文読解 | 134 本 / 523 問 |
 
 各ファイルの冒頭コメントに項目の説明がある。**追加するときは必ずそれを読むこと。**
 
@@ -89,30 +89,20 @@ index.html
 
 ---
 
-## いまのタスク
+## TOEFL Junior 教材の取り込み（完了）
 
-**TOEFL Junior の教材3冊（PDF）を読んで、長文読解のデータを増やす。**
+教材3冊のスキャンPDF（`materials/`、git 管理外）から長文読解を取り込み済み。
 
-```
-TOEFL-Junior-Basic-Reading.pdf              → レベル2（A2）
-Master-TOEFL-Junior-B1-Reading-Comprehension.pdf → レベル3（B1）
-TOEFL-Junior-Advanced-B2-Reading-skills.pdf → レベル4（B2）
-```
+| 教材 | レベル | ID |
+| --- | --- | --- |
+| Basic | 2（A2） | r23〜r58 |
+| Intermediate | 3（B1） | r59〜r96 |
+| Advanced | 4（B2） | r97〜r134 |
 
-スキャンPDFの可能性があるので、テキスト層の有無を先に確かめる。
-テキスト層が無ければ OCR が必要（macOS のショートカット.app に「画像からテキストを抽出」がある）。
-
-### 作るもの
-
-`js/reading-data.js` の形式に合わせて、本文ごとに次を用意する。
-
-- 本文（段落は `\n` 区切り）。レベルに応じた長さ
-- 設問 4〜5 問、すべて4択
-- **主題／細部／文脈中の語義／指示語／推測** の5種類を混ぜる
-- **解説は日本語**で、本文のどこが根拠かを示す
-- 語注 3 語程度
-- `id` は `r17` から続ける（既存の `r1`〜`r16` と重複させない）
-- 正解の位置は 0〜3 に散らす（表示時にもシャッフルされるが、データ上も偏らせない）
+作業パイプラインは `tools/` に残してある（import-reading → build-reading-* → emit-reading-*）。
+中間ファイル（OCR テキスト・解答・注釈）は `data/raw/reading-import/`（git 管理外）。
+新しいデータを足すときは同じ形式で、**解説は日本語**・設問5種類を混ぜる・
+正解の位置は 0〜3 に散らす、を守ること。
 
 ### 教材の扱い
 
