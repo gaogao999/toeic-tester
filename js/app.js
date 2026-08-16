@@ -1505,8 +1505,8 @@
     adaptive: { short: '短め（15問）', standard: '標準（20問）', full: 'じっくり（30問）' }
   };
 
-  // 単語だけ4段階（英検2級まで）、算数と長文は3段階しかないので上限で頭打ちにする
-  const MAX_LEVEL = { word: 4, math: 3, reading: 3 };
+  // 単語と長文は4段階（英検2級/CEFR B2 まで）、算数は3段階しかないので上限で頭打ちにする
+  const MAX_LEVEL = { word: 4, math: 3, reading: 4 };
 
   // 上下の向きが変わった回数がこれだけ溜まれば、レベルは十分に絞れたとみなす
   const ENOUGH_REVERSALS = 6;
