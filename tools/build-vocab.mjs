@@ -4,7 +4,7 @@
  * 使い方:
  *   node tools/build-vocab.mjs            … キャッシュを使う（無ければ取得）
  *   node tools/build-vocab.mjs --fetch    … 元データを取り直す
- *   node tools/build-vocab.mjs --target 3000
+ *   node tools/build-vocab.mjs --target 4000  … 収録語数の上限を決める
  *
  * 出典（いずれも公開データ。詳細と利用条件は README.md を参照）:
  *   - CEFR-J Wordlist Version 1.5 … どの語をどのレベルに置くかの根拠
@@ -12,12 +12,15 @@
  *   - ipa-dict                    … 発音記号
  *   - FrequencyWords              … 同レベル内での優先順位
  *
+ * 熟語は tools/idioms.mjs に手で書いたものを使う。
+ *
  * 既存の単語は id・例文・意味・カテゴリをそのまま残す。学習履歴は id で
  * 結び付いているため、id は決して振り直さない。
  */
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { IDIOMS } from './idioms.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CACHE = join(ROOT, 'data/raw/vocab-sources');
@@ -32,7 +35,7 @@ const EJDICT = (letter) =>
 
 const argv = process.argv.slice(2);
 const FORCE_FETCH = argv.includes('--fetch');
-const TARGET = Number((argv[argv.indexOf('--target') + 1] || '').match(/^\d+$/)?.[0] || 3000);
+const TARGET = Number((argv[argv.indexOf('--target') + 1] || '').match(/^\d+$/)?.[0] || Infinity);
 
 // ============================================================
 // 取得（取得済みならキャッシュを使う）
@@ -254,7 +257,9 @@ const BLOCKLIST = new Set([
   'corpse', 'rape', 'slave', 'torture', 'terror', 'terrorist'
 ]);
 
-const CEFR_TO_LEVEL = { A1: 1, A2: 2, B1: 3 };
+// レベルは英検の級に対応させる（英検とCEFRの対応は英検協会が公表しているもの）
+//   レベル1 = 5級・4級 / レベル2 = 3級 / レベル3 = 準2級 / レベル4 = 2級
+const CEFR_TO_LEVEL = { A1: 1, A2: 2, B1: 3, B2: 4 };
 
 /** 意味の語尾から、大まかなカテゴリを当てる */
 function guessCategory(word, meaning, pos) {
@@ -351,7 +356,7 @@ async function main() {
   const candidates = [];
 
   for (const [word, { cefr, pos }] of cefrj) {
-    if (!CEFR_TO_LEVEL[cefr]) continue; // B2 は範囲外
+    if (!CEFR_TO_LEVEL[cefr]) continue;
     if (!/^[a-z][a-z' -]*$/.test(word)) continue;
     if (have.has(word)) { dropped.already++; continue; }
     if (SKIP_POS.has(pos) || SKIP_WORDS.has(word)) { dropped.pos++; continue; }
@@ -385,13 +390,40 @@ async function main() {
   const room = Math.max(0, TARGET - existing.length);
   const picked = candidates.slice(0, room);
 
-  const result = [...existing.map((w) => ({ ...w }))];
+  // 既存の語も、CEFR-J に載っていれば同じ基準でレベルを付け直す。
+  // 手で決めたレベルと機械で決めたレベルが混在すると、級の表示が信用できなくなるため。
+  let relevelled = 0;
+  const result = existing.map((w) => {
+    const entry = cefrj.get(w.word.toLowerCase());
+    const level = entry ? CEFR_TO_LEVEL[entry.cefr] : null;
+    if (level && level !== w.level) relevelled++;
+    return { ...w, level: level || w.level };
+  });
+
   for (const c of picked) {
     delete c.rank;
     result.push({ id: nextId++, ...c });
   }
 
+  // 熟語は自分で書いたものを足す（辞書から取れる熟語は固有名詞や俗語が多くて使えない）
+  let idiomsAdded = 0;
+  for (const idiom of IDIOMS) {
+    if (have.has(idiom.word.toLowerCase())) continue;
+    have.add(idiom.word.toLowerCase());
+    result.push({
+      id: nextId++,
+      phonetic: '',
+      pos: 'phr.',
+      note: '',
+      category: '熟語・句動詞',
+      ...idiom
+    });
+    idiomsAdded++;
+  }
+
   writeFileSync(join(ROOT, 'js/data.js'), serialize(result), 'utf8');
+  console.log(`\n既存の語のレベルを付け直した: ${relevelled} 語`);
+  console.log(`熟語を追加: ${idiomsAdded} 件`);
 
   // ---- 集計 ----
   const count = (arr, key) =>

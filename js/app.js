@@ -26,11 +26,12 @@
     })[c]);
   }
 
-  // 難易度の表示名。データ側の level はそのまま（600/750/900）で、表示だけを切り替える
+  // 難易度は英検の級で示す。データ側の level は 1〜4 のまま、表示だけを切り替える
   const LEVEL_LABELS = {
-    1: 'レベル1（基礎）',
-    2: 'レベル2（標準）',
-    3: 'レベル3（応用）'
+    1: '英検5級・4級',
+    2: '英検3級',
+    3: '英検準2級',
+    4: '英検2級'
   };
   const levelLabel = (level) => LEVEL_LABELS[level] || `レベル${level}`;
 
@@ -247,12 +248,19 @@
   // 今日の学習メニュー
   // ============================================================
 
-  /**
-   * 残り日数と未習得の数から、今日やる量を決める。
-   * 極端な数にならないよう上限と下限を設けている。
-   */
+  // 1日のノルマ。曜日で決め打ちにしてある（残り日数からは計算しない）
+  const DAILY_GOALS = {
+    weekday: { word: 20, math: 15 },
+    weekend: { word: 25, math: 20 }
+  };
+
+  function isWeekend(date = new Date()) {
+    const d = date.getDay();
+    return d === 0 || d === 6; // 日曜と土曜
+  }
+
   function todayGoals() {
-    const days = Math.max(daysUntilExam(), 1);
+    const quota = isWeekend() ? DAILY_GOALS.weekend : DAILY_GOALS.weekday;
 
     const wordsLeft = WORD_DATA.filter((w) => !Storage.isLearned(w.id)).length;
     const mathLeft = MATH_DATA.filter((p) => !Storage.isLearned(p.id)).length;
@@ -260,14 +268,12 @@
       (r) => r.questions.some((q, i) => !Storage.isLearned(`${r.id}-${i + 1}`))
     ).length;
 
-    const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
-
     return [
       {
         key: 'word',
         icon: '📖',
         name: '単語',
-        goal: wordsLeft === 0 ? 10 : clamp(Math.ceil(wordsLeft / days), 5, 30),
+        goal: quota.word,
         unit: '語',
         left: wordsLeft,
         view: 'quiz'
@@ -276,7 +282,7 @@
         key: 'math',
         icon: '🔢',
         name: '算数',
-        goal: mathLeft === 0 ? 5 : clamp(Math.ceil(mathLeft / days), 3, 20),
+        goal: quota.math,
         unit: '問',
         left: mathLeft,
         view: 'math'
@@ -321,9 +327,10 @@
 
     const days = daysUntilExam();
     const wordsLeft = goals[0].left;
+    const quota = isWeekend() ? '土日' : '平日';
     $('#today-note').textContent =
       days > 0
-        ? `未習得の単語 ${wordsLeft} 語を残り ${days} 日で割り振っています。`
+        ? `${quota}のノルマです。未習得の単語はあと ${wordsLeft} 語、試験まで ${days} 日。`
         : '試験日を過ぎました。';
   }
 
