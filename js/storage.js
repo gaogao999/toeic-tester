@@ -313,13 +313,73 @@ const Storage = (() => {
     if (!parsed || typeof parsed !== 'object' || !parsed.records) {
       throw new Error('形式が正しくありません');
     }
-    state = {
-      records: parsed.records || {},
-      stats: { ...DEFAULT_STATE.stats, ...(parsed.stats || {}) },
-      history: parsed.history || [],
-      settings: { ...DEFAULT_STATE.settings, ...(parsed.settings || {}) }
-    };
+    // 外から持ち込まれるファイルは信用しない。項目ごとに型を強制し、
+    // 想定外の文字列が画面に HTML として挿入される（XSS）のを防ぐ
+    state = sanitizeImported(parsed);
     save();
+  }
+
+  /** 取り込んだデータを想定の型に矯正する。数値でないものは0、余計な項目は捨てる */
+  function sanitizeImported(parsed) {
+    const num = (v) => (typeof v === 'number' && isFinite(v) ? v : 0);
+    const iso = (v) => (typeof v === 'string' && !isNaN(Date.parse(v)) ? v : null);
+
+    const records = {};
+    for (const [id, r] of Object.entries(parsed.records || {})) {
+      if (!r || typeof r !== 'object') continue;
+      records[id] = {
+        box: Math.min(Math.max(Math.round(num(r.box)), 0), MAX_BOX),
+        correct: num(r.correct),
+        wrong: num(r.wrong),
+        lastStudied: iso(r.lastStudied),
+        nextDue: iso(r.nextDue),
+        starred: !!r.starred,
+        learned: !!r.learned
+      };
+    }
+
+    const history = (Array.isArray(parsed.history) ? parsed.history : [])
+      .filter((h) => h && typeof h === 'object' && /^\d{4}-\d{2}-\d{2}$/.test(h.date))
+      .map((h) => ({
+        date: h.date,
+        answered: num(h.answered),
+        correct: num(h.correct),
+        word: num(h.word),
+        math: num(h.math),
+        reading: num(h.reading)
+      }));
+
+    // settings は既知の項目だけ受け取り、型が合わないものは初期値のままにする
+    const s = parsed.settings || {};
+    const settings = { ...DEFAULT_STATE.settings };
+    for (const key of Object.keys(DEFAULT_STATE.settings)) {
+      if (typeof s[key] === typeof DEFAULT_STATE.settings[key]) settings[key] = s[key];
+    }
+    // mockHistory（模擬試験の履歴）は画面にそのまま出すので、数値と既知の値に矯正する
+    if (Array.isArray(s.mockHistory)) {
+      settings.mockHistory = s.mockHistory
+        .filter((h) => h && typeof h === 'object')
+        .slice(0, 5)
+        .map((h) => ({
+          date: iso(h.date) || new Date().toISOString(),
+          mode: h.mode === 'adaptive' ? 'adaptive' : 'exam',
+          correct: num(h.correct),
+          total: num(h.total),
+          rate: num(h.rate),
+          minutes: num(h.minutes)
+        }));
+    }
+
+    return {
+      records,
+      stats: {
+        totalAnswers: num(parsed.stats && parsed.stats.totalAnswers),
+        totalCorrect: num(parsed.stats && parsed.stats.totalCorrect),
+        sessions: num(parsed.stats && parsed.stats.sessions)
+      },
+      history,
+      settings
+    };
   }
 
   return {
