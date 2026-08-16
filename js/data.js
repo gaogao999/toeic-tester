@@ -10,10 +10,10 @@
  *   note     : 補足（混同しやすい語など／空でも可）
  *   example  : 例文（英語／空でも可。空の語は穴埋めクイズには出ない）
  *   exampleJa: 例文の日本語訳
- *   level    : 難易度 (1=基礎 / 2=標準 / 3=応用)
+ *   level    : 難易度 (1=英検5級・4級〜A1 / 2=英検3級・A2 / 3=英検準2級・B1 / 4=英検2級・B2)
  *   category : 出題される場面・分野
  *
- * レベルは CEFR-J Wordlist の A1 / A2 / B1 に対応する。
+ * レベルは CEFR-J Wordlist の A1 / A2 / B1 / B2 に対応する。
  * このファイルは tools/build-vocab.mjs で生成・更新できる（出典は README.md）。
  */
 const WORD_DATA = [
@@ -1578,7 +1578,7 @@ const WORD_DATA = [
   { id: 1559, word: 'plus', phonetic: '/ˈpɫəs/', pos: 'prep.', meaning: 'を加えて、を足して', note: '', example: '', exampleJa: '', level: 2, category: '体・健康' },
   { id: 1560, word: 'among', phonetic: '/əˈməŋ/', pos: 'prep.', meaning: 'の間に、に囲まれて', note: '', example: '', exampleJa: '', level: 2, category: 'つなぎ言葉' },
   { id: 1561, word: 'market', phonetic: '/ˈmɑɹkət/', pos: 'n.', meaning: '市場、市', note: '', example: '', exampleJa: '', level: 2, category: '基本の名詞' },
-  { id: 1562, word: 'nearly', phonetic: '/ˈnɪɹɫi/', pos: 'adv.', meaning: '密接に、親密に', note: '', example: '', exampleJa: '', level: 2, category: '家族・人間関係' },
+  { id: 1562, word: 'nearly', phonetic: '/ˈnɪɹɫi/', pos: 'adv.', meaning: 'ほとんど、もう少しで', note: 'almost とほぼ同じ意味', example: '', exampleJa: '', level: 2, category: '基本の形容詞・副詞' },
   { id: 1563, word: 'fantastic', phonetic: '/fænˈtæstɪk/', pos: 'adj.', meaning: '異様な、風変わりな', note: '', example: '', exampleJa: '', level: 2, category: '自然・天気' },
   { id: 1564, word: 'serve', phonetic: '/ˈsɝv/', pos: 'v.', meaning: 'に仕える、の役に立つ', note: '', example: '', exampleJa: '', level: 2, category: '基本の動詞' },
   { id: 1565, word: 'center', phonetic: '/ˈsɛnɝ/', pos: 'n.', meaning: '中心、中央', note: '', example: '', exampleJa: '', level: 2, category: '基本の名詞' },
@@ -1639,7 +1639,7 @@ const WORD_DATA = [
   { id: 1620, word: 'success', phonetic: '/səkˈsɛs/', pos: 'n.', meaning: '成功、好結果', note: '', example: '', exampleJa: '', level: 2, category: '基本の名詞' },
   { id: 1621, word: 'wet', phonetic: '/ˈwɛt/', pos: 'adj.', meaning: '非禁酒主義の', note: '', example: '', exampleJa: '', level: 2, category: '基本の形容詞・副詞' },
   { id: 1622, word: 'manage', phonetic: '/ˈmænədʒ/', pos: 'v.', meaning: 'を管理する、運営する', note: '', example: '', exampleJa: '', level: 2, category: '基本の動詞' },
-  { id: 1623, word: 'fancy', phonetic: '/ˈfænsi/', pos: 'adj.', meaning: '空想したもの、根拠のない考え', note: '', example: '', exampleJa: '', level: 2, category: '自然・天気' },
+  { id: 1623, word: 'fancy', phonetic: '/ˈfænsi/', pos: 'adj.', meaning: '装飾的な、高級な', note: '動詞では「〜を好む」', example: '', exampleJa: '', level: 2, category: '基本の形容詞・副詞' },
   { id: 1624, word: 'chef', phonetic: '/ˈʃɛf/', pos: 'n.', meaning: 'コック長、料理長', note: '', example: '', exampleJa: '', level: 2, category: '食べ物・料理' },
   { id: 1625, word: 'chest', phonetic: '/ˈtʃɛst/', pos: 'n.', meaning: '大箱、ひつ', note: '', example: '', exampleJa: '', level: 2, category: '基本の名詞' },
   { id: 1626, word: 'journey', phonetic: '/ˈdʒɝni/', pos: 'n.', meaning: '旅行、旅', note: '', example: '', exampleJa: '', level: 2, category: '旅行・交通' },
@@ -2407,7 +2407,7 @@ const WORD_DATA = [
   { id: 2388, word: 'main', phonetic: '/ˈmeɪn/', pos: 'adj.', meaning: 'おもな、主要な', note: '', example: '', exampleJa: '', level: 3, category: '基本の形容詞・副詞' },
   { id: 2389, word: 'fellow', phonetic: '/ˈfɛɫoʊ/', pos: 'n.', meaning: '男、やつ', note: '', example: '', exampleJa: '', level: 3, category: '基本の名詞' },
   { id: 2390, word: 'blind', phonetic: '/ˈbɫaɪnd/', pos: 'adj.', meaning: '目の見えない、盲目の', note: '', example: '', exampleJa: '', level: 3, category: '体・健康' },
-  { id: 2391, word: 'nor', phonetic: '/ˈnɔɹ/', pos: 'conj.', meaning: 'も', note: '', example: '', exampleJa: '', level: 3, category: 'つなぎ言葉' },
+  { id: 2391, word: 'nor', phonetic: '/ˈnɔɹ/', pos: 'conj.', meaning: '〜もまた…ない', note: 'neither A nor B の形でよく使う', example: '', exampleJa: '', level: 3, category: 'つなぎ言葉' },
   { id: 2392, word: 'hanging', phonetic: '/ˈhæŋɡɪŋ/', pos: 'adj.', meaning: '絞首刑', note: '', example: '', exampleJa: '', level: 3, category: '基本の形容詞・副詞' },
   { id: 2393, word: 'somehow', phonetic: '/ˈsəmˌhaʊ/', pos: 'adv.', meaning: 'どうにかして、なんとか', note: '', example: '', exampleJa: '', level: 3, category: '基本の形容詞・副詞' },
   { id: 2394, word: 'hearing', phonetic: '/ˈhiɹɪŋ/', pos: 'n.', meaning: '聴力、聴覚', note: '', example: '', exampleJa: '', level: 3, category: '基本の名詞' },
@@ -2424,7 +2424,7 @@ const WORD_DATA = [
   { id: 2405, word: 'criminal', phonetic: '/ˈkɹɪmənəɫ/', pos: 'n.', meaning: '犯罪の、罪の犯した', note: '', example: '', exampleJa: '', level: 3, category: '基本の名詞' },
   { id: 2406, word: 'honestly', phonetic: '/ˈɑnəsɫi/', pos: 'adv.', meaning: '正直に、公正に', note: '', example: '', exampleJa: '', level: 3, category: '基本の形容詞・副詞' },
   { id: 2407, word: 'fake', phonetic: '/ˈfeɪk/', pos: 'adj.', meaning: 'のふりをする、を装う', note: '', example: '', exampleJa: '', level: 3, category: '基本の形容詞・副詞' },
-  { id: 2408, word: 'onto', phonetic: '/ˈɑntu/', pos: 'prep.', meaning: 'へ', note: '', example: '', exampleJa: '', level: 3, category: 'つなぎ言葉' },
+  { id: 2408, word: 'onto', phonetic: '/ˈɑntu/', pos: 'prep.', meaning: '〜の上へ', note: '', example: '', exampleJa: '', level: 3, category: 'つなぎ言葉' },
   { id: 2409, word: 'concerned', phonetic: '/kənˈsɝnd/', pos: 'adj.', meaning: '心配そうな、気づかっている', note: '', example: '', exampleJa: '', level: 3, category: '気持ち・性格' },
   { id: 2410, word: 'nowhere', phonetic: '/ˈnoʊˌwɛɹ/', pos: 'adv.', meaning: 'どこにもない場所', note: '', example: '', exampleJa: '', level: 3, category: '基本の形容詞・副詞' },
   { id: 2411, word: 'sheriff', phonetic: '/ˈʃɛɹəf/', pos: 'n.', meaning: '長官', note: '', example: '', exampleJa: '', level: 3, category: '基本の名詞' },
@@ -3636,7 +3636,7 @@ const WORD_DATA = [
   { id: 3617, word: 'nonetheless', phonetic: '/ˌnənðəˈɫɛs/', pos: 'adv.', meaning: 'それでもなお', note: '', example: '', exampleJa: '', level: 3, category: '基本の形容詞・副詞' },
   { id: 3618, word: 'composition', phonetic: '/ˌkɑmpəˈzɪʃən/', pos: 'n.', meaning: '創作、制作', note: '', example: '', exampleJa: '', level: 3, category: '基本の名詞' },
   { id: 3619, word: 'canned', phonetic: '/ˈkænd/', pos: 'adj.', meaning: 'かん詰めの', note: '', example: '', exampleJa: '', level: 3, category: '基本の形容詞・副詞' },
-  { id: 3620, word: 'mosquito', phonetic: '/məˈskitoʊ/', pos: 'n.', meaning: 'カ', note: '', example: '', exampleJa: '', level: 3, category: '基本の名詞' },
+  { id: 3620, word: 'mosquito', phonetic: '/məˈskitoʊ/', pos: 'n.', meaning: '蚊', note: '', example: '', exampleJa: '', level: 3, category: '基本の名詞' },
   { id: 3621, word: 'prominent', phonetic: '/ˈpɹɑmənənt/', pos: 'adj.', meaning: '著名な', note: '', example: '', exampleJa: '', level: 3, category: '基本の形容詞・副詞' },
   { id: 3622, word: 'examiner', phonetic: '/ɪɡˈzæmənɝ/', pos: 'n.', meaning: '試験官', note: '', example: '', exampleJa: '', level: 3, category: '学校生活' },
   { id: 3623, word: 'qualify', phonetic: '/ˈkwɑɫəˌfaɪ/', pos: 'v.', meaning: 'に資格を与える', note: '', example: '', exampleJa: '', level: 3, category: '基本の動詞' },
@@ -4045,7 +4045,7 @@ const WORD_DATA = [
   { id: 4026, word: 'photocopy', phonetic: '/ˈfoʊtoʊˌkɑpi/', pos: 'n.', meaning: '写真複写', note: '', example: '', exampleJa: '', level: 3, category: '基本の名詞' },
   { id: 4027, word: 'rudely', phonetic: '/ˈɹudɫi/', pos: 'adv.', meaning: '無作法に', note: '', example: '', exampleJa: '', level: 3, category: '基本の形容詞・副詞' },
   { id: 4028, word: 'restrict', phonetic: '/ɹiˈstɹɪkt/', pos: 'v.', meaning: 'を制限する、限定する', note: '', example: '', exampleJa: '', level: 3, category: '基本の動詞' },
-  { id: 4029, word: 'enthusiast', phonetic: '/ɛnˈθuziˌæst/', pos: 'n.', meaning: '狂', note: '', example: '', exampleJa: '', level: 3, category: '基本の名詞' },
+  { id: 4029, word: 'enthusiast', phonetic: '/ɛnˈθuziˌæst/', pos: 'n.', meaning: '熱心な人、ファン', note: '', example: '', exampleJa: '', level: 3, category: '基本の名詞' },
   { id: 4030, word: 'vividly', phonetic: '/ˈvɪvədɫi/', pos: 'adv.', meaning: 'あざやかに', note: '', example: '', exampleJa: '', level: 3, category: '基本の形容詞・副詞' },
   { id: 4031, word: 'seawater', phonetic: '/ˈsiˌwɑtɝ/', pos: 'n.', meaning: '海水', note: '', example: '', exampleJa: '', level: 3, category: '自然・天気' },
   { id: 4032, word: 'sandal', phonetic: '/ˈsændəɫ/', pos: 'n.', meaning: 'サンダル', note: '', example: '', exampleJa: '', level: 3, category: '基本の名詞' },
@@ -4145,7 +4145,7 @@ const WORD_DATA = [
   { id: 4126, word: 'first floor', phonetic: '', pos: 'phr.', meaning: '1階', note: '', example: '', exampleJa: '', level: 3, category: '熟語・句動詞' },
   { id: 4127, word: 'first lady', phonetic: '', pos: 'phr.', meaning: '大統領夫人', note: '', example: '', exampleJa: '', level: 3, category: '熟語・句動詞' },
   { id: 4128, word: 'frying pan', phonetic: '', pos: 'phr.', meaning: 'フライパン', note: '', example: '', exampleJa: '', level: 3, category: '熟語・句動詞' },
-  { id: 4129, word: 'full stop', phonetic: '', pos: 'phr.', meaning: '7', note: '', example: '', exampleJa: '', level: 3, category: '熟語・句動詞' },
+  { id: 4129, word: 'full stop', phonetic: '', pos: 'phr.', meaning: '終止符、ピリオド', note: 'アメリカ英語では period', example: '', exampleJa: '', level: 3, category: '熟語・句動詞' },
   { id: 4130, word: 'ground floor', phonetic: '', pos: 'phr.', meaning: '一階', note: '', example: '', exampleJa: '', level: 3, category: '熟語・句動詞' },
   { id: 4131, word: 'heart attack', phonetic: '', pos: 'phr.', meaning: '心臓発作、心臓まひ', note: '', example: '', exampleJa: '', level: 3, category: '熟語・句動詞' },
   { id: 4132, word: 'horrify', phonetic: '/ˈhɔɹəˌfaɪ/', pos: 'v.', meaning: 'をぞっとさせる、こわがらせる', note: '', example: '', exampleJa: '', level: 3, category: '基本の動詞' },
