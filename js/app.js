@@ -2048,7 +2048,7 @@
   }
 
   function initStats() {
-    $('#export-btn').addEventListener('click', () => {
+    $('#export-btn')?.addEventListener('click', () => {
       const blob = new Blob([Storage.exportJSON()], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -2059,9 +2059,9 @@
       toast('学習データを書き出しました');
     });
 
-    $('#import-btn').addEventListener('click', () => $('#import-file').click());
+    $('#import-btn')?.addEventListener('click', () => $('#import-file').click());
 
-    $('#import-file').addEventListener('change', (e) => {
+    $('#import-file')?.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
