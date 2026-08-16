@@ -3790,6 +3790,2347 @@ const READING_DATA = [
         explanation: '最後の文に「going to change book-buying and reading forever（読書を永遠に変える）」とあります。'
       }
     ]
+  },
+  {
+    id: 'r59',
+    title: '保護者面談の日のお知らせ',
+    level: 3,
+    topic: 'お知らせ',
+    words: 173,
+    passage:
+      'Parent-Teacher Conference' + '\n' +
+      'On Thursday, September 22, we are going to have a day where parents can come and meet their children\'s teachers. There will be several meetings and events throughout the day. I hope you can make it to some or all of them. Thank you very much. — Principal Edward Shinner' + '\n' +
+      '10:00 - 11:00 A.M. — English, Parent Meetings, with Mrs. Crowe.' + '\n' +
+      '11:00 A.M. - 12:00 P.M. — Math, Parent Meetings, with Mr. Simpson.' + '\n' +
+      '12:00 - 1:00 P.M. — Science, Parent Meetings, with Mr. Flanders.' + '\n' +
+      '1:00 - 2:00 P.M. — Lunch and Speech, Presentation, with Ms. Fox.' + '\n' +
+      '2:00 - 3:00 P.M. — Athletics, Presentation and Demonstration, with Coach Kay.' + '\n' +
+      '3:00 - 4:00 P.M. — After-School Programs, Parent Activities, with Mr. Magoo.' + '\n' +
+      'Notes: All parents must send notes to school with their children saying if they are going to come. We need to know how many meetings to schedule and how much food to make. We would like all parents to participate in the final activity, so make sure to wear comfortable clothing.',
+    glossary: [
+      { w: 'conference', m: '面談・会議' },
+      { w: 'participate', m: '参加する' },
+      { w: 'comfortable', m: '快適な、楽な' }
+    ],
+    questions: [
+      {
+        q: 'Who will lead the English meetings?',
+        choices: [
+          'Mr. Magoo',
+          'Mrs. Crowe',
+          'Mr. Flanders',
+          'Mr. Simpson'
+        ],
+        answer: 1,
+        explanation: '予定表の最初の行に「10:00-11:00 A.M. — English, Parent Meetings, with Mrs. Crowe」とある。英語の面談を担当するのは Mrs. Crowe。'
+      },
+      {
+        q: 'Which of the following is NOT mentioned in the announcement?',
+        choices: [
+          'English Activity',
+          'Athletics Activity',
+          'Parent Meetings',
+          'After-School Science Fair'
+        ],
+        answer: 3,
+        explanation: '案内に出てくるのは English や Athletics の活動、Parent Meetings、After-School Programs で、「After-School Science Fair（放課後サイエンスフェア）」はどこにも書かれていない。'
+      },
+      {
+        q: 'Who is leading the last event of the day?',
+        choices: [
+          'Ms. Fox',
+          'Coach Kay',
+          'Mr. Magoo',
+          'Edward Shinner'
+        ],
+        answer: 2,
+        explanation: '一日の最後の予定は「3:00-4:00 P.M. — After-School Programs」で、担当は Mr. Magoo と書かれている。'
+      },
+      {
+        q: 'What do the parents need to have for the final activity?',
+        choices: [
+          'A note from home',
+          'A pair of sneakers',
+          'Comfortable clothes to wear',
+          'A bottle of water and a packed lunch'
+        ],
+        answer: 2,
+        explanation: 'Notes の最後に「make sure to wear comfortable clothing（動きやすい服装で来てください）」とある。最終アクティビティに必要なのは楽な服装。'
+      }
+    ]
+  },
+  {
+    id: 'r60',
+    title: '7年生のブロードウェイ観劇旅行',
+    level: 3,
+    topic: '学校生活',
+    words: 249,
+    passage:
+      'Last weekend, the seventh grade went to New York City and watched The Phantom of the Opera on Broadway. It was our school\'s first ever trip to Broadway and was a really fun time.' + '\n' +
+      'The music was very well done. The actors were talented singers and very good dancers. The set itself was artistic and amazing. Being at a Broadway musical was a very unique experience. We had really good seats in the theater, so we could see everything perfectly. Plus, our seats were really comfortable.' + '\n' +
+      'After the musical was over, we went to eat pizza. New York pizza is very famous and it was delicious. The restaurant was really busy. We had to wait a long time to sit down and eat. While we were waiting, we went outside to Central Park. There was a group of acrobats putting on a show for everyone to watch. They jumped and flipped so high and fast. It was almost as impressive as watching The Phantom of the Opera. After we had pizza, we went to our hotel and had an awesome night together as a class. We played games in the hotel\'s recreation room. It was so much fun going to New York, and we are sad that our trip had to end. Next year, the sixth-graders will be going to New York to see a Broadway show. We hope they get to see The Phantom of the Opera, but we are sure any show they watch will be great.',
+    glossary: [
+      { w: 'talented', m: '才能のある' },
+      { w: 'impressive', m: '印象的な、見事な' },
+      { w: 'acrobat', m: '曲芸師' }
+    ],
+    questions: [
+      {
+        q: 'What would be the best title for the article?',
+        choices: [
+          'The Seventh Grade Goes to New York',
+          'The Sixth Grade Goes to New York',
+          'Eating New York Pizza in Central Park',
+          'The Sixth and Seventh Grades Go to New York'
+        ],
+        answer: 0,
+        explanation: '第1段落に「the seventh grade went to New York City（7年生がニューヨークへ行った）」とあり、記事全体が7年生の旅行の報告。6年生が行くのは来年の話。'
+      },
+      {
+        q: 'What is suggested about The Phantom of the Opera?',
+        choices: [
+          'It was sad and scary.',
+          'It was the trip\'s main event.',
+          'It was hard to watch from their seats.',
+          'It was in the New York Opera House.'
+        ],
+        answer: 1,
+        explanation: '旅行の中心はミュージカル鑑賞で、曲芸師のショーですら「almost as impressive as watching The Phantom of the Opera（オペラ座の怪人にほぼ匹敵する）」と比較されている。つまり劇が旅行のメインイベント。'
+      },
+      {
+        q: 'In the passage, the word talented is closest in meaning to',
+        choices: [
+          'quiet',
+          'illegal',
+          'gifted',
+          'doubtful'
+        ],
+        answer: 2,
+        explanation: 'talented は「才能のある」。直後に「very good dancers」と続き、歌も踊りも上手だという文脈なので gifted（才能に恵まれた）が最も近い。'
+      },
+      {
+        q: 'In the passage, the word impressive is closest in meaning to',
+        choices: [
+          'funny',
+          'boring',
+          'exciting',
+          'uninteresting'
+        ],
+        answer: 2,
+        explanation: 'impressive は「見事な、心を動かす」。高く速く飛ぶ曲芸に感心している場面なので exciting が最も近い。'
+      },
+      {
+        q: 'In the passage, the word they refers to',
+        choices: [
+          'the trips',
+          'everyone',
+          'Broadway shows',
+          'the sixth-graders'
+        ],
+        answer: 3,
+        explanation: '最後の段落の「We hope they get to see The Phantom of the Opera」の they は、直前の文の「the sixth-graders（来年行く6年生）」を指す。'
+      },
+      {
+        q: 'According to the article, what will the sixth-grade students do next year?',
+        choices: [
+          'They will go to a show in New York',
+          'They will go to see The Phantom of the Opera.',
+          'They will go to the New York Opera House.',
+          'They will go to New York and watch acrobats.'
+        ],
+        answer: 0,
+        explanation: '最終段落に「Next year, the sixth-graders will be going to New York to see a Broadway show」とある。決まっているのは「ニューヨークでショーを見る」ことで、演目までは決まっていない。'
+      }
+    ]
+  },
+  {
+    id: 'r61',
+    title: '北極海のイッカク',
+    level: 3,
+    topic: '生物',
+    words: 237,
+    passage:
+      'Narwhals are a kind of whale that not many people have ever seen. That\'s because they live in the coldest waters on Earth, the Arctic Ocean. This sea water is so cold that much of it has turned into ice. Narwhals eat fish that live on the ocean floor and can dive 1,500 meters to find their prey. It\'s very cold down there, but the narwhal\'s body is built to withstand extremely cold temperatures.' + '\n' +
+      'Narwhals are smaller than other whales but they are still large. They can weigh up to 1,600 kilograms and are 4 to 5 meters long. They are usually white and black colored. As they get older, their skin gets lighter. Narwhals have something very special. Each narwhal has a tusk that grows straight out into a spear. These tusks can be over 2 meters long. These long, sharp tusks make the narwhal look much longer than it is.' + '\n' +
+      'Narwhals have been used as food by people for a long time. For native people in the Far North called Inuits, they are a good source of fat during the cold winters. Inuit people used to hunt them with spears from small boats. Now, they have a different way of hunting them. Many use modern motorboats to chase them and rifles to kill them. When a narwhal is caught, the entire whale including its tusk is used. The narwhal\'s tusk is a very valuable possession.',
+    glossary: [
+      { w: 'tusk', m: '牙' },
+      { w: 'prey', m: '獲物' },
+      { w: 'withstand', m: '耐える' }
+    ],
+    questions: [
+      {
+        q: 'What is the main topic of the passage?',
+        choices: [
+          'Life in the Arctic Ocean',
+          'Ancient Inuits\' hunting habits',
+          'Value of narwhal whales\' tusks',
+          'The narwhal whale in the Arctic Ocean'
+        ],
+        answer: 3,
+        explanation: '生息地・体の特徴・牙・人との関わりと、イッカクという鯨そのものを幅広く説明した文章。北極海の生活全般やイヌイットの狩りは話題の一部にすぎない。'
+      },
+      {
+        q: 'According to the passage, what do narwhal whales eat?',
+        choices: [
+          'Plants that grow near the ice',
+          'Animals living on polar ice caps',
+          'Organisms that are good at diving',
+          'Animals that live on the bottom of the sea'
+        ],
+        answer: 3,
+        explanation: '第1段落に「Narwhals eat fish that live on the ocean floor（海底にすむ魚を食べる）」とある。海の底にすむ動物を食べるが正解。'
+      },
+      {
+        q: 'In the passage, the word it refers to',
+        choices: [
+          'the cold',
+          'the polar area',
+          'the sea water',
+          'the narwhal'
+        ],
+        answer: 2,
+        explanation: '「This sea water is so cold that much of it has turned into ice」の it は直前の the sea water（海水）を指す。海水が凍って氷になる、という文。'
+      },
+      {
+        q: 'In the passage, the word native is closest in meaning to',
+        choices: [
+          'local',
+          'expert',
+          'foreign',
+          'ancient'
+        ],
+        answer: 0,
+        explanation: 'native people は「その土地に元から住む人々」。Far North に住むイヌイットを指しているので local（土地の）が最も近い。'
+      },
+      {
+        q: 'What do narwhals NOT look like?',
+        choices: [
+          'Whales with long spears',
+          'Animals with white and black skin',
+          'Dolphins with long sword-like tails',
+          'Sea mammals with very heavy bodies'
+        ],
+        answer: 2,
+        explanation: 'イッカクは槍のような長い牙を持ち、白黒の体色で、体重1,600kgにもなると書かれている。「剣のような長い尾を持つイルカ」という記述はない。牙であって尾ではない。'
+      },
+      {
+        q: 'Why are "Inuits" mentioned in the passage?',
+        choices: [
+          'To show who use narwhals as food',
+          'To explain how they like to use the narwhal tusks',
+          'To give an example of people who worship the narwhal',
+          'To prove they were the first people to write about narwhals'
+        ],
+        answer: 0,
+        explanation: '第3段落の冒頭で「Narwhals have been used as food by people for a long time. For native people ... called Inuits, they are a good source of fat」とあり、イッカクを食料にする人々の例としてイヌイットが挙げられている。'
+      },
+      {
+        q: 'In the passage, the word chase is closest in meaning to',
+        choices: [
+          'call',
+          'cheat',
+          'follow',
+          'protect'
+        ],
+        answer: 2,
+        explanation: 'chase は「追いかける」。モーターボートでイッカクを追う場面なので follow が最も近い。'
+      },
+      {
+        q: 'What can be inferred about the narwhal\'s tusk?',
+        choices: [
+          'It is very heavy.',
+          'It has special powers.',
+          'It is worth a lot of money.',
+          'People do not like to keep them.'
+        ],
+        answer: 2,
+        explanation: '最後の文に「The narwhal\'s tusk is a very valuable possession（牙はとても価値のある持ち物）」とある。ここから牙が高値で取引される、つまりお金になると推測できる。'
+      }
+    ]
+  },
+  {
+    id: 'r62',
+    title: '野獣にされた王子',
+    level: 3,
+    topic: '文化',
+    words: 288,
+    passage:
+      'Once upon a time, there was a young prince. He was very handsome but also very unkind. He was so mean that a witch turned him into a beast. She said, "You will look like a terrible beast as punishment for your unkindness. If you can\'t find true love by your 30th birthday, you will stay a beast forever!"' + '\n' +
+      'Many years went by. One cold winter night, the prince heard someone come into his castle. He rushed down the stairs to find a beautiful girl in the hallway. He decided to keep her prisoner. She begged the beast to let her return home. Feeling bad for the girl, he allowed her to walk around the castle, but he did not allow her to go home. Soon, the beast found himself doing kind things for the girl. He was in love with her. But the girl did not love him back. She thought he was cruel for keeping her prisoner. She missed her family and friends. He knew it, but he did not want to let her go. Only a month before his 30th birthday, the beast set her free. He could not see the girl sad any longer. The girl returned home, but she began to miss the beast. She decided to visit him for his birthday.' + '\n' +
+      'When she arrived, she was shocked to see the beast becoming more animal-like. Knowing nothing of the curse, she did not know what was happening to him. She ran to him and told him, "I missed you! I love you! What is happening?" She held the beast in her arms and gave him a kiss. At that very moment, the curse was lifted. The beast turned back into a good-looking prince!',
+    glossary: [
+      { w: 'witch', m: '魔女' },
+      { w: 'curse', m: '呪い' },
+      { w: 'prisoner', m: '囚人、とらわれた人' }
+    ],
+    questions: [
+      {
+        q: 'What is the best title for the story?',
+        choices: [
+          'A Beast Finds True Love',
+          'The Prince Meets the Witch',
+          'The Beast Holds a Big Birthday Party',
+          'The Girl Marries the Handsome Prince'
+        ],
+        answer: 0,
+        explanation: '呪いで野獣にされた王子が真実の愛を見つけて元に戻る物語。全体をまとめる題名は「野獣、真実の愛を見つける」がふさわしい。'
+      },
+      {
+        q: 'When will the prince\'s curse end?',
+        choices: [
+          'When he finds true love',
+          'When he learns to be kind',
+          'When he turns 29 years old',
+          'When he turns 30 years old'
+        ],
+        answer: 0,
+        explanation: '魔女のせりふに「If you can\'t find true love by your 30th birthday, you will stay a beast forever!」とある。呪いが解ける条件は真実の愛を見つけること。'
+      },
+      {
+        q: 'Why was the prince turned into a beast?',
+        choices: [
+          'He scared the girl.',
+          'He put the girl in jail.',
+          'He had a greedy nature.',
+          'He was unfriendly and mean.'
+        ],
+        answer: 3,
+        explanation: '第1段落に「He was so mean that a witch turned him into a beast（あまりに意地悪だったので魔女が野獣に変えた）」とある。理由は不親切で意地悪だったこと。'
+      }
+    ]
+  },
+  {
+    id: 'r63',
+    title: 'ヨーロッパで一番好きな国',
+    level: 3,
+    topic: '文化',
+    words: 196,
+    passage:
+      'This summer I traveled around Europe with my family. I liked most of the countries we visited, but I think France is the best country in Europe because of the language, the tourist sites, and the food.' + '\n' +
+      'The French language is not hard to learn because it is like English. It was easy for me to learn important phrases. French is a popular language worldwide. I can use the French I learned in forty-five different countries. Also, it sounds beautiful! France has some of the best and most popular tourist sites in the world. Some examples are Notre Dame, the Louvre Museum, and the Eiffel Tower. The Louvre is the home of the Mona Lisa, and the Eiffel Tower is the most visited monument in the world. Also, the food is wonderful! There are lots of tasty pastries and cheeses. All of the food is fresh and delicious. The very best part of eating in France was the desserts. Chocolate mousse and pain au chocolat are the best.' + '\n' +
+      'If you get a chance to see one country in Europe, I think you should go to France so that you can experience all of these wonderful things!',
+    glossary: [
+      { w: 'monument', m: '記念建造物' },
+      { w: 'phrase', m: '言い回し、フレーズ' },
+      { w: 'dessert', m: 'デザート' }
+    ],
+    questions: [
+      {
+        q: 'What would be the best title for this essay?',
+        choices: [
+          'My Visit to Paris',
+          'The Foods of France',
+          'Learning to Speak French',
+          'My Favorite European Country'
+        ],
+        answer: 3,
+        explanation: '筆者は「France is the best country in Europe」と述べ、言語・観光地・食べ物の3つの理由を挙げている。エッセイ全体の題名は「私のお気に入りのヨーロッパの国」が最適。パリや食べ物だけの話ではない。'
+      },
+      {
+        q: 'What does the author like best about French food?',
+        choices: [
+          'Desserts',
+          'Big dinners',
+          'Pastries and cheeses',
+          'Desserts and pastries'
+        ],
+        answer: 0,
+        explanation: '食べ物の段落に「The very best part of eating in France was the desserts（フランスの食事で一番よかったのはデザート）」とある。'
+      },
+      {
+        q: 'Why does the author like the French language?',
+        choices: [
+          'It is easy to learn.',
+          'It is pleasing to the ear.',
+          'It is useful in many countries.',
+          'All of the above'
+        ],
+        answer: 3,
+        explanation: 'フランス語について「not hard to learn」「I can use the French I learned in forty-five different countries」「it sounds beautiful!」と3つとも述べているので、「上のすべて」が正解。'
+      }
+    ]
+  },
+  {
+    id: 'r64',
+    title: 'イヌはこうして家畜になった',
+    level: 3,
+    topic: '生物',
+    words: 209,
+    passage:
+      'Many people have dogs for pets, but did you know that the dog was the first animal to be domesticated? That means it was the first animal to be kept and cared for by humans. Dogs have been kept as workers, hunters, and friends for much of human history. Dogs were originally gray wolves, but domestication gradually changed this. Humans have selectively bred dogs for traits that they believed were good. That\'s how many varieties of dogs came to exist today.' + '\n' +
+      'Dogs come in many shapes and sizes. Dogs also have different kinds of coats. Some of them have long hair, while others have short. This hair can come in many different colors and patterns. Dogs also have different skills. Some varieties are good at hunting wild animals, while others are good at herding cattle or protecting people. Because dogs are closely related to wolves, it might seem like they would be violent. Although some dogs are violent, 15,000 years of domestication has made most dogs friendly to humans. Today\'s dogs are much easier to train than wild wolves. They respond well to human training: learning to sit, roll over, and even participate in dog shows. Training dogs is a practice that has been improved for many, many years.',
+    glossary: [
+      { w: 'domesticate', m: '家畜化する' },
+      { w: 'breed', m: '繁殖させる、品種' },
+      { w: 'trait', m: '特徴、形質' }
+    ],
+    questions: [
+      {
+        q: 'What is the passage mostly about?',
+        choices: [
+          'Training dogs',
+          'Dogs\' shapes and sizes',
+          'The domestication of dogs',
+          'Similarities between dogs and wolves'
+        ],
+        answer: 2,
+        explanation: 'イヌが最初に家畜化された動物であること、家畜化で狼から変化し多くの品種が生まれたことを説明する文章。主題はイヌの家畜化。'
+      },
+      {
+        q: 'What is a major difference between a dog and a wolf?',
+        choices: [
+          'Wolves are bigger.',
+          'Dogs are usually brown.',
+          'Dogs are more easily trained.',
+          'Wolves need to eat more food.'
+        ],
+        answer: 2,
+        explanation: '後半に「Today\'s dogs are much easier to train than wild wolves（今のイヌは野生の狼よりずっと訓練しやすい）」とある。訓練のしやすさが大きな違い。'
+      },
+      {
+        q: 'Why do so many different varieties of dogs exist?',
+        choices: [
+          'Dogs began working as hunters.',
+          'Wolves naturally evolved into dogs.',
+          'Many types of wolves started breeding.',
+          'Humans developed their particular qualities.'
+        ],
+        answer: 3,
+        explanation: '「Humans have selectively bred dogs for traits that they believed were good. That\'s how many varieties of dogs came to exist」とある。人間が良いと思う特徴を選んで繁殖させたから品種が増えた。'
+      }
+    ]
+  },
+  {
+    id: 'r65',
+    title: '万能の人レオナルド・ダ・ヴィンチ',
+    level: 3,
+    topic: '伝記',
+    words: 241,
+    passage:
+      'Leonardo Da Vinci is one of the most famous historical figures of all time. He was born in 1452 in Florence, Italy. He is often described as the perfect "Renaissance Man," which means he was curious about a wide variety of things. It is not easy to put Da Vinci into a category. He was a painter, sculptor, astronomer, inventor, mathematician, writer, and more. Da Vinci, however, is perhaps most famous as a painter. He painted the Mona Lisa, which one of the most renowned paintings in the world. He also painted The Last Supper, which shows the last dinner of Jesus.' + '\n' +
+      'As a scientist and inventor, Da Vinci designed and invented things that were not possible to create during the time that he lived. He made plans for helicopters, tanks, calculators, and solar-powered machines. He kept extensive notebooks in which he wrote in code. Historians have to hold the notebooks up to a mirror to be able to read them. Da Vinci also made many discoveries, but he was not interested in becoming famous for them. He didn\'t publish any of his ideas.' + '\n' +
+      'Not much is known about Da Vinci\'s personal life or childhood. Da Vinci was careful to keep it secret. He never married and did not have any children, but had many friendships with various people. Today, Da Vinci is a legendary figure. He proves that one person can be talented at many things at the same time.',
+    glossary: [
+      { w: 'renowned', m: '名高い' },
+      { w: 'extensive', m: '広範囲の、膨大な' },
+      { w: 'figure', m: '人物' }
+    ],
+    questions: [
+      {
+        q: 'What would be the most suitable title for the passage?',
+        choices: [
+          'The Many Talents of Da Vinci',
+          'Da Vinci as a Writer and Painter',
+          'The Scientific Discoveries of Da Vinci',
+          'Da Vinci\'s Personal Life and Childhood'
+        ],
+        answer: 0,
+        explanation: '画家・彫刻家・発明家・数学者など多方面の才能を紹介し、最後も「one person can be talented at many things」と締めている。題名は「ダ・ヴィンチの多才ぶり」が最適。'
+      },
+      {
+        q: 'According to the passage, what did Leonardo Da Vinci make plans for?',
+        choices: [
+          'Many scientific discoveries',
+          'Books that he never published',
+          'Helicopters and other machines',
+          'Mirrors to use with his notebooks'
+        ],
+        answer: 2,
+        explanation: '第2段落に「He made plans for helicopters, tanks, calculators, and solar-powered machines」とある。ヘリコプターなどの機械の設計図を作った。'
+      },
+      {
+        q: 'Which of the following is true about Leonardo Da Vinci?',
+        choices: [
+          'He painted The Last Lunch.',
+          'He married and had a family.',
+          'He published many of his findings.',
+          'He is most well-known as a painter.'
+        ],
+        answer: 3,
+        explanation: '第1段落に「Da Vinci, however, is perhaps most famous as a painter（画家として最も有名）」とある。描いたのは The Last Supper（最後の晩餐）で、結婚せず、発見も発表しなかったので他の選択肢は本文と合わない。'
+      }
+    ]
+  },
+  {
+    id: 'r66',
+    title: '理科の課題、いつやる？',
+    level: 3,
+    topic: '手紙・メール',
+    words: 148,
+    passage:
+      'Hey Sheri, We need to talk about our science project. It is due in two weeks but we have not even set a time to start it yet. I have Monday, Wednesday, and Thursday evenings available because I have piano lessons on Tuesdays and soccer practice on Fridays. You said Mondays and Wednesdays are OK for you, so let\'s work those days after school. After school on Monday, we can work in my room on our fireball project. We can work until almost 7:00 P.M. My family has dinner then. You should ask your mom to pick you up by 6:50. I bought all the materials we need. I need you to pay for your half on Monday. E-mail me back and tell me if this plan is OK with you. I think our classmates will be shocked to see us hold fire in our hands!' + '\n' +
+      'Bye, Kim',
+    glossary: [
+      { w: 'due', m: '締め切りの' },
+      { w: 'material', m: '材料' },
+      { w: 'available', m: '都合がつく' }
+    ],
+    questions: [
+      {
+        q: 'What is this e-mail mainly about?',
+        choices: [
+          'Paying back Kim\'s money',
+          'Choosing a science fair project',
+          'Where to work on the science project',
+          'Scheduling a time to work on the science project'
+        ],
+        answer: 3,
+        explanation: 'メールの中心は「It is due in two weeks but we have not even set a time to start it yet」で、その後も曜日と時間の調整が続く。主題は理科の課題をやる日時を決めること。'
+      },
+      {
+        q: 'Which of the following is NOT mentioned?',
+        choices: [
+          'Sheri plays soccer on Friday.',
+          'Kim\'s family eats dinner at 7:00 P.M.',
+          'The science project is due in two weeks.',
+          'The girls haven\'t started the science project.'
+        ],
+        answer: 0,
+        explanation: '金曜にサッカーの練習があるのは書き手の Kim 自身（I have piano lessons on Tuesdays and soccer practice on Fridays）。Sheri がサッカーをするとは書かれていない。'
+      },
+      {
+        q: 'Kim mentions all of the following EXCEPT',
+        choices: [
+          'the girls working in Kim\'s room',
+          'Sheri paying Kim for the supplies',
+          'Kim\'s piano lessons and soccer practice',
+          'the teacher\'s opinion on the girls\' project'
+        ],
+        answer: 3,
+        explanation: 'Kim は自分の部屋で作業すること・材料代の半分の支払い・自分の習い事の予定には触れているが、先生が課題をどう思っているかは書いていない。'
+      }
+    ]
+  },
+  {
+    id: 'r67',
+    title: '月曜日の試験時間割',
+    level: 3,
+    topic: 'お知らせ',
+    words: 146,
+    passage:
+      'This is Monday\'s exam schedule for students in grades 7-8. All grade 7 students will take their tests in the gym. All grade 8 students will take their tests in the cafeteria. Please make sure you go to the right place on time. Doors will be locked ten minutes after the times written below. Each exam is one hour long. All students will get a lunch break from 11:30 A.M. to 1:00 P.M. and a fifteen-minute rest between exams.' + '\n' +
+      'Gymnasium (Grade 7) — Math: 9:00 A.M. / Science: 10:15 A.M. / English: 1:15 P.M. / History: 2:30 P.M.' + '\n' +
+      'Cafeteria (Grade 8) — Math: 10:00 A.M. / Science: 1:15 P.M. / English: 2:30 P.M. / History: Tuesday Exam.' + '\n' +
+      'Note: If a student cannot make it to an exam for emergency reasons, please bring a letter to the school office. All missed exams will be taken on Wednesday.',
+    glossary: [
+      { w: 'grade', m: '学年' },
+      { w: 'emergency', m: '緊急事態' },
+      { w: 'locked', m: '施錠された' }
+    ],
+    questions: [
+      {
+        q: 'What is this announcement mainly about?',
+        choices: [
+          'Monday\'s exam schedule for all students',
+          'Monday\'s exam schedule for the eighth-grade students',
+          'Monday\'s exam schedule for the seventh-grade students',
+          'Monday\'s exam schedule for the seventh-and eighth-grade students'
+        ],
+        answer: 3,
+        explanation: '冒頭に「This is Monday\'s exam schedule for students in grades 7-8」とあり、7年生と8年生の両方の試験時間割を知らせるお知らせ。'
+      },
+      {
+        q: 'The seventh-grade students have an exam at all times EXCEPT',
+        choices: [
+          '9:00 A.M.',
+          '2:30 P.M.',
+          '1:15 P.M.',
+          '10:00 A.M.'
+        ],
+        answer: 3,
+        explanation: '7年生（Gymnasium）の試験は 9:00・10:15・1:15・2:30 に始まる。10:00 A.M. は8年生（Cafeteria）の数学の時間で、7年生の試験はない。'
+      },
+      {
+        q: 'Which of the following is NOT true?',
+        choices: [
+          'Each exam is one hour long.',
+          'The seventh-grade students take exams in the gym.',
+          'Students get a fifteen-minute break between exams.',
+          'The eighth-grade students have four exams on Monday.'
+        ],
+        answer: 3,
+        explanation: '8年生の History は「Tuesday Exam」と書かれているので、月曜日の試験は3教科だけ。「8年生は月曜に4つ試験がある」は本文と合わない。'
+      }
+    ]
+  },
+  {
+    id: 'r68',
+    title: 'アメリカのサマーキャンプ',
+    level: 3,
+    topic: '文化',
+    words: 220,
+    passage:
+      'Many American children spend part of their summer at summer camps. Some of these camps are day camps, but many are places where children stay overnight for one week or more. At some camps, the campers sleep in tents. At others, the campers sleep in cabins. Some camps are all boys or all girls, while some are co-ed. Some summer camps have themes. Children can attend a week of horseback riding, drama, or sports camp. The most common summer camps, however, are general camps on a lake.' + '\n' +
+      'Americans believe that sending their children to summer camp will help them gain independence and make friends. At camp, they learn to swim, sail, canoe, and snorkel in the water. They also learn many sports and learn about surviving in nature. Some camps create organized events such as a color war. During a color war, the camp is divided into different colors. These different colored teams compete against each other in various events. It\'s usually very exciting for the campers and the staff.' + '\n' +
+      'Children that have gone to camp repeatedly say that it was one of the best experiences of their lives. Even though some campers get homesick, they usually go to camp for more than one summer. Many return year after year and keep their camp friends for a very long time.',
+    glossary: [
+      { w: 'independence', m: '自立' },
+      { w: 'co-ed', m: '男女共学の' },
+      { w: 'homesick', m: 'ホームシックの' }
+    ],
+    questions: [
+      {
+        q: 'What is the passage mostly about?',
+        choices: [
+          'Sleeping in tents and cabins',
+          'Making friends at American camps',
+          'Overcoming homesickness at camp',
+          'Summer camps in America'
+        ],
+        answer: 3,
+        explanation: 'キャンプの種類・活動・子どもへの効果と、アメリカのサマーキャンプ全般を紹介する文章。テントや友だち作りはその一部。'
+      },
+      {
+        q: 'According to the passage, which of the following is NOT true of American summer camps?',
+        choices: [
+          'They never have horseback riding.',
+          'They have many different activities.',
+          'They are good experiences for children.',
+          'They can be attended for a week or more.'
+        ],
+        answer: 0,
+        explanation: '第1段落に「Children can attend a week of horseback riding, drama, or sports camp」とあり、乗馬キャンプは実際にある。「乗馬は絶対にない」が本文と合わない選択肢。'
+      },
+      {
+        q: 'The author mentions all of the following EXCEPT',
+        choices: [
+          'camps organizing color wars',
+          'children learning water activities',
+          'staff members teaching about hiking',
+          'campers staying in tents and cabins'
+        ],
+        answer: 2,
+        explanation: '色別対抗戦（color war）・水辺の活動（swim, sail, canoe, snorkel）・テントや小屋での宿泊は本文にあるが、スタッフがハイキングを教えるという記述はない。'
+      }
+    ]
+  },
+  {
+    id: 'r69',
+    title: 'ピアノの誕生',
+    level: 3,
+    topic: '文化',
+    words: 243,
+    passage:
+      'The piano is one of the most popular instruments in the world. The modern piano was invented by Bartolomeo Cristofori. Cristofori worked as the keeper of instruments for Ferdinando de\'Medici, the Prince of Tuscany. It is unclear when he created the first piano, but the oldest Cristofori pianos that exist today are from the 1720s. Cristofori knew a lot about the clavichord and the harpsichord before he made the piano. The clavichord and the harpsichord were good instruments but were flawed. The clavichord was not loud enough to be used with an orchestra, while the harpsichord could not play very expressive notes. Cristofori invented the piano to have an instrument that was both loud and expressive. Cristofori\'s piano became famous because of a respected writer named Scipione Maffei. Maffei wrote an article about the piano with a diagram of it. Most people that would become piano builders found out about the piano from this article. Interestingly, Johann Sebastian Bach did not like the piano when he first heard it. He thought the high notes were not loud enough. Eventually, he came to like it. Wolfgang Mozart was one of the first musicians to use the piano. He composed much of his music on it. Still, the pianos in Mozart\'s time were different than they are now. Today, the piano is one of the most well-known instruments in the world. It is used in orchestras, musicals, and in many other popular forms of music.',
+    glossary: [
+      { w: 'instrument', m: '楽器' },
+      { w: 'expressive', m: '表現力豊かな' },
+      { w: 'flawed', m: '欠点のある' }
+    ],
+    questions: [
+      {
+        q: 'What is the best title for this passage?',
+        choices: [
+          'Mozart on the Piano',
+          'The Piano\'s Beginning',
+          'Cristofori\'s First Piano',
+          'Pianos in the World Today'
+        ],
+        answer: 1,
+        explanation: 'クリストフォリによる発明から普及までを語る文章なので、題名は「ピアノの始まり」が最適。モーツァルトや現代のピアノは話の一部にすぎない。'
+      },
+      {
+        q: 'The author mentions all of the following EXCEPT',
+        choices: [
+          'the piano\'s loud and expressive sound',
+          'Bach\'s opinion of the first piano he heard',
+          'Cristofori\'s knowledge of the harpsichord',
+          'Scipione Maffei\'s friendship with Cristofori'
+        ],
+        answer: 3,
+        explanation: '音量と表現力・バッハの感想・クラヴィコードとハープシコードの知識は本文にあるが、マッフェイとクリストフォリが友人だったという記述はない。マッフェイは記事を書いた人物として登場するだけ。'
+      },
+      {
+        q: 'According to the passage, which of the following is NOT true of Cristofori?',
+        choices: [
+          'He was Greek.',
+          'He invented the piano.',
+          'He worked for the Prince of Tuscany.',
+          'He was known as the keeper of instruments.'
+        ],
+        answer: 0,
+        explanation: 'クリストフォリは「the keeper of instruments for Ferdinando de\'Medici, the Prince of Tuscany」としてイタリアで働いた人物。ギリシャ人だったという記述はない。'
+      }
+    ]
+  },
+  {
+    id: 'r70',
+    title: '8年生に新しい統一テスト',
+    level: 3,
+    topic: '学校生活',
+    words: 183,
+    passage:
+      'Students across the country were disappointed and angry to learn that all eighth-grade students must now take a standardized test. A government official said the test will be used to see if children are ready for the challenges of high school, such as the bigger workloads and more difficult class topics. He also mentioned that any student who fails the test cannot move onto the next grade.' + '\n' +
+      'Mr. Richards, the Briscoe Middle School principal, was quoted saying, "There will be a big problem if too many students fail." When asked why, Mr. Richards explained that there will not be enough class space for new eighth-grade students if too many old eighth-graders are held back. Briscoe Middle School does not have the space for extra students. The test will be given to all eighth-graders this coming May. It will be a three-hour test that focuses on math, science, history, reading, and writing. Teachers and students are concerned that the test was written for too many students at too many different schools. With each school having a different curriculum, some schools may have an advantage.',
+    glossary: [
+      { w: 'standardized test', m: '統一テスト' },
+      { w: 'workload', m: '作業量、学習量' },
+      { w: 'curriculum', m: '教育課程' }
+    ],
+    questions: [
+      {
+        q: 'What would be the best headline for this article?',
+        choices: [
+          'Students Fail New Test',
+          'Official Explains New Test',
+          'New Test Unwelcome in Schools',
+          'Test to Judge Middle School Readiness'
+        ],
+        answer: 2,
+        explanation: '冒頭の「Students ... were disappointed and angry」から、記事全体が新テストへの不満と心配を伝えている。見出しは「新テスト、学校で不評」が最適。'
+      },
+      {
+        q: 'In the passage, the word disappointed is closest in meaning to',
+        choices: [
+          'delighted',
+          'satisfied',
+          'saddened',
+          'overjoyed'
+        ],
+        answer: 2,
+        explanation: 'disappointed は「がっかりした」。saddened（悲しんだ）が最も近い。delighted や overjoyed は逆の意味。'
+      },
+      {
+        q: 'The phrase held back in the passage is closest in meaning to',
+        choices: [
+          'passed',
+          'hugged',
+          'stopped',
+          'kicked out'
+        ],
+        answer: 2,
+        explanation: 'held back は「進級させられず留め置かれる」こと。落第して止められるという意味なので stopped が最も近い。'
+      }
+    ]
+  },
+  {
+    id: 'r71',
+    title: 'クリスマスの朝のサプライズ',
+    level: 3,
+    topic: '日常生活',
+    words: 173,
+    passage:
+      'Every year, on the 1st of November, my mother asks me what I want for Christmas. This year I told her, "I want the new Rendla video game." Rendla, The Adventure Through Time was the game of the year. Everyone wanted it. I waited patiently for Christmas to arrive. Bright and early Christmas morning I went straight to the tree to open all my presents. I opened everything but my video game was not there. I was really sad. It was the only thing I really wanted.' + '\n' +
+      'I tried to put on a brave face and thank my family for all my other great presents, but they knew I was disappointed. I thought I was going to cry. I ran up to my room so no one would see the tears in my eyes.' + '\n' +
+      'To my surprise, there was a gift sitting on my bed. I tore the wrapping paper off the tiny box. It was Rendla! I ran back downstairs and hugged my mom. I was the happiest boy in the world.',
+    glossary: [
+      { w: 'patiently', m: '辛抱強く' },
+      { w: 'disappointed', m: 'がっかりした' },
+      { w: 'wrapping paper', m: '包装紙' }
+    ],
+    questions: [
+      {
+        q: 'What is the main idea of this story?',
+        choices: [
+          'A boy wanting to get a video game',
+          'A popular video game sold in stores',
+          'A boy receiving a game he didn\'t want',
+          'A Christmas dinner with a large family'
+        ],
+        answer: 0,
+        explanation: 'ほしかったビデオゲームがツリーの下になくて落ち込み、最後に部屋で見つけて大喜びする話。主題は「ゲームをほしがる男の子」。'
+      },
+      {
+        q: 'In the passage, the phrase put on a brave face is closest in meaning to',
+        choices: [
+          'look sad',
+          'pretend to be satisfied',
+          'tell lies',
+          'be frustrated with parents'
+        ],
+        answer: 1,
+        explanation: 'put on a brave face は「平気なふりをする」。プレゼントに感謝しつつ本当はがっかりしている場面なので、「満足しているふりをする」が最も近い。'
+      },
+      {
+        q: 'In the passage, the word tore is closest in meaning to',
+        choices: [
+          'joined',
+          'applied',
+          'ripped',
+          'wrapped'
+        ],
+        answer: 2,
+        explanation: 'tore は tear（破る）の過去形。包装紙をビリビリ破る場面なので ripped が正解。'
+      }
+    ]
+  },
+  {
+    id: 'r72',
+    title: 'Y2K問題とは何だったのか',
+    level: 3,
+    topic: '技術',
+    words: 190,
+    passage:
+      'When computer programmers started making software systems, they programmed the years to be in two digits. For example, instead of using the year 1995, they shortened it to This didn\'t seem like a problem until the year 2000 began to come near. The year 1999, shortened to \'99, would become \'00 instead of 2000. Programmers worried that all computer systems would get confused and recognize \'00 as 1900. People were concerned that computer systems everywhere would crash. Bank information would be lost, the electricity would go out, and the world would lose much of its information. This problem was called "Y2K," short for "Year 2000." Some people gathered canned food and bottles of water in fear that many systems would stop working when 2000 came. In reality, only small errors occurred. Computer programmers worked hard before the year 2000 to make sure the problems were fixed. Still, at a horse racetrack in Delaware in the U.S.A., 150 gambling machines stopped working. In Japan, an alarm went off at a nuclear power plant. Many web sites around the world showed errors. Instead of showing the date as 2000, they showed 19100.',
+    glossary: [
+      { w: 'digit', m: '桁、数字' },
+      { w: 'crash', m: '（システムが）停止する' },
+      { w: 'occur', m: '起こる' }
+    ],
+    questions: [
+      {
+        q: 'What is the best title for this passage?',
+        choices: [
+          'The Y2K Problem',
+          'Collecting Food in 1999',
+          'Two-Digit and Four-Digit Dates',
+          'Computer Programmers, Our Heroes'
+        ],
+        answer: 0,
+        explanation: '年号2桁問題の仕組み・人々の不安・実際に起きた小さな誤作動と、Y2K問題の全体を説明する文章。題名は「Y2K問題」が最適。'
+      },
+      {
+        q: 'In the passage, the word crash is closest in meaning to',
+        choices: [
+          'hit',
+          'close off',
+          'restart',
+          'break down'
+        ],
+        answer: 3,
+        explanation: 'crash はコンピュータシステムが「動かなくなる」こと。break down（故障して止まる）が最も近い。'
+      },
+      {
+        q: 'In the passage, the word gathered is closest in meaning to',
+        choices: [
+          'took',
+          'found',
+          'collected',
+          'harvested'
+        ],
+        answer: 2,
+        explanation: 'gathered は「集めた」。缶詰や水を蓄える場面なので collected が最も近い。'
+      }
+    ]
+  },
+  {
+    id: 'r73',
+    title: 'ミッキーマウスの歩み',
+    level: 3,
+    topic: '文化',
+    words: 214,
+    passage:
+      'Mickey Mouse is one of the most popular cartoon characters in the world. Mickey was invented in 1928 by Walt Disney. His first public cartoon was called Steamboat Willie, which was seen by many audiences. Originally, Walt Disney himself did Mickey Mouse\'s vocal expressions such as whistling, laughing, or crying. Mickey did not actually speak until 1929. Interestingly enough, Mickey\'s first words were "Hot dogs! Hot dogs!" When Walt Disney began producing Mickey cartoons, there were hardly any animations in theaters. One of the reasons why Disney was much more successful than other animators was because of his use of sound. Most animation companies were creating silent animations. Walt Disney created a sound track to match the scenes in the cartoons, and this became very popular. Audiences began to see how much could be conveyed by a sound track. Throughout his existence, Mickey has undergone a few changes. For example, he didn\'t always have white gloves. His black hands were difficult to see against his black body, so animators dressed Mickey in white gloves. In 1940, Mickey was given pupils in his eyes. Later, he would lose his trademark red pants and start wearing different clothes. Today, Mickey Mouse is an icon for the Walt Disney Company and is known all over the world.',
+    glossary: [
+      { w: 'audience', m: '観客' },
+      { w: 'convey', m: '伝える' },
+      { w: 'trademark', m: 'トレードマーク' }
+    ],
+    questions: [
+      {
+        q: 'What is the passage mostly about?',
+        choices: [
+          'Walt Disney\'s animations',
+          'Mickey Mouse\'s first words',
+          'Mickey Mouse\'s life and history',
+          'The trademark of Mickey Mouse'
+        ],
+        answer: 2,
+        explanation: '誕生から声・音の工夫、手袋や目の変化、現在の地位まで、ミッキーマウスの歴史全体をたどる文章。最初の言葉やトレードマークは話の一部。'
+      },
+      {
+        q: 'In the passage, the word conveyed is closest in meaning to',
+        choices: [
+          'loved',
+          'carried',
+          'touched',
+          'mimicked'
+        ],
+        answer: 1,
+        explanation: 'conveyed は「伝えられた」。サウンドトラックでどれだけ多くのことが伝えられるかという文脈なので carried が最も近い。'
+      },
+      {
+        q: 'In the passage, the word undergone is closest in meaning to',
+        choices: [
+          'achieved',
+          'understood',
+          'gone between',
+          'gone through'
+        ],
+        answer: 3,
+        explanation: 'undergone は undergo（経験する）の過去分詞。「いくつかの変化を経てきた」という文脈なので gone through が正解。'
+      }
+    ]
+  },
+  {
+    id: 'r74',
+    title: '新入生からの自己紹介の手紙',
+    level: 3,
+    topic: '手紙・メール',
+    words: 124,
+    passage:
+      'Dear Mr. Williams, My name is Allen Clark and I will be a new student at your school next semester. I am going to be in your history class. I thought it would be a good idea to introduce myself. My family and I have just moved from Nebraska. My dad got a job in Burlington and he thinks it will be a good chance for us to try something new. Also, do you know what books the students read last year? I want to read them before I come to school in the fall. It would be great if you could send me a list. Thank you for your time. I look forward to taking your class in the fall. Sincerely, Allen Clark',
+    glossary: [
+      { w: 'semester', m: '学期' },
+      { w: 'introduce', m: '紹介する' },
+      { w: 'look forward to', m: '楽しみにする' }
+    ],
+    questions: [
+      {
+        q: 'What is this letter mainly about?',
+        choices: [
+          'A student who likes history',
+          'A student introducing himself',
+          'A student moving to a new city',
+          'A student asking for a list of books'
+        ],
+        answer: 1,
+        explanation: '「I thought it would be a good idea to introduce myself」とあるとおり、手紙の中心は新入生の自己紹介。本のリストのお願いは付け足しの用件。'
+      },
+      {
+        q: 'In the passage, the word he refers to',
+        choices: [
+          'Nebraska',
+          'Allen\'s father',
+          'Allen Clark',
+          'Mr. Williams'
+        ],
+        answer: 1,
+        explanation: '「My dad got a job in Burlington and he thinks it will be a good chance」の he は直前の My dad、つまりアレンの父親を指す。'
+      },
+      {
+        q: 'In the passage, the word them refers to',
+        choices: [
+          'the lists',
+          'the schools',
+          'the books',
+          'the teachers'
+        ],
+        answer: 2,
+        explanation: '「do you know what books the students read last year? I want to read them」の them は直前の the books（去年みんなが読んだ本）を指す。'
+      }
+    ]
+  },
+  {
+    id: 'r75',
+    title: 'ハワイで環境保護を手伝った2週間',
+    level: 3,
+    topic: '学校生活',
+    words: 204,
+    passage:
+      'Eleven students at Middlebury Junior High School returned this week from their trip to Hawaii. The students spent two weeks helping an environmental agency with their work. This agency, Environmental Ocean Life, works to preserve and protect the plants and animals that live in Hawaii\'s waters. Every year, they test the water and check on the plants and animals to make sure they are doing well in their environments. The Middlebury students joined them for two weeks to help them with their water tests.' + '\n' +
+      'The students reported that they had no idea how many different things could be tested. We learned a lot," said Justin Lim, a seventh-grade student. "We learned how to measure salinity, which is how much salt is in the water. Some plants and animals need certain levels of salinity to stay alive."' + '\n' +
+      'The agency thanked the students for their help by giving them the gift of a surfing lesson. "I never thought I\'d be surfing in Hawaii," said Nancy Jones, another seventh-grade student. She was very grateful to Environmental Ocean Life. "Not only did they teach me and my classmates so much about the Pacific Ocean around Hawaii, but they also gave us a surfing lesson. They are so cool!"',
+    glossary: [
+      { w: 'preserve', m: '保護する' },
+      { w: 'salinity', m: '塩分濃度' },
+      { w: 'grateful', m: '感謝している' }
+    ],
+    questions: [
+      {
+        q: 'What would be the most suitable headline for the article?',
+        choices: [
+          'The Pacific Ocean\'s Effect on Students',
+          'Middle School Students Helping in Hawaii',
+          'Middlebury Junior High School Students Touring Hawaii',
+          'Environmental Ocean Life Donating Surfing Lessons'
+        ],
+        answer: 1,
+        explanation: '記事の中心は、中学生11人がハワイで環境団体の水質調査を2週間手伝ったこと。見出しは「中学生、ハワイで活動を手伝う」が最適。観光旅行ではない。'
+      },
+      {
+        q: 'In the passage, the word they refers to',
+        choices: [
+          'Hawaii\'s waters',
+          'Hawaiian people',
+          'the environments',
+          'the plants and animals'
+        ],
+        answer: 3,
+        explanation: '「check on the plants and animals to make sure they are doing well」の they は直前の the plants and animals を指す。動植物が元気かどうかを確かめる、という文。'
+      },
+      {
+        q: 'In the passage, the word she refers to',
+        choices: [
+          'a student',
+          'the agency',
+          'an animal',
+          'Nancy Jones'
+        ],
+        answer: 3,
+        explanation: '「She was very grateful to Environmental Ocean Life」の She は直前で発言した Nancy Jones を指す。'
+      }
+    ]
+  },
+  {
+    id: 'r76',
+    title: '地球温暖化のしくみと影響',
+    level: 3,
+    topic: '環境',
+    words: 150,
+    passage:
+      'Global Warming is the idea that the world\'s temperature began to increase in the twentieth century and is continuing to increase. During the twentieth century, the global surface temperature went up by approximately 0.6 degrees Celsius. This may not seem like a lot, but this type of temperature rise is very unusual, considering Earth\'s history. Scientists believe that today\'s global warming is not caused by nature. Instead, it is humans who are causing it. Human activity is causing Earth\'s atmosphere to change. Carbon emissions from factories, livestock industry, airplanes, and automobiles are all threats to the ozone layer of the atmosphere.' + '\n' +
+      'It may seem like fun to have a world without winter, but global warming may result in the melting of the polar ice caps and rising sea levels. This would destroy coastal towns and cities and wipe out a lot of animal species. This is not something anybody wants.',
+    glossary: [
+      { w: 'emission', m: '排出' },
+      { w: 'atmosphere', m: '大気' },
+      { w: 'wipe out', m: '絶滅させる' }
+    ],
+    questions: [
+      {
+        q: 'What would be the best title for the passage?',
+        choices: [
+          'Melting Polar Ice Caps',
+          'Mere 0.6 Degrees Celsius',
+          'Earth\'s Changing Atmosphere',
+          'The Globe\'s Temperature Increase'
+        ],
+        answer: 3,
+        explanation: '気温上昇という現象の定義から原因・影響までを説明する文章。題名は「地球の気温上昇」が最適。氷や大気の話は説明の一部。'
+      },
+      {
+        q: 'In the passage, the word This refers to',
+        choices: [
+          'Earth\'s history',
+          'Global Warming',
+          '0.6 degrees Celsius',
+          'the twentieth century'
+        ],
+        answer: 2,
+        explanation: '「This may not seem like a lot」の This は直前の文の「0.6 degrees Celsius の上昇」を指す。大したことがないように見えるのはこの数字。'
+      },
+      {
+        q: 'In the passage, the word it refers to',
+        choices: [
+          'today',
+          'the problem',
+          'human activity',
+          'global warming'
+        ],
+        answer: 3,
+        explanation: '「Instead, it is humans who are causing it」の文末の it は、前の文から話題になっている global warming（今の温暖化）を指す。'
+      }
+    ]
+  },
+  {
+    id: 'r77',
+    title: '南北戦争が始まった場所',
+    level: 3,
+    topic: '歴史',
+    words: 213,
+    passage:
+      'The Battle of Fort Sumter was the first battle in the American Civil War. Fort Sumter was an army fort off the coast of Charleston, South Carolina. After South Carolina and other six Southern states seceded from the Union, they prevented the Northern soldiers at the fort from getting supplies.' + '\n' +
+      'Abraham Lincoln told the governor of South Carolina that he would be sending supplies to Fort Sumter. The governor responded by saying that the Northern soldiers needed to leave the fort immediately, but Lincoln refused to give up. On April 12, 1861, the Southern soldiers began to shoot cannons at the fort, forcing the Northern army to withdraw. No one on either side was killed, but this was the first battle of the Civil War. After the attack on Fort Sumter, Americans from both the North and South wanted further military action. For the rest of the war, the South would control Fort Sumter and the Charleston Harbor. This gave them an advantage. Although the Battle of Fort Sumter was a small battle, it was the first in one of the biggest wars in America\'s history. Neither the North nor South expected the war to last as long as it did. It raged on for four years. It all started at Fort Sumter.',
+    glossary: [
+      { w: 'secede', m: '脱退する' },
+      { w: 'withdraw', m: '撤退する' },
+      { w: 'rage on', m: '（戦争が）荒れ狂う、続く' }
+    ],
+    questions: [
+      {
+        q: 'What is this passage mainly about?',
+        choices: [
+          'The main battles of the Civil War',
+          'The South\'s control of the Charleston Harbor',
+          'Abraham Lincoln\'s decision not to give up',
+          'The significance of the Battle of Fort Sumter'
+        ],
+        answer: 3,
+        explanation: '小さな戦闘だったが「it was the first in one of the biggest wars in America\'s history」と締めくくられており、サムター要塞の戦いの歴史的な意味が主題。'
+      },
+      {
+        q: 'In the passage, the word they refers to',
+        choices: [
+          'the Union and its soldiers',
+          'the country and its people',
+          'American soldiers and supplies from Lincoln',
+          'South Carolina and other six Southern states'
+        ],
+        answer: 3,
+        explanation: '「After South Carolina and other six Southern states seceded ..., they prevented ...」の they は直前の「サウスカロライナと他の南部6州」を指す。'
+      },
+      {
+        q: 'In the passage, the word he refers to',
+        choices: [
+          'a soldier',
+          'South Carolina',
+          'Abraham Lincoln',
+          'South Carolina\'s governor'
+        ],
+        answer: 2,
+        explanation: '「Abraham Lincoln told the governor ... that he would be sending supplies」の he は文の主語リンカーンを指す。物資を送ると言ったのはリンカーン。'
+      }
+    ]
+  },
+  {
+    id: 'r78',
+    title: '竜巻はどこで生まれるか',
+    level: 3,
+    topic: '理科',
+    words: 203,
+    passage:
+      'Tornadoes are giant rotating columns of air. They form in thunderstorms when there is a great difference in the temperature and humidity of the lower and upper atmosphere. They can be very dangerous and very destructive.' + '\n' +
+      'There are different varieties of tornadoes. They can be very big or small. Some tornadoes are only a few feet across and others can travel across an entire state. Tornadoes stretch from the ground high into the sky. Usually, people rate them from FO to F5, F5 being the most dangerous with wind speeds of around 261-318 miles per hour. They are a very violent force of nature and can lay whole towns completely flat.' + '\n' +
+      'Tornadoes can happen all over the world but a lot of them happen in the central United States in a region called Tornado Alley. Tornado Alley is made up of the low, flat states of the central United States between the Rocky Mountains and the Appalachian Mountains. Even though Tornado Alley is the most common place for tornadoes, the deadliest recorded tornado was in Bangladesh in 1989 and killed around 1,300 people. Recently, massive tornadoes destroyed large parts of Alabama in the United States, a state that does not usually have tornadoes.',
+    glossary: [
+      { w: 'rotate', m: '回転する' },
+      { w: 'humidity', m: '湿度' },
+      { w: 'destructive', m: '破壊的な' }
+    ],
+    questions: [
+      {
+        q: 'What is this passage mainly about?',
+        choices: [
+          'The worst recorded tornadoes',
+          'How and where tornadoes happen',
+          'Bad tornadoes in the United States',
+          'The most destructive storms of nature'
+        ],
+        answer: 1,
+        explanation: '竜巻のでき方（雷雨の中で発生）と起こる場所（Tornado Alley など）を説明する文章なので、「竜巻はどのように・どこで起こるか」が主題。'
+      },
+      {
+        q: 'Where do most tornadoes happen?',
+        choices: [
+          'In Bangladesh',
+          'Everywhere in the world',
+          'In the central United States',
+          'In the western United States'
+        ],
+        answer: 2,
+        explanation: '第3段落に「a lot of them happen in the central United States in a region called Tornado Alley」とある。最も多いのはアメリカ中部。'
+      },
+      {
+        q: 'What is NOT true about tornadoes?',
+        choices: [
+          'Most are very large.',
+          'They come in many sizes.',
+          'They can be very destructive.',
+          'They can happen all over the world.'
+        ],
+        answer: 0,
+        explanation: '「Some tornadoes are only a few feet across（数フィートしかないものもある）」とあり大きさは様々。「ほとんどが巨大」は本文と合わない。'
+      },
+      {
+        q: 'In the passage, the word varieties is closest in meaning to',
+        choices: [
+          'sizes',
+          'types',
+          'regions',
+          'powers'
+        ],
+        answer: 1,
+        explanation: 'varieties は「種類」。「different varieties of tornadoes（いろいろな種類の竜巻）」という文脈なので types が正解。'
+      },
+      {
+        q: 'In the passage, the word entire is closest in meaning to',
+        choices: [
+          'half',
+          'part',
+          'whole',
+          'massive'
+        ],
+        answer: 2,
+        explanation: 'entire は「全体の」。「travel across an entire state（州全体を横断する）」という文脈なので whole が最も近い。'
+      },
+      {
+        q: 'In the passage, the word them refers to',
+        choices: [
+          'the people',
+          'the tornadoes',
+          'Tornado Alleys',
+          'states of the USA'
+        ],
+        answer: 1,
+        explanation: '「Usually, people rate them from F0 to F5」の them は前の文から話題の the tornadoes を指す。竜巻を F0〜F5 で格付けする、という文。'
+      }
+    ]
+  },
+  {
+    id: 'r79',
+    title: '階段から落ちた日の贈り物',
+    level: 3,
+    topic: '日常生活',
+    words: 341,
+    passage:
+      'The day started like any other day. I woke up at six-thirty and went into the bathroom to take a shower and get ready for school. "Are you up yet, Jacob?" I heard my mom yell from downstairs.' + '\n' +
+      '"Yes, I am. Is breakfast ready?" I yelled back.' + '\n' +
+      '"Come down when you are ready," she said and then she laughed. I wondered what was funny but didn\'t think about it very much. I finished brushing my teeth and packed my bag for school. I had a presentation in history, so I had some extra things to bring. I started walking down the stairs to the kitchen when I heard a strange whining noise. Then I decided to jump down the last five stairs but I didn\'t hop quite far enough. My foot got caught and I fell face-first with a loud bang. "Jacob! What happened?" My mom said as she found me motionless on the floor. Blood was pouring from my nose and my arm was aching. I couldn\'t move it, so my mom helped me up and took me out to the car.' + '\n' +
+      'Two hours later I left the hospital. My nose was fine but there was a cast on my arm. The pain had gone away, but I was very upset that I would have to miss presenting my history project. I had worked for weeks on it and was really looking forward to it. "It\'s okay, honey." My mom said, knowing what was on my mind. "I am sure Mr. Anderson will let you present your project next week. Besides, I think I have something at home that will make you feel better."' + '\n' +
+      'Then I remembered the noise that I had heard just before jumping down the stairs. When I got home, there was a new puppy waiting for me in the kitchen, along with my cold breakfast. I was really hungry, so I ate my breakfast. My mom let me share some of it with my new friend. It turned out to be a good day after all.',
+    glossary: [
+      { w: 'whining', m: 'クンクン鳴く声' },
+      { w: 'motionless', m: '動かない' },
+      { w: 'cast', m: 'ギプス' }
+    ],
+    questions: [
+      {
+        q: 'What would be the best title for this story?',
+        choices: [
+          'A Surprise for Jacob',
+          'Jacob\'s Kind Mother',
+          'Broken Arms and Legs',
+          'Jacob\'s Missing Project'
+        ],
+        answer: 0,
+        explanation: '腕を折った散々な一日の最後に子犬のサプライズが待っていた話。題名は「ジェイコブへのサプライズ」が最適。'
+      },
+      {
+        q: 'What did Jacob NOT do in the morning before falling?',
+        choices: [
+          'Take a shower',
+          'Brush his teeth',
+          'Pack his bag for school',
+          'Eat the breakfast his mom made'
+        ],
+        answer: 3,
+        explanation: '落ちる前にしたのはシャワー・歯みがき・かばんの準備。朝食は病院から帰った後に食べたので、「落ちる前に朝食を食べた」が該当しない行動。'
+      },
+      {
+        q: 'What body part did Jacob hurt in his fall?',
+        choices: [
+          'His arm',
+          'His legs',
+          'His back and arm',
+          'His nose and teeth'
+        ],
+        answer: 0,
+        explanation: '病院を出たとき「there was a cast on my arm（腕にギプス）」とあり、「My nose was fine」なので鼻は無事。けがをしたのは腕。'
+      },
+      {
+        q: 'In the passage, the word whining is closest in meaning to',
+        choices: [
+          'loud',
+          'angry',
+          'crying',
+          'yelling'
+        ],
+        answer: 2,
+        explanation: 'whining は子犬の「クンクンという鳴き声」。crying が最も近い。最後に子犬が登場することからも鳴き声だと分かる。'
+      },
+      {
+        q: 'In the passage, the word motionless is closest in meaning to',
+        choices: [
+          'still',
+          'awake',
+          'shocked',
+          'terrified'
+        ],
+        answer: 0,
+        explanation: 'motionless は「動かない」。床に倒れて動けない場面なので still（じっとした）が正解。'
+      },
+      {
+        q: 'In the passage, the word it refers to',
+        choices: [
+          'day',
+          'puppy',
+          'breakfast',
+          'new friend'
+        ],
+        answer: 2,
+        explanation: '「I ate my breakfast. My mom let me share some of it with my new friend」の it は直前の my breakfast を指す。朝食を子犬に分けてあげた、という文。'
+      }
+    ]
+  },
+  {
+    id: 'r80',
+    title: 'サファリからの手紙',
+    level: 3,
+    topic: '手紙・メール',
+    words: 248,
+    passage:
+      'Dear Class, I am writing to tell you about the African safari that I\'m on. I promised I\'d send you an update as soon as I had the time. You should know that I was touched by how interested you were in my trip. After spending some time here, I think you should come on a safari if you have the chance. There are many volunteer projects in Africa that need helpers. I encourage you to get involved.' + '\n' +
+      'I know you were most interested in African animals. On the safari, I\'ve been able to see lions, giraffes, zebras, gazelles, as well as many other animals. My favorite was the giraffes. Did you know that they have blue-black tongues? I didn\'t! They\'re incredibly long - about eighteen inches! Giraffes use these long tongues to eat leaves from acacia trees with sharp thorns. As for the lions, it was incredible to see them in the wild. The male\'s mane was quite impressive.' + '\n' +
+      'Anyway, I hope you\'re behaving yourself for your substitute teacher, Mr. Wilson. The school was kind enough to give me these two weeks off to participate in this project. So I hope you are showing that you can behave and study hard without me. I\'ll be back to school on Monday the 11th, so I\'ve sent this letter express mail. I hope it reaches you before I get back. When I return, I\'ll show you all of the photos that I\'ve taken. I\'ll see you soon. Mrs. Lee',
+    glossary: [
+      { w: 'safari', m: 'サファリ（野生動物を見る旅）' },
+      { w: 'thorn', m: 'とげ' },
+      { w: 'substitute teacher', m: '代理の先生' }
+    ],
+    questions: [
+      {
+        q: 'What is the letter mostly about?',
+        choices: [
+          'Students volunteering in Africa',
+          'Sending letters via express mail',
+          'The safari experience of a teacher',
+          'Surprising information about giraffes'
+        ],
+        answer: 2,
+        explanation: '先生がアフリカのサファリでの体験（見た動物・キリンの舌・ボランティア）をクラスに報告する手紙。主題は先生のサファリ体験。'
+      },
+      {
+        q: 'What is suggested about the giraffe\'s tongues?',
+        choices: [
+          'They are longer in the male giraffes.',
+          'If they\'re not blue-black, they\'re brown.',
+          'They are blue-black because of what they eat.',
+          'They are good for eating leaves on thorny trees.'
+        ],
+        answer: 3,
+        explanation: '「Giraffes use these long tongues to eat leaves from acacia trees with sharp thorns」とある。長い舌はとげのある木から葉を食べるのに役立つ。'
+      },
+      {
+        q: 'What does Mrs. Lee imply about the student\'s behavior?',
+        choices: [
+          'Mr. Wilson doesn\'t tolerate bad behavior.',
+          'She is worried that the students will behave badly.',
+          'The students won\'t be able to volunteer if they behave badly.',
+          'The students will be rewarded by Mr. Wilson if they behave well.'
+        ],
+        answer: 1,
+        explanation: '「I hope you\'re behaving yourself」「I hope you are showing that you can behave and study hard without me」と繰り返しており、先生は生徒たちが行儀よくできるか心配していると読み取れる。'
+      }
+    ]
+  },
+  {
+    id: 'r81',
+    title: 'クラスのペットを決める投票',
+    level: 3,
+    topic: '学校生活',
+    words: 220,
+    passage:
+      'Mrs. Jones had a tradition. At the end of the first day of school, Mrs. Jones always asked the children to vote on which animal would live in their class for the year. Then she would go to the local pet store and buy a class pet. The children loved the class pets. At the end of the day, if the students did all their work, the class got to play with it. It was exciting for the students to watch Perry the bird fly around or to see Timmy the turtle dive in the classroom sink.' + '\n' +
+      'Now, it was my class\'s turn to choose. Mrs. Jones asked each student what pet they\'d like. After everyone chose, the most popular choices were a rabbit, a lizard, or a dog. Mrs. Jones had to say, "Students, we cannot have a dog. We cannot walk him at night." The vote was between a lizard and a rabbit. The boys cried, "Rabbits are boring!" while the girls shouted "Lizards are ugly!" Mrs. Jones hushed the class. "It\'s time to vote. Let the best pet win." She asked the class to raise their hands to vote. "Who wants a rabbit?" Ten hands rose. Next she asked, "Who wants a lizard?" Eleven students lifted their hands. "I guess we have a winner," announced Mrs. Jones.',
+    glossary: [
+      { w: 'tradition', m: '伝統、恒例行事' },
+      { w: 'vote', m: '投票する' },
+      { w: 'hush', m: '静かにさせる' }
+    ],
+    questions: [
+      {
+        q: 'What would be the best title for this story?',
+        choices: [
+          'The Big Pet Decision',
+          'A New Year at School',
+          'Buck the Class Bunny',
+          'Timmy the Turtle Returns'
+        ],
+        answer: 0,
+        explanation: 'クラスで飼うペットを投票で決める話なので、題名は「ペットの大決定」が最適。バニーやカメの話は出てくるが中心ではない。'
+      },
+      {
+        q: 'What can be inferred about the students in the class?',
+        choices: [
+          'The class is all boys.',
+          'There are more girls.',
+          'There are more boys.',
+          'There are the same number of boys and girls.'
+        ],
+        answer: 2,
+        explanation: '男子は「Rabbits are boring!（ウサギ派はいや）」つまりトカゲ派、女子は「Lizards are ugly!」つまりウサギ派。ウサギ10票・トカゲ11票でトカゲが勝ったので、男子の方が多いと推測できる。'
+      },
+      {
+        q: 'What is likely true about this year\'s class pet?',
+        choices: [
+          'It is a dog.',
+          'It is a rabbit.',
+          'It is a turtle.',
+          'It is a lizard.'
+        ],
+        answer: 3,
+        explanation: '投票の結果はウサギ10票・トカゲ11票で「I guess we have a winner」。今年のペットはトカゲだと分かる。'
+      }
+    ]
+  },
+  {
+    id: 'r82',
+    title: 'ドラキュラのモデルになった男',
+    level: 3,
+    topic: '歴史',
+    words: 203,
+    passage:
+      'Dracula, the legendary vampire, was inspired by a real man, Vlad III Dracula. Over six hundred years ago, Dracula ruled Romania. He became famous throughout Europe for his cruelty.' + '\n' +
+      'The first thing he did when he became ruler of Romania was to destroy his enemies, the nobles called Boyars. Dracula killed the older Boyars and made the younger and fitter Boyars build him a castle. He forced them to work until they died. Dracula was equally cruel to people who broke the law. Lawbreakers would be killed or tortured in the worst ways. Those who angered Dracula were thrown onto wood spikes. He left their bodies on the spikes outside his castle to warn people to behave. Many people believed he liked killing and hurting people. They also believed he drank the blood of his victims. The rumors of Dracula drinking blood and killing so many people gave Bram Stoker, an Irish novelist, an idea for a story about an evil, blood-drinking monster.' + '\n' +
+      'He wrote and published a book with the title of Dracula in 1897. After the book, many more vampire stories in which Dracula appears were written. In modern vampire fiction, one can always find aspects of Bram Stoker\'s original story.',
+    glossary: [
+      { w: 'cruelty', m: '残酷さ' },
+      { w: 'torture', m: '拷問する' },
+      { w: 'rumor', m: 'うわさ' }
+    ],
+    questions: [
+      {
+        q: 'Which title best summarizes the main idea of the passage?',
+        choices: [
+          'The Origins of Dracula',
+          'The History of the Boyars',
+          'The Novel Dracula by Bram Stoker',
+          'The Life of Vlad III Dracula, the Vampire'
+        ],
+        answer: 0,
+        explanation: '実在のヴラド3世から小説、そして現代の吸血鬼小説へとつながる「ドラキュラの起源」を語る文章。ヴラド3世の生涯やボヤールの歴史だけの話ではない。'
+      },
+      {
+        q: 'What can you infer about Vlad III Dracula from the passage?',
+        choices: [
+          'He was feared.',
+          'He was a great leader.',
+          'He was nice to his family.',
+          'He was loved by his people.'
+        ],
+        answer: 0,
+        explanation: '法を破った者を処刑し、死体を城の外にさらして「人々に行いを慎むよう警告した」とある。ここから、ヴラド3世は恐れられていたと推測できる。'
+      },
+      {
+        q: 'What does the author imply about vampire fiction today?',
+        choices: [
+          'It is related to Bram Stoker.',
+          'It is based on the life of Vlad III Dracula.',
+          'It is very popular among modern writers.',
+          'It is often influenced by Bram Stoker\'s Dracula.'
+        ],
+        answer: 3,
+        explanation: '最後に「In modern vampire fiction, one can always find aspects of Bram Stoker\'s original story」とある。今日の吸血鬼小説はストーカーの『ドラキュラ』の影響を受けている。'
+      }
+    ]
+  },
+  {
+    id: 'r83',
+    title: 'アメリカ国歌の意外な生まれ',
+    level: 3,
+    topic: '歴史',
+    words: 231,
+    passage:
+      'The Star-Spangled Banner is the United States of America\'s national anthem. The lyrics to this song were written by Francis Scott Key, American lawyer and poet. When Key wrote the lyrics, he did not expect them to become a song. Instead, the lyrics were a part of a poem he wrote called Defence of Fort McHenry. The poem was about the War of 1812. Key saw British ships bombing Fort McHenry and was inspired to write the poem. Oddly enough, the words written by Francis Scott Key were paired with a popular British drinking song. At the time, this drinking song was widely known in America. Although Key\'s original poem was written in 1814, The Star-Spangled Banner did not become America\'s official anthem until 1931. Before that, it was recognized as an important song in the navy in 1889. It had been part of American patriotic music for a long time. Today, The Star-Spangled Banner is sung on many occasions. It technically has four verses, but only the first one is commonly sung. The song is known as being especially difficult to sing. It has a wide range from very low to very high notes. Now, the national anthem is played at all national sports games. This began in 1916 on President Woodrow Wilson\'s orders. It is amusing that The Star-Spangled Banner was not the official national anthem at that time.',
+    glossary: [
+      { w: 'anthem', m: '国歌、賛歌' },
+      { w: 'lyrics', m: '歌詞' },
+      { w: 'patriotic', m: '愛国的な' }
+    ],
+    questions: [
+      {
+        q: 'What is the best title for the passage?',
+        choices: [
+          'National Anthems in America',
+          'Defence of Fort McHenry in 1814',
+          'Francis Scott Key\'s American Anthem',
+          'How the National Anthem Became Official'
+        ],
+        answer: 2,
+        explanation: 'フランシス・スコット・キーの詩がどうやって国歌になったかを語る文章。題名は「フランシス・スコット・キーのアメリカ国歌」が最適。'
+      },
+      {
+        q: 'What does the author imply about the lyrics being paired with a drinking song?',
+        choices: [
+          'It was written at a bar.',
+          'It is a strange combination.',
+          'It is appropriate in America.',
+          'It wasn\'t written by young people.'
+        ],
+        answer: 1,
+        explanation: '「Oddly enough（奇妙なことに）」と前置きして酒場の歌と組み合わされたことを紹介している。筆者はこれを不思議な組み合わせだと思っている。'
+      },
+      {
+        q: 'What is suggested about The Star-Spangled Banner before 1931 when it became official?',
+        choices: [
+          'It was already very popular.',
+          'It was only a drinking song.',
+          'It wasn\'t known by many Americans.',
+          'It was competing with many other songs for the title.'
+        ],
+        answer: 0,
+        explanation: '1931年に公式となる前から「recognized as an important song in the navy in 1889」「part of American patriotic music for a long time」とあり、すでに広く親しまれていたことが分かる。'
+      }
+    ]
+  },
+  {
+    id: 'r84',
+    title: 'スーザンへの補習の提案',
+    level: 3,
+    topic: '手紙・メール',
+    words: 142,
+    passage:
+      'Dear Susan, Mr. Andrews and I have come up with a plan to help you in your biology class. I know that you were very sick at the beginning of the semester. We want to help you catch up to the other students. It would be sad if you failed the upcoming exam. Mr. Andrews has agreed to give you extra help every Monday and Wednesday morning from 7:30 until 8:20. This tutoring will last for four weeks, ending at the time of the exams. With this extra help, Mr. Andrews and I hope that you\'ll be prepared for your biology exam. Please let me know by the end of the week if this plan works for you. If you are going to have trouble getting to school early, then please let us know. I\'m sure we can arrange something.' + '\n' +
+      'Principal Stockton',
+    glossary: [
+      { w: 'catch up', m: '追いつく' },
+      { w: 'tutoring', m: '個別指導' },
+      { w: 'arrange', m: '手配する' }
+    ],
+    questions: [
+      {
+        q: 'What is the letter mainly about?',
+        choices: [
+          'Susan being sick',
+          'An extra help plan for Susan',
+          'The upcoming biology exam',
+          'Principal Stockton\'s schedule'
+        ],
+        answer: 1,
+        explanation: '「Mr. Andrews and I have come up with a plan to help you」とあり、手紙の中心は病気で遅れたスーザンのための補習プラン。'
+      },
+      {
+        q: 'Why does Principal Stockton talk about failing the upcoming exam?',
+        choices: [
+          'To explain that exams are usually failed',
+          'To prove that Susan is already prepared',
+          'To suggest that Susan do her homework',
+          'To show why extra help is being provided'
+        ],
+        answer: 3,
+        explanation: '「It would be sad if you failed the upcoming exam」は、なぜ特別な補習を用意するのかという理由を示すために書かれている。'
+      },
+      {
+        q: 'Why is Susan\'s having trouble getting to school early mentioned?',
+        choices: [
+          'To prove that Susan is a reliable student',
+          'To explain that the school can change the plan if necessary',
+          'To give an example of a reason that Mr. Andrews won\'t come',
+          'To inform Susan that there won\'t be afternoon tutoring sessions'
+        ],
+        answer: 1,
+        explanation: '「If you are going to have trouble getting to school early, then please let us know. I\'m sure we can arrange something」とある。都合が悪ければ計画を調整できると伝えるための一文。'
+      }
+    ]
+  },
+  {
+    id: 'r85',
+    title: 'アメリカを支えたハドソン川',
+    level: 3,
+    topic: '社会',
+    words: 229,
+    passage:
+      'The Hudson River is one of the most significant rivers in America, though it is not the largest. It was named after Henry Hudson, an English explorer who charted the river for the Dutch East India Company. The Hudson goes for 315 miles, starting in the Adirondack Mountains in New York State. It enters the ocean around New York City. Washington Irving, an American writer, was one of the first to write about the Hudson River. He lived in the Hudson River Valley and wrote about the unique characteristics of this area. He developed the first kind of American folklore and told a story of a man named Rip Van Winkle. Rip Van Winkle fell asleep one day while climbing the mountains around the Hudson River. He did not wake up for twenty years. When he finally woke up, America had become a free country.' + '\n' +
+      'The river has not only been written about by famous writers, but has had practical purposes as well. It was an important means of transportation as America developed. The Erie Canal was built to connect the river to Lake Erie, one of the nation\'s great lakes. This canal allowed the many cities on the Great Lakes to get goods from Europe. The Hudson River Valley area was also good for building railroads. All in all, the Hudson River is an important river in America.',
+    glossary: [
+      { w: 'significant', m: '重要な' },
+      { w: 'folklore', m: '民間伝承' },
+      { w: 'canal', m: '運河' }
+    ],
+    questions: [
+      {
+        q: 'What would be the best title for this passage?',
+        choices: [
+          'Washington Irving\'s River',
+          'The Biggest River in America',
+          'A River of American Importance',
+          'Why Americans Built the Erie Canal'
+        ],
+        answer: 2,
+        explanation: '文学と交通の両面から川の重要性を語り、「the Hudson River is an important river in America」と締めている。題名は「アメリカにとって大切な川」が最適。冒頭で「最大の川ではない」と明言している。'
+      },
+      {
+        q: 'Why does the author mention "Washington Irving" in paragraph 2?',
+        choices: [
+          'To give an example of an American writer',
+          'To prove that many writers live in New York',
+          'To explain why Rip Van Winkle did not wake up',
+          'To show that writers wrote about the Hudson River'
+        ],
+        answer: 3,
+        explanation: 'アーヴィングは「one of the first to write about the Hudson River」として登場する。作家たちがこの川を題材にしたことを示す例。'
+      },
+      {
+        q: 'Why does the author talk about "the Erie Canal" in paragraph 3?',
+        choices: [
+          'To point out the need to build a railroad',
+          'To explain why writers liked the Hudson',
+          'To prove that Americans were good builders',
+          'To show how transportation was used on the river'
+        ],
+        answer: 3,
+        explanation: 'エリー運河は「an important means of transportation」の説明の中で、五大湖の都市がヨーロッパの品物を手に入れられるようになった例として挙げられている。川が輸送に使われたことを示すため。'
+      }
+    ]
+  },
+  {
+    id: 'r86',
+    title: 'ベーブ・ルースの生涯',
+    level: 3,
+    topic: '伝記',
+    words: 210,
+    passage:
+      'Babe Ruth is one of the greatest and the most popular American baseball players that ever lived. He was one of the first five players elected to the Baseball Hall of Fame. Though over sixty years have passed since his death, almost every kid in the U.S. today grows up knowing his name. He was born in 1895 as George Herman Ruth, Jr. in Maryland and grew up without a mother. At the age of seven, his father sent him to St. Mary\'s, a Catholic school where Babe Ruth lived for the next twelve years of his life. There he learned to play baseball but was isolated from his family. He started playing in the majors as a pitcher when he was only nineteen years old. He was very successful and before long he was traded to the Boston Red Sox. There he won a World Series in 1915 but fame as a hitter was still a long way off. In 1919, Babe Ruth was sold to the New York Yankees for 125,000 dollars cash and three 25,000 dollar notes. He then started to become the legend that everyone knows about today. By the end of his career, Babe Ruth had hit 714 home runs and had scored 2,213 runs.',
+    glossary: [
+      { w: 'elect', m: '選出する' },
+      { w: 'isolated', m: '孤立した' },
+      { w: 'legend', m: '伝説' }
+    ],
+    questions: [
+      {
+        q: 'What is the best title for the passage?',
+        choices: [
+          '714 Home Runs',
+          'The Career of Babe Ruth',
+          'The Life of Babe Ruth',
+          'All-Time Best Baseball Players'
+        ],
+        answer: 2,
+        explanation: '誕生から少年時代、選手としての活躍、通算成績までを語る文章なので、題名は「ベーブ・ルースの生涯」が最適。ホームラン記録や経歴は生涯の一部。'
+      },
+      {
+        q: 'Why does the author talk about "St. Mary\'s"?',
+        choices: [
+          'To explain why Ruth wasn\'t very nice',
+          'To give some background information about Ruth',
+          'To show why Ruth joined the New York Yankees',
+          'To provide an example of a place to learn baseball'
+        ],
+        answer: 1,
+        explanation: 'セント・メアリーズは7歳で送られて12年間暮らし、野球を覚えた場所として登場する。ルースの生い立ちを説明するための背景情報。'
+      },
+      {
+        q: 'Why does the author mention that almost all American kids today grow up knowing Babe Ruth\'s name?',
+        choices: [
+          'To show how admired he is in the U.S.',
+          'To explain the American kids\' wishes',
+          'To prove that he was the greatest pitcher',
+          'To give an example of how Americans love baseball'
+        ],
+        answer: 0,
+        explanation: '死後60年以上たっても「almost every kid in the U.S. today grows up knowing his name」という事実は、彼がアメリカでどれほど敬愛されているかを示すために書かれている。'
+      }
+    ]
+  },
+  {
+    id: 'r87',
+    title: '世界一「高い」山はどっち？',
+    level: 3,
+    topic: '理科',
+    words: 192,
+    passage:
+      'The highest mountain in the world is thought to be Mount Everest, but, in fact, the Mauna Kea stands taller than all other mountains in the world. Although Mount Everest is over 29,000 feet above sea level, the Mauna Kea volcano is over 33,000 feet tall. Most people do not know Mauna Kea is taller because the base of the volcano begins under the sea. In contrast, Mount Everest\'s base is completely above the ocean. There has been confusion about why Mount Everest holds the crown as the highest mountain in the world when Mauna Kea is roughly 4,000 feet taller. This is because of the difference between mountain height and tallness. Height is how far a mountain reaches into the sky. While the tallness of a mountain is measured from the base to the peak, the height is measured from sea level to the peak. Because Mount Everest is 29,000 feet above the sea, it is higher than Mauna Kea. However, Mauna Kea is taller because a large part of the mountain is under water. If both mountains started at sea level, Mauna Kea would be the loftier of the two.',
+    glossary: [
+      { w: 'peak', m: '山頂' },
+      { w: 'roughly', m: 'およそ' },
+      { w: 'lofty', m: 'そびえ立つ' }
+    ],
+    questions: [
+      {
+        q: 'What title best expresses the main idea of the passage?',
+        choices: [
+          'Mount Everest',
+          'The Tallest Mountain in the World',
+          'The Mauna Kea Volcano\'s Base',
+          'The Highest Mountain in the World'
+        ],
+        answer: 1,
+        explanation: 'エベレストではなくマウナケアこそ世界一「背の高い」山だと説明する文章。主張の中心はマウナケアなので「世界で最も背の高い山」が最適。'
+      },
+      {
+        q: 'Why does the author talk about Mauna Kea\'s base?',
+        choices: [
+          'To explain why Mauna Kea is taller than Mount Everest',
+          'To prove why Mauna Kea is higher than Mount Everest',
+          'To exemplify why Mount Everest is taller than Mauna Kea',
+          'To show why Mount Everest is the same height as Mauna Kea'
+        ],
+        answer: 0,
+        explanation: 'マウナケアの土台が海の下から始まることは、「マウナケアの方が背が高い」理由の説明として書かれている。'
+      },
+      {
+        q: 'Why are "mountain height and tallness" mentioned in the passage?',
+        choices: [
+          'To note Mount Everest and Mauna Kea are the same heights',
+          'To clarify how they are irrelevant to mountains',
+          'To explain how they are the same when they are used',
+          'To point out why Mount Everest is the highest and Mauna Kea is the tallest'
+        ],
+        answer: 3,
+        explanation: 'height（海面から頂上まで）と tallness（土台から頂上まで）の違いは、エベレストが「最も高い」でマウナケアが「最も背が高い」理由を示すために持ち出されている。'
+      }
+    ]
+  },
+  {
+    id: 'r88',
+    title: '感謝の夕食会へのご招待',
+    level: 3,
+    topic: '手紙・メール',
+    words: 186,
+    passage:
+      'Dear Mrs. Andrews, As you know, the Boy Scouts will be having a dinner in your honor this month. We want to thank you for all the help that you have given us in the last few years. We would be very honored if you could join us. I\'m writing to you to give you details about the dinner. It will occur on Wednesday, October 28 and start at 7 P.M. at the Green Mountain Restaurant. There will be a buffet with all kinds of food. There will also be speeches from people who are involved in the Boy Scouts. It is going to be an amazing evening. The boys have prepared a special gift for you. I won\'t tell you what it is going to be because they asked me to make sure that it is a surprise. There will also be a surprise guest speaker at the dinner.' + '\n' +
+      'The boys have been working for months planning this dinner. It was their idea. They are very excited for it.' + '\n' +
+      'You are an amazing person, and we are happy to tell the world. Thanks.' + '\n' +
+      'Donald Doolittle',
+    glossary: [
+      { w: 'in one\'s honor', m: '〜に敬意を表して' },
+      { w: 'buffet', m: 'ビュッフェ' },
+      { w: 'gratitude', m: '感謝' }
+    ],
+    questions: [
+      {
+        q: 'Why did Donald Doolittle write this e-mail?',
+        choices: [
+          'To ask for help from Mrs. Andrews',
+          'To find out if Mrs. Andrews likes buffets',
+          'To inform Mrs. Andrews about the dinner',
+          'To prove that the Boy Scouts need support'
+        ],
+        answer: 2,
+        explanation: '「I\'m writing to you to give you details about the dinner」と明言されているとおり、目的は夕食会の詳細を知らせること。'
+      },
+      {
+        q: 'What is suggested about Mrs. Andrews?',
+        choices: [
+          'She used to be a member of the Boy Scouts.',
+          'She is having a dinner party with her friends.',
+          'She is an important supporter of the Boy Scouts.',
+          'She does not know the boys from the Boy Scouts.'
+        ],
+        answer: 2,
+        explanation: '夕食会は「in your honor（あなたに敬意を表して）」開かれ、「thank you for all the help that you have given us in the last few years」とある。長年ボーイスカウトを支えてきた大切な人物だと分かる。'
+      },
+      {
+        q: 'Why does Donald Doolittle mention "a surprise guest speaker"?',
+        choices: [
+          'To tell Mrs. Andrews that she will have to speak',
+          'To explain that he doesn\'t know about the dinner',
+          'To show how special and how much fun the dinner will be',
+          'To give an example of why he doesn\'t want to go to the dinner'
+        ],
+        answer: 2,
+        explanation: 'サプライズのゲストスピーカーは、特別な贈り物やビュッフェと並べて「It is going to be an amazing evening」を裏付ける材料。夕食会がどれほど特別で楽しいかを示すため。'
+      },
+      {
+        q: 'Why does Donald Doolittle mention that the party was the boys\' idea?',
+        choices: [
+          'To show the boys\' gratitude to Mrs. Andrews',
+          'To prove how kind they are to senior citizens',
+          'To give an example of their hard work in school',
+          'To explain how long it will take for them to have the dinner'
+        ],
+        answer: 0,
+        explanation: '「It was their idea. They are very excited for it」は、少年たち自身が感謝を伝えたがっていることを示すために書かれている。'
+      }
+    ]
+  },
+  {
+    id: 'r89',
+    title: '巨大ザメ・メガロドンは今も海に？',
+    level: 3,
+    topic: '生物',
+    words: 250,
+    passage:
+      'The great white shark is one of the most famous predators in the world. It is also one of the biggest and scariest sharks in the ocean. Movies like Jaws have made it even more popular. Believe it or not, before the great white, there was an even bigger shark in the ocean. The megalodon is an extinct kind of shark that lived over a million years ago. Its name means big tooth and it did have giant teeth. It is thought to have been somewhere between 45 and 65 feet long. Great white sharks have been known to be up to 20 feet long. This means that the megalodon was two or three times bigger than the modern-day great white. For centuries, people have been finding the megalodon\'s teeth in rocks from the ocean or in rocks from areas that used to be covered by oceans. They had no idea what animal the teeth came from. Early scientists thought that they were from ancient dragons or giant snakes. It wasn\'t until the nineteenth century that a scientist discovered that the teeth were from the mouth of a shark.' + '\n' +
+      'Most people think that the megalodon no longer swims in the sea but some people do not agree. Nearly 90 percent of the ocean remains unexplored, so these people say that there is a good chance that these giant sharks are still out there. Anything is possible but a shark as big as a megalodon would have a hard time hiding.',
+    glossary: [
+      { w: 'predator', m: '捕食者' },
+      { w: 'extinct', m: '絶滅した' },
+      { w: 'unexplored', m: '未踏査の' }
+    ],
+    questions: [
+      {
+        q: 'Why does the author write the passage?',
+        choices: [
+          'To give an example of a shark movie',
+          'To talk about the biggest shark of all time',
+          'To inform readers about the great white shark',
+          'To imply that people don\'t know about the great white shark'
+        ],
+        answer: 1,
+        explanation: '話題の中心はホホジロザメの2〜3倍もあった史上最大のサメ、メガロドン。ホホジロザメは大きさを比べる引き立て役として登場する。'
+      },
+      {
+        q: 'Based on the passage, what is probably true about a great white\'s teeth?',
+        choices: [
+          'They are sharper than any other animal\'s.',
+          'They are bigger than the megalodon\'s teeth.',
+          'They are smaller than the megalodon\'s teeth.',
+          'There are more of them than in the megalodon\'s mouth.'
+        ],
+        answer: 2,
+        explanation: 'メガロドンは「big tooth（大きな歯）」の意味で巨大な歯を持ち、体もホホジロザメの2〜3倍。ここからホホジロザメの歯はメガロドンの歯より小さいと推測できる。'
+      },
+      {
+        q: 'Why does the author mention "early scientists"?',
+        choices: [
+          'To ask why people are interested in sharks and megalodons',
+          'To show that they believed in ancient dragons and giant snakes',
+          'To prove that the great white was the biggest animal in the sea',
+          'To show that people in the past did not know about megalodons'
+        ],
+        answer: 3,
+        explanation: '初期の科学者は歯の化石を「ancient dragons or giant snakes のもの」と考えた。昔の人々がメガロドンを知らなかったことを示す例。'
+      },
+      {
+        q: 'Why does the author mention that "nearly 90 percent of the ocean remains unexplored"?',
+        choices: [
+          'To show why no one has found a big megalodon yet',
+          'To imply that humans need to explore the depths of the ocean soon',
+          'To explain why some people claim megalodons possibly exist',
+          'To convince readers that the ocean is large enough for many sharks'
+        ],
+        answer: 2,
+        explanation: '「Nearly 90 percent of the ocean remains unexplored, so these people say that there is a good chance that these giant sharks are still out there」——生存説の根拠として海の未踏査ぶりが挙げられている。'
+      }
+    ]
+  },
+  {
+    id: 'r90',
+    title: '地球温暖化デーのお知らせ',
+    level: 3,
+    topic: 'お知らせ',
+    words: 154,
+    passage:
+      'Friday, August 19 is our third annual Global Warming Day. We are happy to say that this year\'s event will be bigger than last year\'s. It is very important to get together and learn about something that is going to change all of our lives. We hope you all can come and enjoy this wonderful day with us.' + '\n' +
+      '10:00 - 11:30 A.M. — Greenhouses in America, a lecture by Dr. Aaron.' + '\n' +
+      '11:30 A.M. - 12:30 P.M. — Healthy Lunch, lunch and a health talk.' + '\n' +
+      '12:30 - 2:00 P.M. — Free Energy, a demonstration by Mr. Witherspoon.' + '\n' +
+      '2:00 - 4:00 P.M. — Melting Icebergs, a student activity with Mrs. Neimeyer.' + '\n' +
+      '4:00 - 6:00 P.M. — Our Gentle Planet, a movie presented by Dr. Lynch.' + '\n' +
+      'Note: If you want to participate in the Melting Icebergs activity, bring a bathing suit. If you have any food allergies, make sure to report them to the cafeteria before Friday.',
+    glossary: [
+      { w: 'annual', m: '毎年恒例の' },
+      { w: 'demonstration', m: '実演' },
+      { w: 'allergy', m: 'アレルギー' }
+    ],
+    questions: [
+      {
+        q: 'How many times has there been a Global Warming Day?',
+        choices: [
+          'It has happened twice.',
+          'This will be the first time ever.',
+          'Last year was the first time ever.',
+          'This will be the last Global Warming Day.'
+        ],
+        answer: 0,
+        explanation: '冒頭に「our third annual Global Warming Day（3回目の恒例行事）」とある。今年が3回目ということは、これまでに2回開かれている。'
+      },
+      {
+        q: 'Who will lead the lecture activity?',
+        choices: [
+          'Dr. Lynch',
+          'Dr. Aaron',
+          'Mrs. Neimeyer',
+          'Mr. Witherspoon'
+        ],
+        answer: 1,
+        explanation: '予定表で Lecture（講義）とあるのは「Greenhouses in America」で、担当は Dr. Aaron。'
+      },
+      {
+        q: 'When does the demonstration activity finish?',
+        choices: [
+          'At lunch',
+          '2:00 P.M.',
+          '12:30 P.M.',
+          'Before lunch'
+        ],
+        answer: 1,
+        explanation: 'Demonstration（実演）は「Free Energy」で 12:30-2:00 P.M. の枠。終わるのは 2:00 P.M.。'
+      },
+      {
+        q: 'Who will need to bring a bathing suit?',
+        choices: [
+          'Students doing the Melting Icebergs activity',
+          'Students going swimming during the day',
+          'The boys and girls on the swimming team',
+          'All students attending the Global Warming Day'
+        ],
+        answer: 0,
+        explanation: 'Note に「If you want to participate in the Melting Icebergs activity, bring a bathing suit」とある。水着が必要なのは Melting Icebergs に参加する生徒。'
+      }
+    ]
+  },
+  {
+    id: 'r91',
+    title: 'サマープログラム合格のお知らせ',
+    level: 3,
+    topic: '手紙・メール',
+    words: 172,
+    passage:
+      'Dear Cathy, Thank you for your application. I wanted to write this letter to you myself. I am excited to say that you have been accepted into our summer program. This year, we had more students apply than ever before. I was very impressed when I read your essay. You seem like the perfect girl for our program.' + '\n' +
+      'This summer, our program is going to be focusing on young writers. In your application, you said that you are very interested in writing poetry. When you join us on July 15, you should bring some of your writing so that we can work on editing it. If you\'d like, you can send a sample to me now. I would be very happy to read it and give you some comments. That way, you can get an early start on the program. I hope you have been enjoying your first week of vacation. I look forward to meeting you in person and reading more of your work. Have a wonderful week. Sincerely, Erica Lee',
+    glossary: [
+      { w: 'application', m: '応募、申込書' },
+      { w: 'accept', m: '受け入れる' },
+      { w: 'edit', m: '編集する、直す' }
+    ],
+    questions: [
+      {
+        q: 'Why did Erica Lee write this e-mail?',
+        choices: [
+          'To help the student with her application',
+          'To inform the student about another program',
+          'To ask for some more information from the student',
+          'To tell the student she can join the program'
+        ],
+        answer: 3,
+        explanation: '「I am excited to say that you have been accepted into our summer program」が用件の中心。プログラムへの合格を伝えるメール。'
+      },
+      {
+        q: 'In the passage, the phrase accepted into is closest in meaning to',
+        choices: [
+          'given to',
+          'chosen for',
+          'replaced by',
+          'conceived of'
+        ],
+        answer: 1,
+        explanation: 'accepted into は「〜に受け入れられた」。プログラムに選ばれたという意味なので chosen for が最も近い。'
+      },
+      {
+        q: 'In the passage, the word sample is closest in meaning to',
+        choices: [
+          'a lot',
+          'everything',
+          'application',
+          'small part'
+        ],
+        answer: 3,
+        explanation: 'sample は書いたものの「見本、一部」。詩の一部を送ってほしいという文脈なので small part が最も近い。'
+      },
+      {
+        q: 'According to the e-mail, what did Cathy apply for?',
+        choices: [
+          'A teaching program',
+          'A young writers program',
+          'A religious summer school',
+          'A summer sports academy'
+        ],
+        answer: 1,
+        explanation: '「our program is going to be focusing on young writers」「you are very interested in writing poetry」とある。キャシーが応募したのは若い書き手のためのプログラム。'
+      }
+    ]
+  },
+  {
+    id: 'r92',
+    title: '地震のしくみを知ろう',
+    level: 3,
+    topic: '理科',
+    words: 235,
+    passage:
+      'Everyone in the world knows about earthquakes. Many people have even experienced an earthquake, but not many people understand what an earthquake actually is. This week, I have heard a lot of students talking about earthquakes, so I decided to write about them for my weekly column in the school newspaper.' + '\n' +
+      'Earthquakes can start miles below Earth\'s surface. All of the water and land on Earth rests on top of giant plates that fit together like puzzle pieces. These are called tectonic plates. These tectonic plates are always moving and are always pressing against each other. An earthquake usually occurs where two of the plates meet. The edges of the plates are rough, and sometimes they get caught while the rest of the plate continues to move. When this happens, the plates release a lot of energy created by gathered strain that causes an earthquake.' + '\n' +
+      'Earthquakes happen almost every day all over the world, but most of them cannot be felt because they are so small. However, some can be devastating, especially when they occur in the place where tectonic plates come together. They can create mountains and tsunamis or even make land disappear. Recently, Japan and New Zealand have experienced large earthquakes. Experts say more will happen in the future. It is important to learn as much about earthquakes as possible because they are very powerful and can change human life a great deal.',
+    glossary: [
+      { w: 'tectonic plate', m: '構造プレート' },
+      { w: 'devastating', m: '壊滅的な' },
+      { w: 'strain', m: 'ひずみ' }
+    ],
+    questions: [
+      {
+        q: 'What would be the best title for the article?',
+        choices: [
+          'Natural Disasters',
+          'Understanding Earthquakes',
+          'Finding Earthquakes Underground',
+          'The Ocean and the Power of Tsunamis'
+        ],
+        answer: 1,
+        explanation: '「not many people understand what an earthquake actually is」と述べ、プレートの仕組みから影響までを説明する記事。題名は「地震を理解する」が最適。'
+      },
+      {
+        q: 'What is suggested about the students at the author\'s school?',
+        choices: [
+          'They are afraid of earthquakes.',
+          'They are interested in earthquakes.',
+          'They have experienced many disasters.',
+          'They do not care enough about earthquakes.'
+        ],
+        answer: 1,
+        explanation: '「I have heard a lot of students talking about earthquakes, so I decided to write about them」とある。生徒たちが地震の話をしている＝関心を持っていると読み取れる。'
+      },
+      {
+        q: 'Based on the article, what is probably true about earthquakes?',
+        choices: [
+          'They are getting bigger as time goes on.',
+          'They are happening more now than before.',
+          'They happen more than some people realize.',
+          'They are happening less than they did one hundred years ago.'
+        ],
+        answer: 2,
+        explanation: '「Earthquakes happen almost every day all over the world, but most of them cannot be felt」とある。感じられないほど小さな地震が毎日起きている＝人々が思うより多く起きている。'
+      },
+      {
+        q: 'In the passage, the word pressing is closest in meaning to',
+        choices: [
+          'moving',
+          'pulling',
+          'crossing',
+          'pushing'
+        ],
+        answer: 3,
+        explanation: 'pressing は「押し付けている」。プレート同士が押し合う場面なので pushing が正解。'
+      },
+      {
+        q: 'In the passage, the word release is closest in meaning to',
+        choices: [
+          'bind',
+          'let go',
+          'tackle',
+          'control'
+        ],
+        answer: 1,
+        explanation: 'release は「解放する」。ためたエネルギーを放出する文脈なので let go が最も近い。'
+      },
+      {
+        q: 'Why does the author mention earthquakes creating mountains and tsunamis?',
+        choices: [
+          'To explain how our Earth was created',
+          'To suggest that earthquakes happen often',
+          'To illustrate how powerful earthquakes can be',
+          'To advise people not to live in the mountains or by the sea'
+        ],
+        answer: 2,
+        explanation: '山や津波を作り土地を消すという例は、直前の「some can be devastating」を具体的に示すもの。地震の力の大きさを描くために挙げられている。'
+      }
+    ]
+  },
+  {
+    id: 'r93',
+    title: 'カフェテリアの大騒動',
+    level: 3,
+    topic: '学校生活',
+    words: 270,
+    passage:
+      'The cafeteria was packed. The noise was deafening because every single seat was taken and everyone was talking. Taco day was always full of people but I had never seen it like this before.' + '\n' +
+      'I sat with my friends at our usual tables after waiting for a while. I was having a great conversation with them when I heard Alex from behind me. "Hey Tom! Check this out!" I turned and got a face full of sour cream. I was so angry that without thinking I picked up a taco from my plate and threw it back as hard as I could. Alex had been expecting it. He ducked, and the taco flew through the air, hitting Regina. It all happened so fast that no one saw it happen. Regina looked around angrily. When she saw Alex laughing, she threw her taco at him. Everyone started throwing tacos at each other and soon the whole cafeteria was in chaos. I crawled under a table but I still got covered in tacos.' + '\n' +
+      'It was over fast, but everything and everyone was covered in beef, cheese, lettuce, and sour cream. It was one of the biggest messes I had ever seen! I felt bad for being one of the people who caused it. I stayed with a few of my friends and we helped clean up the mess. It was good that we helped, because the people who didn\'t got into a lot of trouble. It was a lucky day for me but I still felt bad for my part in the chaos. I knew that I would never throw food again.',
+    glossary: [
+      { w: 'deafening', m: '耳をつんざくような' },
+      { w: 'chaos', m: '大混乱' },
+      { w: 'crawl', m: 'はう' }
+    ],
+    questions: [
+      {
+        q: 'What would be the best title for this story?',
+        choices: [
+          'Taco Day',
+          'The Food Fight',
+          'Trouble with Regina',
+          'The Mess at Breakfast'
+        ],
+        answer: 1,
+        explanation: 'タコスの投げ合いでカフェテリア中が大混乱になる話。題名は「食べ物の投げ合い（フードファイト）」が最適。タコスの日はきっかけにすぎない。'
+      },
+      {
+        q: 'Why does the author throw his food?',
+        choices: [
+          'To do something funny',
+          'To hit his friend who hit him first',
+          'To show that he didn\'t like his food',
+          'To prove he was happy with the meal'
+        ],
+        answer: 1,
+        explanation: '「I turned and got a face full of sour cream. I was so angry that ... I picked up a taco ... and threw it back」とある。先にぶつけてきた友だちに投げ返したのが理由。'
+      },
+      {
+        q: 'What does the author mean by saying "the whole cafeteria was in chaos" in line 11?',
+        choices: [
+          'The cafeteria was dirty.',
+          'The cafeteria was out of control.',
+          'The cafeteria was full of students.',
+          'The cafeteria didn\'t have teachers.'
+        ],
+        answer: 1,
+        explanation: 'chaos は「大混乱」。みんながタコスを投げ合い、机の下に隠れても浴びるほどの状態なので、「収拾がつかなくなった」が正解。'
+      },
+      {
+        q: 'Which word best describes the cafeteria after the fight?',
+        choices: [
+          'cozy',
+          'disgusting',
+          'impressive',
+          'distinguished'
+        ],
+        answer: 1,
+        explanation: 'けんかの後は「everything and everyone was covered in beef, cheese, lettuce, and sour cream」「one of the biggest messes」とある。この様子を表すのは disgusting（うんざりするほど汚い）。'
+      },
+      {
+        q: 'What does the author decide after the food fight?',
+        choices: [
+          'It was a good idea not to tell.',
+          'He will help clean the cafeteria often.',
+          'He won\'t get involved in cafeteria food fights.',
+          'He might want to start another food fight.'
+        ],
+        answer: 2,
+        explanation: '最後に「I knew that I would never throw food again」とある。もう食べ物の投げ合いには関わらないと決めた。'
+      },
+      {
+        q: 'In the passage, the word packed is closest in meaning to',
+        choices: [
+          'closed',
+          'heated',
+          'crowded',
+          'spacious'
+        ],
+        answer: 2,
+        explanation: 'packed は「ぎっしり詰まった」。全席が埋まっていた場面なので crowded が正解。'
+      }
+    ]
+  },
+  {
+    id: 'r94',
+    title: '空を飛ぶ夢の歴史',
+    level: 3,
+    topic: '技術',
+    words: 240,
+    passage:
+      'Most people are very familiar with airplanes. In the industrialized world, a lot of people have ridden in planes. High up in the air, they can travel huge distances in a short amount of time. A plane ride from Detroit, United States to Incheon, South Korea can take fourteen hours. It is amazing that it takes only fourteen hours to travel halfway around the world. People have been trying to fly for thousands of years. Ancient Greek, Egyptian, and Mayan legends involve great men or gods who could fly. Some even came from faraway worlds. Leonardo Da Vinci is famous for many inventions involving flight. He studied birds and designed machines that he hoped would fly. Unfortunately, he was never successful, but his attempts show how dedicated people were to finding ways to fly. There were many other people trying to build airplanes since Da Vinci. One of these people was Clement Ader, a French engineer who made important contributions to the science of flight. Ader created a bat-like flying structure that supposedly flew for 50 meters. Finally, the Wright Brothers came forward. The brothers are credited with making the world\'s first airplane in 1903. They spent the rest of their lives modifying their airplanes to fly further and faster. The modern airplane is a lot different from what the Wrights probably imagined. A scramjet is an experimental aircraft that can travel up to 12,000 kilometers an hour. That\'s fast!',
+    glossary: [
+      { w: 'dedicated', m: '熱心な、打ち込んだ' },
+      { w: 'contribution', m: '貢献' },
+      { w: 'modify', m: '改良する' }
+    ],
+    questions: [
+      {
+        q: 'Which title best summarizes the main idea of the passage?',
+        choices: [
+          'Flight Competition',
+          'The Wright Brothers',
+          'The Search for Flight',
+          'The First Flying Gliders'
+        ],
+        answer: 2,
+        explanation: '古代の伝説からダ・ヴィンチ、アデール、ライト兄弟、現代のスクラムジェットまで、人類が飛行を追い求めた歴史をたどる文章。題名は「飛行の探求」が最適。'
+      },
+      {
+        q: 'According to the passage, what is made possible because of flight?',
+        choices: [
+          'Remembering Leonardo Da Vinci',
+          'Flying from South Korea to Mexico',
+          'New and advanced military hints',
+          'Traveling over long distances at swift speeds'
+        ],
+        answer: 3,
+        explanation: '冒頭に「they can travel huge distances in a short amount of time」とあり、デトロイト〜仁川14時間の例が続く。飛行が可能にしたのは長距離の高速移動。'
+      },
+      {
+        q: 'What inspired Leonardo Da Vinci\'s inventions for flying?',
+        choices: [
+          'People\'s bodies',
+          'The flight of birds',
+          'The science of flight',
+          'His own ability to fly'
+        ],
+        answer: 1,
+        explanation: '「He studied birds and designed machines that he hoped would fly」とある。ダ・ヴィンチの発明のヒントは鳥の飛び方。'
+      },
+      {
+        q: 'In the passage, the phrase credited with is closest in meaning to',
+        choices: [
+          'declared as',
+          'accepted as',
+          'renowned for',
+          'concerned with'
+        ],
+        answer: 2,
+        explanation: 'credited with は「〜の功績があると認められている」。世界初の飛行機を作ったと称えられている文脈なので renowned for が最も近い。'
+      },
+      {
+        q: 'In the passage, the word modifying is closest in meaning to',
+        choices: [
+          'improving',
+          'discovering',
+          'assembling',
+          'undermining'
+        ],
+        answer: 0,
+        explanation: 'modifying は「改良すること」。より遠くへ速く飛べるよう手を加え続けた文脈なので improving が正解。'
+      },
+      {
+        q: 'Which of the following is NOT true about the Wright Brothers?',
+        choices: [
+          'They fought many times with Clement Ader.',
+          'They worked for most of their lives on airplanes.',
+          'They are usually credited as the fathers of airplanes.',
+          'They probably couldn\'t imagine today\'s airplanes.'
+        ],
+        answer: 0,
+        explanation: 'ライト兄弟は生涯をかけて飛行機を改良し、初の飛行機の生みの親とされる。アデールと何度も争ったという記述はない。'
+      }
+    ]
+  },
+  {
+    id: 'r95',
+    title: 'アマゾンの巨大ヘビを探して',
+    level: 3,
+    topic: '生物',
+    words: 246,
+    passage:
+      'The green anaconda is the world\'s heaviest snake. It is also one of the world\'s longest snakes. When the first Europeans came to South America, they reported finding snakes that were 100 feet long. Snakes of this size have not been found since, but native people say that they have found snakes up to 50 feet long. Most scientists think that the largest green anacondas are about 25 feet long.' + '\n' +
+      'The snakes spend most of their time in rivers. They are very heavy, so it is much easier for them to move around and hunt in the water. They are very good at staying camouflaged. They are green and yellow, perfect colors for the murky waters of the Amazon River. When anything gets close enough to the water, the green anaconda strikes and eats. They like fish, birds, small alligators, and anything else that might get close. The Amazon Basin is one of the least explored places on Earth. People still live deep in the jungle with almost no contact with the outside world. To find the biggest anacondas, this is where scientists need to go. However, there are no roads and the place can be very dangerous. The jungles are full of dangerous animals such as poisonous tree frogs. Native people can become violent on account of misunderstandings. Also, the snakes themselves are very good at hiding in the wet swamps of the Amazon. These things make it quite difficult for scientists to study them.',
+    glossary: [
+      { w: 'camouflage', m: 'カモフラージュする' },
+      { w: 'murky', m: '濁った' },
+      { w: 'on account of', m: '〜が原因で' }
+    ],
+    questions: [
+      {
+        q: 'What is the main topic of the passage?',
+        choices: [
+          'The green anaconda\'s river life',
+          'The weight of anaconda snakes',
+          'Finding and studying large green anacondas',
+          'Scientists searching the Amazon River Basin'
+        ],
+        answer: 2,
+        explanation: 'オオアナコンダの大きさをめぐる説と、最大級の個体を探して研究することの難しさが話の中心。「大きなオオアナコンダを見つけて研究すること」が主題。'
+      },
+      {
+        q: 'Why does the author mention that most scientists think that the largest green anacondas are about 25 feet long?',
+        choices: [
+          'To prove that the Europeans were wrong',
+          'To give an example of scientists not knowing the truth for sure',
+          'To explain that 25 feet is the longest any snake can be',
+          'To show the scientific opinion against the natives\' opinion'
+        ],
+        answer: 3,
+        explanation: 'ヨーロッパ人は100フィート、先住民は50フィートと言うのに対し、科学者は25フィートと考える——という対比を示すための一文。先住民の主張と対立する科学側の見解を示している。'
+      },
+      {
+        q: 'In the passage, the word camouflaged is closest in meaning to',
+        choices: [
+          'safe',
+          'secret',
+          'hidden',
+          'dangerous'
+        ],
+        answer: 2,
+        explanation: 'camouflaged は「カモフラージュされた」。緑と黄色の体が濁った川の色にまぎれるという文脈なので hidden（隠れた）が最も近い。'
+      },
+      {
+        q: 'In the passage, the word poisonous is closest in meaning to',
+        choices: [
+          'long',
+          'heavy',
+          'hungry',
+          'harmful'
+        ],
+        answer: 3,
+        explanation: 'poisonous は「毒のある」。危険な動物の例として毒ガエルが挙がっている文脈なので harmful が最も近い。'
+      },
+      {
+        q: 'According to the passage, all of the following can be threats in the Amazon River Basin EXCEPT',
+        choices: [
+          'local disease',
+          'lack of roads',
+          'native people',
+          'dangerous animals'
+        ],
+        answer: 0,
+        explanation: '危険として挙がっているのは道路がないこと・危険な動物・誤解から暴力的になりうる先住民。「地域の病気」は本文にない。'
+      },
+      {
+        q: 'Which of the following is true about the Amazon River Basin?',
+        choices: [
+          'It often rains and floods.',
+          'It is highly unexplored.',
+          'It is home to yellow anacondas.',
+          'It is relatively more developed.'
+        ],
+        answer: 1,
+        explanation: '「The Amazon Basin is one of the least explored places on Earth（地球上で最も探査が進んでいない場所のひとつ）」とある。highly unexplored が本文と一致する。'
+      },
+      {
+        q: 'In the passage, the word they refers to',
+        choices: [
+          'snakes',
+          'scientists',
+          'Europeans',
+          'native people'
+        ],
+        answer: 3,
+        explanation: '「native people say that they have found snakes up to 50 feet long」の they は文の主語 native people を指す。'
+      },
+      {
+        q: 'According to the passage, why do green anacondas live in rivers?',
+        choices: [
+          'They can\'t move very quickly in rivers.',
+          'They are better swimmers than crocodiles.',
+          'The river is ideal because they are so heavy.',
+          'Rivers are a good place for them to find food.'
+        ],
+        answer: 2,
+        explanation: '「They are very heavy, so it is much easier for them to move around and hunt in the water」とある。体が重いので水中の方が動きやすいから川にすむ。'
+      }
+    ]
+  },
+  {
+    id: 'r96',
+    title: '宇宙に生命はいるのか',
+    level: 3,
+    topic: '科学',
+    words: 256,
+    passage:
+      'The idea of life in outer space has been talked about for a long time. Some scientists say that life development on Earth was far too unlikely for it to have happened anywhere else. Things had to be perfect for us to make it on this planet. Other scientists say that space is too big. Stars and other planets are far too numerous for there to be no other life in the universe. For many years, there have been reports of visitors from other planets. People all around the world have claimed to see alien spaceships or even aliens themselves. There have been glimpses of these so-called UFOs (unidentified flying objects) flying through the air and they have even been captured on video. Some Americans believe that the U.S. Army found an alien spaceship crashed in the desert and then lied to the press about it. Although these sightings may be true, scientists have not found significant evidence that aliens exist. If you go out into the countryside on a clear night and look up, you can see thousands of stars. Those stars make up a tiny part of our universe. There are more stars, planets, and galaxies than we can count. Even the smartest scientists can\'t even come close to defining how big space is. The number of possible stars and planets out there is bigger than our ability to count. If we are really on the only planet that can sustain life, then we are very special in a universe full of amazing things.',
+    glossary: [
+      { w: 'numerous', m: '非常に多くの' },
+      { w: 'glimpse', m: 'ちらりと見えること' },
+      { w: 'sustain', m: '維持する' }
+    ],
+    questions: [
+      {
+        q: 'What would be the best title for this passage?',
+        choices: [
+          'Visitors from Faraway Planets',
+          'The Possibility of Life on Other Worlds',
+          'The Life and Times of an Alien Life',
+          'The Mysterious Crash Landing in America'
+        ],
+        answer: 1,
+        explanation: '地球外生命の可能性をめぐる科学者の意見・UFOの目撃談・宇宙の広さを語る文章。題名は「ほかの世界に生命がいる可能性」が最適。'
+      },
+      {
+        q: 'Why does the author mention "reports of visitors from other planets"?',
+        choices: [
+          'To give an example of people who do not believe in science',
+          'To explain why scientists are not interested in studying aliens',
+          'To raise the issue of whether or not we are alone in the universe',
+          'To inform people that a spaceship crashed in the American desert'
+        ],
+        answer: 2,
+        explanation: '他の惑星からの訪問者の報告は、「宇宙に私たちしかいないのか」という問いを持ち出すために紹介されている。'
+      },
+      {
+        q: 'What can be inferred about finding aliens?',
+        choices: [
+          'It\'s not possible yet.',
+          'It\'s already been done.',
+          'Aliens can be found in the USA.',
+          'Scientists already know the truth.'
+        ],
+        answer: 0,
+        explanation: '「scientists have not found significant evidence that aliens exist（宇宙人が存在する確かな証拠は見つかっていない）」とある。宇宙人を見つけることはまだできていないと推測できる。'
+      },
+      {
+        q: 'In the passage, the word numerous is closest in meaning to',
+        choices: [
+          'rare',
+          'large',
+          'plentiful',
+          'interesting'
+        ],
+        answer: 2,
+        explanation: 'numerous は「数え切れないほど多い」。星や惑星が多すぎるという文脈なので plentiful が最も近い。'
+      },
+      {
+        q: 'What have some people claimed about aliens?',
+        choices: [
+          'Aliens often appear in dreams.',
+          'They have encountered aliens.',
+          'Aliens are extremely dangerous.',
+          'Aliens are always kidnapping people.'
+        ],
+        answer: 1,
+        explanation: '「People all around the world have claimed to see alien spaceships or even aliens themselves」とある。宇宙人に遭遇したと主張する人々がいる。'
+      },
+      {
+        q: 'In the passage, the word they refers to',
+        choices: [
+          'UFOs',
+          'people',
+          'videos',
+          'glimpses'
+        ],
+        answer: 0,
+        explanation: '「There have been glimpses of these so-called UFOs ... flying through the air and they have even been captured on video」の they は UFOs を指す。'
+      },
+      {
+        q: 'In the passage, the word defining is closest in meaning to',
+        choices: [
+          'wanting',
+          'describing',
+          'questioning',
+          'guaranteeing'
+        ],
+        answer: 1,
+        explanation: 'defining は「定義する、言い表す」。宇宙の大きさを言い表せないという文脈なので describing が最も近い。'
+      },
+      {
+        q: 'According to the passage, what is NOT true about the night sky?',
+        choices: [
+          'It proves that aliens are real.',
+          'We can see stars there.',
+          'It has an uncountable amount of stars.',
+          'The stars there are only a fraction of the universe.'
+        ],
+        answer: 0,
+        explanation: '夜空については、数千の星が見える・それは宇宙のごく一部・数え切れないほど星があると書かれているが、「宇宙人が実在する証明になる」とは書かれていない。'
+      }
+    ]
   }
 ];
 

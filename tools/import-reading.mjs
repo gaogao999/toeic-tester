@@ -53,7 +53,15 @@ function parseBook(path) {
   for (const l of raw.split('\n')) {
     const m = l.match(/^--- p\.(\d+) ---$/);
     if (m) { page = Number(m[1]); continue; }
-    lines.push({ page, text: l });
+    // OCR が設問番号の 1 を I や l と読み違えることがある（I. / I0. / II. など）
+    const t = l.replace(/^([Il]{1,2})(\d*)([.,]\s)/, (_, a, b, c) => a.replace(/[Il]/g, '1') + b + c);
+    // 2段組の選択肢が1行にまとまることがある（「(A) 〜 (C) 〜」）ので行を分ける
+    if (/^\([A-D]\)\s/.test(t) && /\s\([A-D]\)\s/.test(t.slice(4))) {
+      const parts = t.split(/\s(?=\([A-D]\)\s)/);
+      for (const p of parts) lines.push({ page, text: p });
+      continue;
+    }
+    lines.push({ page, text: t });
   }
 
   const blocks = [];
