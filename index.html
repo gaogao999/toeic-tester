@@ -174,8 +174,13 @@
 
       <div class="panel">
         <h2 class="panel-title">出題形式を選ぶ</h2>
-        <p class="hint">どの形式も、答えの英単語をキーボードで入力します。</p>
+        <p class="hint">サクサク4択はタップで答えます。ほかの形式は英単語をキーボードで入力します。</p>
         <div class="mode-grid">
+          <button class="mode-card" data-quiz-mode="tempo">
+            <span class="mode-icon">⚡</span>
+            <span class="mode-name">サクサク4択</span>
+            <span class="mode-desc">意味を4択から選ぶ。制限時間つき</span>
+          </button>
           <button class="mode-card" data-quiz-mode="ja-en">
             <span class="mode-icon">🇯🇵→⌨️</span>
             <span class="mode-name">意味 → 英単語</span>
@@ -196,6 +201,37 @@
             <span class="mode-name">スペル練習</span>
             <span class="mode-desc">単語を見ながら正確に打つ</span>
           </button>
+        </div>
+        <label class="field tempo-setting">
+          <span>⚡ サクサク4択の制限時間</span>
+          <select id="filter-tempo-time">
+            <option value="0">なし（自分のペースで）</option>
+            <option value="3">3秒</option>
+            <option value="5">5秒</option>
+            <option value="8">8秒</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div id="tempo-body" hidden>
+      <div class="session-bar">
+        <span id="tempo-counter">0 / 0</span>
+        <div class="progress-bar slim"><div class="progress-fill" id="tempo-progress"></div></div>
+        <span class="score" id="tempo-score">正解 0</span>
+      </div>
+
+      <div class="panel tempo-panel">
+        <div class="tempo-timer-track" id="tempo-timer-track" hidden>
+          <div class="tempo-timer-fill" id="tempo-timer"></div>
+        </div>
+        <p class="tempo-combo" id="tempo-combo"></p>
+        <p class="tempo-word" id="tempo-word">—</p>
+        <p class="tempo-phonetic" id="tempo-phonetic"></p>
+        <div class="tempo-choices" id="tempo-choices"></div>
+        <div class="tempo-actions">
+          <button type="button" class="btn btn-ghost" id="tempo-speak">🔊 読み上げ</button>
+          <button type="button" class="btn btn-ghost" id="tempo-quit">やめる</button>
         </div>
       </div>
     </div>
@@ -247,6 +283,7 @@
         <p class="result-emoji" id="result-emoji">🎉</p>
         <h2 class="result-score"><span id="result-correct">0</span> / <span id="result-total">0</span> 正解</h2>
         <p class="result-rate" id="result-rate">正答率 0%</p>
+        <p class="result-extra" id="result-extra" hidden></p>
         <div class="result-list" id="result-list"></div>
         <div class="result-actions">
           <button class="btn btn-primary" id="result-retry">もう一度</button>

@@ -117,6 +117,7 @@
   // ============================================================
 
   function showView(name) {
+    stopTempo(); // 別の画面へ移ったらサクサク4択のタイマーを止める
     $$('.view').forEach((v) => v.classList.toggle('is-active', v.id === `view-${name}`));
     $$('.tab').forEach((t) => t.classList.toggle('is-active', t.dataset.view === name));
     window.scrollTo(0, 0);
@@ -334,6 +335,7 @@
     $('#filter-scope').value = s.scope;
     $('#list-scope').value = s.scope;
     $('#filter-quiz-length').value = String(s.quizLength);
+    $('#filter-tempo-time').value = String(s.tempoTime);
     updateFilterCount();
   }
 
@@ -360,6 +362,9 @@
     });
     $('#filter-quiz-length').addEventListener('change', (e) => {
       Storage.updateSettings({ quizLength: Number(e.target.value) });
+    });
+    $('#filter-tempo-time').addEventListener('change', (e) => {
+      Storage.updateSettings({ tempoTime: Number(e.target.value) });
     });
   }
 
@@ -687,15 +692,23 @@
   }
 
   function resetQuizToSetup() {
+    stopTempo();
     updateFilterCount();
     const enough = getFilteredWords().length > 0;
     $('#quiz-body').hidden = true;
+    $('#tempo-body').hidden = true;
     $('#quiz-result').hidden = true;
     $('#quiz-empty').hidden = enough;
     $('#quiz-setup').hidden = !enough;
   }
 
   function startQuiz(mode, wordsOverride) {
+    // サクサク4択は入力ではなくタップで答えるので、専用の画面に切り替える
+    if (mode === 'tempo') {
+      startTempo(wordsOverride);
+      return;
+    }
+
     const settings = Storage.getSettings();
     const words = wordsOverride || getFilteredWords();
     quiz.mode = mode;
@@ -716,6 +729,7 @@
     Storage.incrementSessions();
     $('#quiz-setup').hidden = true;
     $('#quiz-result').hidden = true;
+    $('#tempo-body').hidden = true;
     $('#quiz-body').hidden = false;
     $('#quiz-replay').hidden = mode !== 'listening';
     renderQuestion();
@@ -813,11 +827,15 @@
     renderQuestion();
   }
 
-  function showResult() {
+  function showResult(extra) {
     const total = quiz.questions.length;
     const rate = Math.round((quiz.correct / total) * 100);
 
+    $('#result-extra').textContent = extra || '';
+    $('#result-extra').hidden = !extra;
+
     $('#quiz-body').hidden = true;
+    $('#tempo-body').hidden = true;
     $('#quiz-result').hidden = false;
     $('#result-correct').textContent = quiz.correct;
     $('#result-total').textContent = total;
@@ -825,13 +843,17 @@
     $('#result-emoji').textContent = rate === 100 ? '🏆' : rate >= 80 ? '🎉' : rate >= 50 ? '💪' : '📖';
 
     $('#result-list').innerHTML = quiz.results
-      .map(
-        (r) => `<div class="result-item ${r.isCorrect ? 'ok' : 'ng'}">
+      .map((r) => {
+        // detail はサクサク4択で使う補足（選んだ答え・時間切れ）
+        const right = r.isCorrect
+          ? r.word.meaning
+          : r.detail || (r.typed ? `入力: ${r.typed}` : r.word.meaning);
+        return `<div class="result-item ${r.isCorrect ? 'ok' : 'ng'}">
           <span>${r.isCorrect ? '⭕️' : '❌'}</span>
           <b>${escapeHtml(r.word.word)}</b>
-          <span>${escapeHtml(r.isCorrect || !r.typed ? r.word.meaning : `入力: ${r.typed}`)}</span>
-        </div>`
-      )
+          <span>${escapeHtml(right)}</span>
+        </div>`;
+      })
       .join('');
 
     const wrongWords = quiz.results.filter((r) => !r.isCorrect).map((r) => r.word);
@@ -860,6 +882,241 @@
     $('#quiz-replay').addEventListener('click', () => {
       const q = quiz.questions[quiz.index];
       if (q) Speech.speak(q.word.word);
+    });
+  }
+
+  // ============================================================
+  // サクサク4択（テンポ重視・制限時間つき）
+  // ============================================================
+  //
+  // 入力式のクイズは1問に時間がかかるので、暗記の初期段階では
+  // 「短い時間で大量の単語に触れる」ほうが効く。そのための軽い形式。
+
+  const tempo = {
+    questions: [],
+    index: 0,
+    correct: 0,
+    results: [],
+    combo: 0,      // 連続正解数
+    bestCombo: 0,
+    totalTime: 0,  // 解答にかかった時間の合計（ミリ秒）
+    startedAt: 0,
+    limit: 5,      // 1問あたりの制限時間（秒）。0 なら無制限
+    locked: true,  // 採点後、次の問題までの入力を止める
+    timerId: null,
+    advanceId: null
+  };
+
+  const TEMPO_CORRECT_WAIT = 550;  // 正解ならすぐ次へ
+  const TEMPO_WRONG_WAIT = 1600;   // 間違えたら正解を読む時間を置く
+
+  /** 4択を作る。誤答は同じカテゴリの語を優先して選ぶ */
+  function buildTempoQuestions(words, length) {
+    const source = shuffle(words).slice(0, length);
+
+    return source.map((w) => {
+      const sameCategory = WORD_DATA.filter((x) => x.category === w.category && x.id !== w.id);
+      const anyOther = WORD_DATA.filter((x) => x.id !== w.id);
+      const used = new Set([w.meaning]);
+      const wrong = [];
+
+      for (const cand of shuffle(sameCategory).concat(shuffle(anyOther))) {
+        if (wrong.length >= 3) break;
+        if (used.has(cand.meaning)) continue; // 同じ意味が2つ並ばないようにする
+        used.add(cand.meaning);
+        wrong.push(cand.meaning);
+      }
+
+      return { word: w, choices: shuffle([w.meaning, ...wrong]) };
+    });
+  }
+
+  function startTempo(wordsOverride) {
+    const settings = Storage.getSettings();
+    const words = wordsOverride || getFilteredWords();
+
+    tempo.questions = buildTempoQuestions(words, settings.quizLength);
+    if (tempo.questions.length === 0) {
+      toast('出題できる単語がありません');
+      return;
+    }
+
+    tempo.index = 0;
+    tempo.correct = 0;
+    tempo.results = [];
+    tempo.combo = 0;
+    tempo.bestCombo = 0;
+    tempo.totalTime = 0;
+    tempo.limit = Number(settings.tempoTime) || 0;
+
+    quiz.mode = 'tempo'; // 結果画面の「もう一度」から戻ってこられるように
+
+    Storage.incrementSessions();
+    $('#quiz-setup').hidden = true;
+    $('#quiz-result').hidden = true;
+    $('#quiz-body').hidden = true;
+    $('#tempo-body').hidden = false;
+    renderTempo();
+  }
+
+  function renderTempo() {
+    const q = tempo.questions[tempo.index];
+    tempo.locked = false;
+
+    $('#tempo-counter').textContent = `${tempo.index + 1} / ${tempo.questions.length}`;
+    $('#tempo-progress').style.width = `${(tempo.index / tempo.questions.length) * 100}%`;
+    $('#tempo-score').textContent = `正解 ${tempo.correct}`;
+    renderCombo();
+
+    $('#tempo-word').textContent = q.word.word;
+    $('#tempo-phonetic').textContent = q.word.phonetic || '';
+
+    $('#tempo-choices').innerHTML = q.choices
+      .map(
+        (c, i) => `<button type="button" class="tempo-choice" data-tempo-choice="${i}">
+          <span class="tempo-num">${i + 1}</span><span>${escapeHtml(c)}</span>
+        </button>`
+      )
+      .join('');
+
+    if (Storage.getSettings().autoSpeak) Speech.speak(q.word.word);
+
+    tempo.startedAt = Date.now();
+    startTempoTimer();
+  }
+
+  function renderCombo() {
+    // 2連続からは炎を出して勢いが見えるようにする
+    $('#tempo-combo').textContent = tempo.combo >= 2 ? `🔥 ${tempo.combo} 連続正解` : '';
+  }
+
+  function startTempoTimer() {
+    const track = $('#tempo-timer-track');
+    const fill = $('#tempo-timer');
+
+    if (!tempo.limit) {
+      track.hidden = true;
+      return;
+    }
+
+    track.hidden = false;
+    // いったんアニメーションを切って幅を戻し、次のフレームから縮め始める
+    fill.style.transition = 'none';
+    fill.style.width = '100%';
+    void fill.offsetWidth;
+    fill.style.transition = `width ${tempo.limit}s linear`;
+    fill.style.width = '0%';
+
+    tempo.timerId = setTimeout(() => answerTempo(-1), tempo.limit * 1000);
+  }
+
+  /** 採点した時点でバーの動きを止める */
+  function freezeTempoTimer() {
+    const fill = $('#tempo-timer');
+    if (!fill) return;
+    const current = getComputedStyle(fill).width;
+    fill.style.transition = 'none';
+    fill.style.width = current;
+  }
+
+  /** 画面を離れたときなど、動いているタイマーをすべて止める */
+  function stopTempo() {
+    if (tempo.timerId) clearTimeout(tempo.timerId);
+    if (tempo.advanceId) clearTimeout(tempo.advanceId);
+    tempo.timerId = null;
+    tempo.advanceId = null;
+    tempo.locked = true;
+    freezeTempoTimer();
+  }
+
+  /** choiceIndex が -1 なら時間切れ */
+  function answerTempo(choiceIndex) {
+    if (tempo.locked) return;
+    tempo.locked = true;
+
+    if (tempo.timerId) clearTimeout(tempo.timerId);
+    tempo.timerId = null;
+    freezeTempoTimer();
+
+    const q = tempo.questions[tempo.index];
+    const timedOut = choiceIndex < 0;
+    const chosen = timedOut ? null : q.choices[choiceIndex];
+    const isCorrect = !timedOut && chosen === q.word.meaning;
+
+    tempo.totalTime += Date.now() - tempo.startedAt;
+    Storage.recordAnswer(q.word.id, isCorrect);
+    // 4択はまぐれ当たりもあるので、ここでは「覚えた」チェックは付けない
+
+    if (isCorrect) {
+      tempo.correct += 1;
+      tempo.combo += 1;
+      tempo.bestCombo = Math.max(tempo.bestCombo, tempo.combo);
+    } else {
+      tempo.combo = 0;
+    }
+
+    tempo.results.push({
+      word: q.word,
+      isCorrect,
+      detail: timedOut ? '⏰ 時間切れ' : `選んだ答え: ${chosen}`
+    });
+
+    const correctIndex = q.choices.indexOf(q.word.meaning);
+    $$('#tempo-choices .tempo-choice').forEach((btn, i) => {
+      btn.disabled = true;
+      if (i === correctIndex) btn.classList.add('is-correct');
+      if (!isCorrect && i === choiceIndex) btn.classList.add('is-wrong');
+    });
+
+    $('#tempo-score').textContent = `正解 ${tempo.correct}`;
+    renderCombo();
+
+    tempo.advanceId = setTimeout(nextTempo, isCorrect ? TEMPO_CORRECT_WAIT : TEMPO_WRONG_WAIT);
+  }
+
+  function nextTempo() {
+    tempo.advanceId = null;
+    if (tempo.index === tempo.questions.length - 1) {
+      showTempoResult();
+      return;
+    }
+    tempo.index += 1;
+    renderTempo();
+  }
+
+  function showTempoResult() {
+    // 結果画面は入力式クイズと共通のものを使う
+    quiz.questions = tempo.questions;
+    quiz.results = tempo.results;
+    quiz.correct = tempo.correct;
+    quiz.mode = 'tempo';
+
+    const avg = (tempo.totalTime / tempo.questions.length / 1000).toFixed(1);
+    showResult(`平均 ${avg} 秒／問 ・ 最高 ${tempo.bestCombo} 連続正解`);
+  }
+
+  function initTempo() {
+    $('#tempo-choices').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-tempo-choice]');
+      if (btn) answerTempo(Number(btn.dataset.tempoChoice));
+    });
+
+    $('#tempo-speak').addEventListener('click', () => {
+      const q = tempo.questions[tempo.index];
+      if (q) Speech.speak(q.word.word);
+    });
+
+    $('#tempo-quit').addEventListener('click', resetQuizToSetup);
+
+    // PC では 1〜4 のキーでも答えられる
+    document.addEventListener('keydown', (e) => {
+      if ($('#tempo-body').hidden) return;
+      const n = Number(e.key);
+      const q = tempo.questions[tempo.index];
+      if (q && n >= 1 && n <= q.choices.length) {
+        e.preventDefault();
+        answerTempo(n - 1);
+      }
     });
   }
 
@@ -1844,6 +2101,7 @@
     initMock();
     initFlashcards();
     initQuiz();
+    initTempo();
     initList();
     initStats();
     renderHome();

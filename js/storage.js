@@ -19,6 +19,7 @@ const Storage = (() => {
       category: 'all',
       scope: 'all',
       quizLength: 10,
+      tempoTime: 5, // サクサク4択の1問あたりの制限時間（秒）。0 なら無制限
       autoSpeak: false,
       mathLevel: 'all',
       mathCategory: 'all',

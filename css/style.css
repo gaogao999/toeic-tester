@@ -981,3 +981,126 @@ body { touch-action: pan-y; }
 .mock-passage,
 .word-list,
 .result-list { touch-action: pan-y; }
+
+/* ------------------------------------------------------------
+   サクサク4択（テンポ重視・制限時間つき）
+   ------------------------------------------------------------ */
+
+.tempo-setting {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.tempo-panel {
+  text-align: center;
+}
+
+/* 残り時間のバー。減っていく様子だけで時間が分かるようにする */
+.tempo-timer-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.tempo-timer-fill {
+  height: 100%;
+  width: 100%;
+  border-radius: 3px;
+  background: var(--primary);
+}
+
+.tempo-combo {
+  min-height: 1.4em;
+  margin: 0 0 4px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--orange);
+}
+
+.tempo-word {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.tempo-phonetic {
+  min-height: 1.3em;
+  margin: 4px 0 20px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.tempo-choices {
+  display: grid;
+  gap: 10px;
+}
+
+.tempo-choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  font: inherit;
+  font-size: 1rem;
+  text-align: left;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.tempo-choice:hover:not(:disabled) { border-color: var(--primary); }
+.tempo-choice:disabled { cursor: default; }
+
+.tempo-num {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--surface);
+  border-radius: 50%;
+}
+
+/* 長文読解の選択肢と同じ見せ方。一瞬で正誤が分かるように塗りつぶす */
+.tempo-choice.is-correct {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+  font-weight: 700;
+}
+
+.tempo-choice.is-wrong {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
+
+.tempo-choice.is-correct .tempo-num,
+.tempo-choice.is-wrong .tempo-num {
+  color: var(--text);
+}
+
+.tempo-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.result-extra {
+  margin: -4px 0 16px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
