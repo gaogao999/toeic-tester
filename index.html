@@ -11,16 +11,10 @@
 
 <header class="app-header">
   <h1 class="app-title">🎓 EIS合格応援アプリ</h1>
-  <nav class="tabs" id="tabs">
-    <button class="tab is-active" data-view="home">ホーム</button>
-    <button class="tab" data-view="flashcard">単語カード</button>
-    <button class="tab" data-view="quiz">クイズ</button>
-    <button class="tab" data-view="reading">長文読解</button>
-    <button class="tab" data-view="math">算数</button>
-    <button class="tab" data-view="mock">模擬試験</button>
-    <button class="tab" data-view="list">単語一覧</button>
-    <button class="tab" data-view="stats">学習記録</button>
-  </nav>
+  <div class="header-side">
+    <span class="streak-badge" id="header-streak" hidden>🔥 <b>0</b>日</span>
+    <button class="gear-btn" data-view="settings" aria-label="設定">⚙</button>
+  </div>
 </header>
 
 <main class="container">
@@ -30,25 +24,35 @@
   <!-- 試験日までの残り日数 → 今日の学習メニュー → カレンダー の3つだけ -->
   <section class="view is-active" id="view-home">
     <div class="countdown-card">
-      <p class="countdown-label" id="countdown-label">試験日まで</p>
+      <p class="countdown-label" id="countdown-label">EIS入試まで</p>
       <p class="countdown-days"><span id="countdown-number">—</span><span class="countdown-unit">日</span></p>
-      <p class="countdown-date" id="countdown-date"></p>
+      <p class="countdown-date"><span id="countdown-date"></span> ・ <span id="countdown-weeks"></span></p>
       <div class="countdown-sub">
-        <span id="countdown-weeks"></span>
         <span id="countdown-pace"></span>
       </div>
     </div>
 
     <div class="panel today-panel">
       <div class="today-head">
-        <h2 class="panel-title today-title">今日の学習メニュー</h2>
+        <h2 class="panel-title today-title">今日の学習</h2>
         <span class="today-status" id="today-status"></span>
       </div>
       <div class="today-list" id="today-list"></div>
       <p class="hint" id="today-note"></p>
     </div>
 
-    <div class="panel">
+    <div class="panel weak-spot" id="weak-spot" hidden>
+      <h2 class="panel-title">いま最も伸ばせるところ</h2>
+      <div class="row-line" id="weak-spot-row"></div>
+    </div>
+
+    <!-- カレンダー本体は畳んでおき、要約1行だけを見せる（1画面に収めるため） -->
+    <details class="panel calendar-fold">
+      <summary class="row-line">
+        <span class="row-name">学習カレンダー</span>
+        <span class="row-sub" id="cal-summary"></span>
+        <span class="row-chevron">›</span>
+      </summary>
       <div class="calendar-head">
         <button class="btn btn-ghost cal-nav" id="cal-prev" aria-label="前の月">‹</button>
         <span class="calendar-title" id="cal-title"></span>
@@ -64,7 +68,7 @@
         <button class="btn btn-secondary" id="cal-today">今月へ</button>
         <button class="btn btn-secondary" id="cal-exam">試験日の月へ</button>
       </div>
-    </div>
+    </details>
   </section>
 
   <!-- ============ 単語カード ============ -->
@@ -130,10 +134,62 @@
     </div>
 
     <div id="quiz-setup">
-      <div class="panel">
-        <h2 class="panel-title">出題範囲</h2>
-        <p class="hint">この設定は単語カードと単語一覧にも適用されます。</p>
-        <div class="filters">
+      <!-- 学習ハブ。単語・長文読解・算数をここで行き来する -->
+      <nav class="study-chips">
+        <button class="study-chip is-active" type="button">単語</button>
+        <button class="study-chip" data-view="reading">長文読解</button>
+        <button class="study-chip" data-view="math">算数</button>
+      </nav>
+
+      <div class="panel study-panel">
+        <h2 class="panel-title">出題形式</h2>
+        <div class="row-list">
+          <button class="row-line" data-quiz-mode="tempo">
+            <span class="row-icon">⚡</span>
+            <span class="row-main">
+              <span class="row-name">サクサク4択 <span class="badge">推奨</span></span>
+              <span class="row-sub">タップで解答・短時間で大量に</span>
+            </span>
+            <span class="row-chevron">›</span>
+          </button>
+          <button class="row-line" data-view="flashcard">
+            <span class="row-icon">🃏</span>
+            <span class="row-main">
+              <span class="row-name">単語カード</span>
+              <span class="row-sub">意味と例文を見ながら覚える</span>
+            </span>
+            <span class="row-chevron">›</span>
+          </button>
+        </div>
+        <!-- 入力式の4形式は1枚に畳む（1画面に収めるため） -->
+        <details class="row-fold">
+          <summary class="row-line">
+            <span class="row-icon">⌨️</span>
+            <span class="row-main">
+              <span class="row-name">入力して答える</span>
+              <span class="row-sub">意味→英単語／穴埋め／リスニング／スペル</span>
+            </span>
+            <span class="row-chevron">›</span>
+          </summary>
+          <div class="row-fold-body">
+            <button class="btn btn-secondary" data-quiz-mode="ja-en">🇯🇵 意味 → 英単語</button>
+            <button class="btn btn-secondary" data-quiz-mode="fill">✍️ 例文穴埋め</button>
+            <button class="btn btn-secondary" data-quiz-mode="listening">🎧 リスニング</button>
+            <button class="btn btn-secondary" data-quiz-mode="spell">⌨️ スペル練習</button>
+          </div>
+        </details>
+      </div>
+
+      <!-- 出題範囲は1行の要約に畳む。開くと従来の4プルダウン -->
+      <details class="panel range-fold" id="range-fold">
+        <summary class="row-line">
+          <span class="row-main">
+            <span class="row-name">出題範囲 <span class="row-sub" id="filter-count">対象: 0 語</span></span>
+            <span class="row-sub" id="filter-summary"></span>
+          </span>
+          <span class="range-change">変更</span>
+        </summary>
+        <div class="filters range-fold-body">
           <label class="field">
             <span>レベル</span>
             <select id="filter-level">
@@ -169,49 +225,28 @@
               <option value="9999">すべて</option>
             </select>
           </label>
+          <label class="field">
+            <span>⚡ 4択の制限時間</span>
+            <select id="filter-tempo-time">
+              <option value="0">なし（自分のペースで）</option>
+              <option value="3">3秒</option>
+              <option value="5">5秒</option>
+              <option value="8">8秒</option>
+            </select>
+          </label>
         </div>
-        <p class="hint" id="filter-count">対象: 0 語</p>
-      </div>
+        <p class="hint">この設定は単語カードと単語一覧にも適用されます。</p>
+      </details>
 
-      <div class="panel">
-        <h2 class="panel-title">出題形式を選ぶ</h2>
-        <p class="hint">サクサク4択はタップで答えます。ほかの形式は英単語をキーボードで入力します。</p>
-        <div class="mode-grid">
-          <button class="mode-card" data-quiz-mode="tempo">
-            <span class="mode-icon">⚡</span>
-            <span class="mode-name">サクサク4択</span>
-            <span class="mode-desc">意味を4択から選ぶ。制限時間つき</span>
-          </button>
-          <button class="mode-card" data-quiz-mode="ja-en">
-            <span class="mode-icon">🇯🇵→⌨️</span>
-            <span class="mode-name">意味 → 英単語</span>
-            <span class="mode-desc">日本語の意味を見て英単語を打つ</span>
-          </button>
-          <button class="mode-card" data-quiz-mode="fill">
-            <span class="mode-icon">✍️</span>
-            <span class="mode-name">例文穴埋め</span>
-            <span class="mode-desc">文脈に合う語を打つ</span>
-          </button>
-          <button class="mode-card" data-quiz-mode="listening">
-            <span class="mode-icon">🎧</span>
-            <span class="mode-name">リスニング</span>
-            <span class="mode-desc">読み上げを聞いて単語を打つ</span>
-          </button>
-          <button class="mode-card" data-quiz-mode="spell">
-            <span class="mode-icon">⌨️</span>
-            <span class="mode-name">スペル練習</span>
-            <span class="mode-desc">単語を見ながら正確に打つ</span>
-          </button>
-        </div>
-        <label class="field tempo-setting">
-          <span>⚡ サクサク4択の制限時間</span>
-          <select id="filter-tempo-time">
-            <option value="0">なし（自分のペースで）</option>
-            <option value="3">3秒</option>
-            <option value="5">5秒</option>
-            <option value="8">8秒</option>
-          </select>
-        </label>
+      <div class="panel study-panel">
+        <button class="row-line" data-view="list">
+          <span class="row-icon">📚</span>
+          <span class="row-main">
+            <span class="row-name">単語一覧</span>
+            <span class="row-sub" id="list-total-note"></span>
+          </span>
+          <span class="row-chevron">›</span>
+        </button>
       </div>
     </div>
 
@@ -298,6 +333,11 @@
   <!-- ============ 長文読解 ============ -->
   <section class="view" id="view-reading">
     <div id="reading-list-view">
+      <nav class="study-chips">
+        <button class="study-chip" data-view="quiz">単語</button>
+        <button class="study-chip is-active" type="button">長文読解</button>
+        <button class="study-chip" data-view="math">算数</button>
+      </nav>
       <div class="panel">
         <h2 class="panel-title">長文を選ぶ</h2>
         <label class="field">
@@ -363,6 +403,11 @@
   <!-- ============ 算数 ============ -->
   <section class="view" id="view-math">
     <div id="math-setup">
+      <nav class="study-chips">
+        <button class="study-chip" data-view="quiz">単語</button>
+        <button class="study-chip" data-view="reading">長文読解</button>
+        <button class="study-chip is-active" type="button">算数</button>
+      </nav>
       <div class="panel">
         <h2 class="panel-title">算数の出題範囲</h2>
         <div class="filters">
@@ -568,7 +613,11 @@
           </div>
         </section>
 
-        <div class="result-list" id="mock-review"></div>
+        <!-- 全問レビューは畳んでおく（1画面に収めるため） -->
+        <details class="review-fold">
+          <summary>くわしい答え合わせを見る ›</summary>
+          <div class="result-list" id="mock-review"></div>
+        </details>
         <div class="result-actions">
           <button class="btn btn-primary" id="mock-again">もう一度</button>
           <button class="btn btn-ghost" data-view="home">ホームへ</button>
@@ -605,26 +654,12 @@
 
   <!-- ============ 学習記録 ============ -->
   <section class="view" id="view-stats">
-    <div class="dashboard">
-      <div class="stat-card">
-        <span class="stat-label">総解答数</span>
-        <span class="stat-value" id="stats-answers">0</span>
-        <span class="stat-unit">回</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-label">通算正答率</span>
-        <span class="stat-value accent-green" id="stats-rate">0%</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-label">連続学習</span>
-        <span class="stat-value accent-orange" id="stats-streak">0</span>
-        <span class="stat-unit">日</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-label">苦手な単語</span>
-        <span class="stat-value accent-red" id="stats-weak">0</span>
-        <span class="stat-unit">語</span>
-      </div>
+    <div class="panel stats-summary">
+      <span>通算正答率 <b class="accent-green" id="stats-rate">0%</b> ・ <b id="stats-answers">0</b>問</span>
+      <span class="accent-orange">🔥 連続 <b id="stats-streak">0</b>日</span>
+    </div>
+
+    <div class="dashboard dashboard-3">
       <div class="stat-card">
         <span class="stat-label">✓ 覚えた</span>
         <span class="stat-value accent-green" id="stats-learned">0</span>
@@ -635,25 +670,34 @@
         <span class="stat-value accent-green" id="stats-mastered">0</span>
         <span class="stat-unit">語</span>
       </div>
+      <div class="stat-card">
+        <span class="stat-label">苦手</span>
+        <span class="stat-value accent-red" id="stats-weak">0</span>
+        <span class="stat-unit">語</span>
+      </div>
     </div>
 
     <div class="panel">
-      <h2 class="panel-title">直近14日間の学習量</h2>
+      <h2 class="panel-title">伸ばせる分野</h2>
+      <div class="row-list" id="stats-weak-areas"></div>
+    </div>
+
+    <!-- 詳しいグラフ類は畳んでおく（1画面に収めるため） -->
+    <details class="panel review-fold">
+      <summary>グラフ・分野別・習得段階を見る ›</summary>
+      <h2 class="panel-title fold-title">直近14日間の学習量</h2>
       <div class="chart" id="chart"></div>
-    </div>
-
-    <div class="panel">
-      <h2 class="panel-title">分野別の正答率</h2>
+      <h2 class="panel-title fold-title">分野別の正答率</h2>
       <p class="hint">解いたことのある分野だけを、正答率の低い順に並べています。ここが弱点です。</p>
       <div class="accuracy-groups" id="accuracy-groups"></div>
-    </div>
-
-    <div class="panel">
-      <h2 class="panel-title">習得段階の分布</h2>
+      <h2 class="panel-title fold-title">習得段階の分布</h2>
       <p class="hint">正解するほど右の箱へ進み、復習の間隔が延びます（1日 → 3日 → 7日 → 14日 → 30日）。</p>
       <div class="box-dist" id="box-dist"></div>
-    </div>
+    </details>
+  </section>
 
+  <!-- ============ 設定（⚙） ============ -->
+  <section class="view" id="view-settings">
     <div class="panel">
       <h2 class="panel-title">AI診断の設定</h2>
       <p class="hint">
@@ -688,6 +732,14 @@
   </section>
 
 </main>
+
+<!-- 下タブ。4つに絞り、常に画面下に固定する -->
+<nav class="bottom-nav" id="tabs">
+  <button class="tab is-active" data-view="home"><span class="tab-icon">🏠</span>ホーム</button>
+  <button class="tab" data-view="quiz"><span class="tab-icon">📖</span>学習</button>
+  <button class="tab" data-view="mock"><span class="tab-icon">📝</span>テスト</button>
+  <button class="tab" data-view="stats"><span class="tab-icon">📊</span>記録</button>
+</nav>
 
 <div class="toast" id="toast" hidden></div>
 

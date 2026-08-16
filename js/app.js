@@ -117,13 +117,25 @@
   // 画面切り替え
   // ============================================================
 
+  // 下タブは4つだけなので、その中の画面（単語カード・単語一覧など）は親タブを光らせる
+  const TAB_GROUP = {
+    home: 'home',
+    quiz: 'quiz',
+    flashcard: 'quiz',
+    reading: 'quiz',
+    math: 'quiz',
+    list: 'quiz',
+    mock: 'mock',
+    stats: 'stats',
+    settings: null // 設定はどのタブにも属さない
+  };
+
   function showView(name) {
     stopTempo(); // 別の画面へ移ったらサクサク4択のタイマーを止める
     $$('.view').forEach((v) => v.classList.toggle('is-active', v.id === `view-${name}`));
-    $$('.tab').forEach((t) => t.classList.toggle('is-active', t.dataset.view === name));
+    const group = TAB_GROUP[name] !== undefined ? TAB_GROUP[name] : name;
+    $$('.tab').forEach((t) => t.classList.toggle('is-active', t.dataset.view === group));
     window.scrollTo(0, 0);
-
-    scrollActiveTabIntoView();
 
     if (name === 'home') renderHome();
     if (name === 'flashcard') startFlashcards();
@@ -158,7 +170,9 @@
 
   function moveTab(step) {
     const names = tabNames();
-    const current = names.indexOf($('.tab.is-active').dataset.view);
+    const active = $('.tab.is-active');
+    if (!active) return false; // 設定画面などタブに属さない画面ではスワイプ移動しない
+    const current = names.indexOf(active.dataset.view);
     const next = current + step;
     if (next < 0 || next >= names.length) return false;
     showView(names[next]);
@@ -238,10 +252,59 @@
     renderCountdown();
     renderTodayMenu();
     renderCalendar();
+    renderHeaderStreak();
+    renderWeakSpot();
+  }
+
+  function renderHeaderStreak() {
+    const streak = Storage.getStreak();
+    const badge = $('#header-streak');
+    badge.hidden = streak === 0;
+    badge.querySelector('b').textContent = streak;
+  }
+
+  /** 弱点分野を横断で集める。正答率の低い順（十分に解いた分野だけ） */
+  function weakRows(minAnswered) {
+    const readingItems = READING_DATA.flatMap((r) =>
+      r.questions.map((q, i) => ({ id: `${r.id}-${i + 1}`, category: r.topic }))
+    );
+    return [
+      ...accuracyByCategory(WORD_DATA).map((r) => ({ ...r, subject: '単語', view: 'quiz' })),
+      ...accuracyByCategory(readingItems).map((r) => ({ ...r, subject: '長文読解', view: 'reading' })),
+      ...accuracyByCategory(MATH_DATA).map((r) => ({ ...r, subject: '算数', view: 'math' }))
+    ]
+      .filter((r) => r.answered >= minAnswered)
+      .sort((a, b) => a.rate - b.rate);
+  }
+
+  const weakRowHtml = (r) => `<button class="row-line" data-view="${r.view}">
+      <span class="row-main">
+        <span class="row-name">${escapeHtml(r.subject)}　${escapeHtml(r.category)}</span>
+      </span>
+      <span class="row-rate ${r.rate >= 80 ? 't-high' : r.rate >= 60 ? 't-mid' : 't-low'}">${r.rate}%</span>
+      <span class="row-solve">解く</span>
+    </button>`;
+
+  function renderWeakSpot() {
+    const rows = weakRows(4);
+    const w = rows[0];
+    $('#weak-spot').hidden = !w;
+    if (w) $('#weak-spot-row').innerHTML = weakRowHtml(w);
   }
 
   function updateFilterCount() {
     $('#filter-count').textContent = `対象: ${getFilteredWords().length} 語`;
+    renderFilterSummary();
+  }
+
+  /** 畳んだ出題範囲の1行要約（例: 英検3級 ・ まだ覚えていない ・ 10問） */
+  function renderFilterSummary() {
+    const text = (sel) => {
+      const el = $(sel);
+      return el.options[el.selectedIndex] ? el.options[el.selectedIndex].textContent : '';
+    };
+    $('#filter-summary').textContent =
+      `${text('#filter-level')} ・ ${text('#filter-scope')} ・ ${text('#filter-quiz-length')}`;
   }
 
   // ============================================================
@@ -369,7 +432,11 @@
     });
     $('#filter-quiz-length').addEventListener('change', (e) => {
       Storage.updateSettings({ quizLength: Number(e.target.value) });
+      renderFilterSummary();
     });
+
+    // 学習ハブの「単語一覧」行に総語数を出す
+    $('#list-total-note').textContent = `${WORD_DATA.length.toLocaleString()}語`;
     $('#filter-tempo-time').addEventListener('change', (e) => {
       Storage.updateSettings({ tempoTime: Number(e.target.value) });
     });
@@ -421,7 +488,7 @@
     const unit = $('.countdown-unit');
 
     if (days > 0) {
-      label.textContent = '試験日まで';
+      label.textContent = 'EIS入試まで';
       number.textContent = days;
       unit.hidden = false;
     } else if (days === 0) {
@@ -475,9 +542,11 @@
     });
     for (let i = 0; i < leading; i++) cells.push('<div class="cal-cell is-empty"></div>');
 
+    let studiedThisMonth = 0;
     for (let d = 1; d <= daysInMonth; d++) {
       const date = new Date(cal.year, cal.month, d);
       const key = dateKeyOf(date);
+      if (studied.has(key)) studiedThisMonth += 1;
       const classes = ['cal-cell'];
       if (key === examKey) classes.push('is-exam');
       if (key === todayKey) classes.push('is-today');
@@ -491,6 +560,8 @@
     }
 
     $('#calendar').innerHTML = cells.join('');
+    // 畳んだ状態でも様子が分かるよう、1行の要約を出す
+    $('#cal-summary').textContent = `${cal.month + 1}月は ${studiedThisMonth}日 学習`;
   }
 
   function moveMonth(step) {
@@ -2310,6 +2381,19 @@
   }
 
   function initList() {
+    // 末尾に近づいたら自動で続きを読み込む（「さらに表示」を押さなくて済むように）
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!$('#view-list').classList.contains('is-active')) return;
+        if (!$('#list-more')) return;
+        if (window.innerHeight + window.scrollY < document.body.offsetHeight - 400) return;
+        listLimit += LIST_PAGE_SIZE;
+        renderList();
+      },
+      { passive: true }
+    );
+
     $('#list-search').addEventListener('input', renderListFromTop);
     $('#list-sort').addEventListener('change', renderListFromTop);
 
@@ -2369,6 +2453,7 @@
     $('#stats-learned').textContent = WORD_DATA.filter((w) => Storage.isLearned(w.id)).length;
     $('#stats-mastered').textContent = WORD_DATA.filter((w) => Storage.isMastered(w.id)).length;
 
+    renderWeakAreas();
     renderAccuracyByCategory();
 
     // 直近14日の棒グラフ
@@ -2423,6 +2508,14 @@
         rate: Math.round((t.correct / t.answered) * 100)
       }))
       .sort((a, b) => a.rate - b.rate); // 弱い順
+  }
+
+  /** 記録画面の「伸ばせる分野」。弱い順に3件だけ */
+  function renderWeakAreas() {
+    const rows = weakRows(4).slice(0, 3);
+    $('#stats-weak-areas').innerHTML =
+      rows.map(weakRowHtml).join('') ||
+      '<p class="hint">まだ解答が少なく、分野を絞れません。学習を進めるとここに出ます。</p>';
   }
 
   function renderAccuracyByCategory() {

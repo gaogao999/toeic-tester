@@ -60,53 +60,85 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 
-/* ---------- ヘッダー / タブ ---------- */
+/* ---------- ヘッダー / 下タブ ---------- */
 .app-header {
   position: sticky;
   top: 0;
   z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  padding: 12px 16px 0;
+  padding: 10px 16px;
 }
 
 .app-title {
-  margin: 0 0 10px;
-  font-size: 1.15rem;
+  margin: 0;
+  font-size: 1.05rem;
   font-weight: 700;
-  text-align: center;
 }
 
-.tabs {
-  display: flex;
-  gap: 4px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.tabs::-webkit-scrollbar { display: none; }
+.header-side { display: flex; align-items: center; gap: 8px; }
 
-.tab {
-  flex: 1 0 auto;
-  padding: 9px 14px;
-  border: none;
-  border-bottom: 2px solid transparent;
-  background: none;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  font-family: inherit;
-  cursor: pointer;
+.streak-badge {
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: rgba(224, 138, 18, 0.14);
+  color: var(--orange);
+  font-size: 0.8rem;
+  font-weight: 700;
   white-space: nowrap;
 }
-.tab.is-active {
-  color: var(--primary);
-  border-bottom-color: var(--primary);
-  font-weight: 700;
+
+.gear-btn {
+  border: none;
+  background: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px;
 }
+
+/* 下タブ。常に画面下に固定する（1画面完結の前提） */
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  height: 56px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+.tab-icon { font-size: 1.15rem; line-height: 1; }
+.tab.is-active { color: var(--primary); font-weight: 700; }
 
 .container {
   max-width: 720px;
   margin: 0 auto;
-  padding: 18px 16px 48px;
+  /* 下タブに隠れないよう、下に余白を足す */
+  padding: 14px 16px calc(72px + env(safe-area-inset-bottom));
 }
 
 .view { display: none; }
@@ -525,26 +557,27 @@ body {
 }
 
 /* ---------- 受験までのカウントダウン ---------- */
+/* 1画面に収めるため、現行の約230pxから150px前後まで圧縮している */
 .countdown-card {
   background: linear-gradient(135deg, var(--primary), var(--green));
   color: #fff;
   border-radius: var(--radius);
-  padding: 24px 20px;
-  margin-bottom: 16px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
   text-align: center;
   box-shadow: var(--shadow);
 }
 .countdown-label { margin: 0; font-size: 0.85rem; opacity: 0.9; }
-.countdown-days { margin: 4px 0 2px; line-height: 1; }
-#countdown-number { font-size: 3.6rem; font-weight: 700; letter-spacing: -0.02em; }
-.countdown-unit { font-size: 1.2rem; font-weight: 700; margin-left: 4px; }
-.countdown-date { margin: 6px 0 0; font-size: 0.95rem; font-weight: 600; }
+.countdown-days { margin: 2px 0; line-height: 1; }
+#countdown-number { font-size: 2.8rem; font-weight: 700; letter-spacing: -0.02em; }
+.countdown-unit { font-size: 1.1rem; font-weight: 700; margin-left: 4px; }
+.countdown-date { margin: 4px 0 0; font-size: 0.85rem; font-weight: 600; }
 .countdown-sub {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  margin-top: 12px;
-  padding-top: 12px;
+  margin-top: 8px;
+  padding-top: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.3);
   font-size: 0.8rem;
   opacity: 0.95;
@@ -1207,6 +1240,137 @@ body { touch-action: pan-y; }
 @media (min-width: 520px) {
   .diagnosis-cols { grid-template-columns: 1fr 1fr; }
 }
+
+/* ------------------------------------------------------------
+   1画面完結版のパーツ（行リスト・チップ・折りたたみ）
+   ------------------------------------------------------------ */
+
+/* 学習ハブの科目チップ */
+.study-chips { display: flex; gap: 8px; margin-bottom: 12px; }
+.study-chip {
+  flex: 1;
+  padding: 10px 8px;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.study-chip.is-active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+/* 1行メニュー。高さ46px以上を保つ */
+.row-list { display: grid; }
+.row-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 46px;
+  padding: 8px 4px;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+}
+.row-list .row-line:last-child,
+.row-fold summary.row-line,
+details .row-line { border-bottom: none; }
+.row-icon { flex-shrink: 0; font-size: 1.1rem; width: 1.5em; text-align: center; }
+.row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.row-name { font-weight: 700; font-size: 0.95rem; }
+.row-name .badge { margin-left: 4px; }
+.row-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.row-chevron { flex-shrink: 0; color: var(--text-muted); font-size: 1.1rem; }
+.row-rate { flex-shrink: 0; font-weight: 700; font-variant-numeric: tabular-nums; }
+.row-rate.t-high { color: var(--green); }
+.row-rate.t-mid { color: var(--orange); }
+.row-rate.t-low { color: var(--red); }
+.row-solve {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 99px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* details を1行メニューとして使うときの体裁 */
+details.row-fold > summary,
+details.range-fold > summary,
+details.calendar-fold > summary {
+  list-style: none;
+  cursor: pointer;
+}
+details.row-fold > summary::-webkit-details-marker,
+details.range-fold > summary::-webkit-details-marker,
+details.calendar-fold > summary::-webkit-details-marker { display: none; }
+details[open] .row-chevron { transform: rotate(90deg); }
+
+.row-fold-body {
+  display: grid;
+  gap: 8px;
+  padding: 4px 4px 10px;
+}
+
+.range-change {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.range-fold-body { margin-top: 10px; }
+.range-fold .row-name .row-sub { font-weight: 400; margin-left: 6px; }
+
+.calendar-fold[open] > summary { margin-bottom: 12px; }
+.study-panel { padding: 6px 12px; }
+
+/* 折りたたみ式のレビュー・グラフ */
+.review-fold summary {
+  cursor: pointer;
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 4px 0;
+  list-style: none;
+}
+.review-fold summary::-webkit-details-marker { display: none; }
+.review-fold[open] summary { margin-bottom: 10px; }
+.fold-title { margin-top: 16px; }
+
+/* 記録の1行サマリー */
+.stats-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 16px;
+  font-size: 0.92rem;
+}
+.dashboard-3 { grid-template-columns: repeat(3, 1fr); }
+
+/* サクサク4択の選択肢は指の置き場所が毎回同じになるよう高さを揃える */
+.tempo-choice { min-height: 56px; }
 
 .key-input {
   width: 100%;
