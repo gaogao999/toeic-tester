@@ -3,7 +3,12 @@
  * データは localStorage に保存されるため、同じブラウザなら次回も引き継がれる。
  */
 const Storage = (() => {
-  const KEY = 'eis-app:v1'; // 単語データを入れ替えたため、旧バージョンの履歴は引き継がない
+  // このキーは今後のアップデートでも絶対に変えない。変えると全員の学習記録が読めなくなる。
+  // データ形式を変えたくなったら、キーはそのままにして load() の中でマイグレーションする。
+  const KEY = 'eis-app:v1';
+  const BACKUP_KEY = 'eis-app:v1:backup'; // 1日1回の自動バックアップ（その日最初の保存の直前の状態）
+  const BACKUP_DATE_KEY = 'eis-app:v1:backup-date';
+  const BROKEN_KEY = 'eis-app:v1:broken'; // 壊れて読めなかった生データの退避先（手動復旧用）
 
   // Leitner の各ボックスに対応する復習間隔（日数）
   const INTERVALS = [0, 1, 3, 7, 14, 30];
@@ -30,11 +35,13 @@ const Storage = (() => {
 
   let state = load();
 
-  function load() {
+  /** 生の文字列を state の形に整える。壊れていたら null（例外は投げない） */
+  function tryParse(raw) {
+    if (!raw) return null;
     try {
-      const raw = localStorage.getItem(KEY);
-      if (!raw) return structuredCloneSafe(DEFAULT_STATE);
       const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object' || typeof parsed.records !== 'object') return null;
+      // 新しい項目が増えても DEFAULT_STATE 側の初期値で埋まるので、古いデータのまま読める
       return {
         records: parsed.records || {},
         stats: { ...DEFAULT_STATE.stats, ...(parsed.stats || {}) },
@@ -42,9 +49,31 @@ const Storage = (() => {
         settings: { ...DEFAULT_STATE.settings, ...(parsed.settings || {}) }
       };
     } catch (e) {
-      console.warn('保存データを読み込めませんでした。初期化します。', e);
-      return structuredCloneSafe(DEFAULT_STATE);
+      return null;
     }
+  }
+
+  function load() {
+    const raw = localStorage.getItem(KEY);
+    const main = tryParse(raw);
+    if (main) return main;
+
+    if (raw) {
+      // 壊れたデータでも捨てずに退避しておく。初期化で上書きしてしまうと二度と戻せないため
+      try {
+        localStorage.setItem(BROKEN_KEY, raw);
+      } catch (e) {
+        /* 退避すら失敗したら諦める */
+      }
+      // 自動バックアップ（最大1日前の状態）から復元を試みる
+      const backup = tryParse(localStorage.getItem(BACKUP_KEY));
+      if (backup) {
+        console.warn('保存データが壊れていたため、自動バックアップから復元しました。');
+        return backup;
+      }
+      console.warn('保存データを読み込めませんでした。初期化します（元データは退避済み）。');
+    }
+    return structuredCloneSafe(DEFAULT_STATE);
   }
 
   function structuredCloneSafe(obj) {
@@ -53,6 +82,16 @@ const Storage = (() => {
 
   function save() {
     try {
+      // その日最初の保存の前に、前日までの状態をバックアップとして残す。
+      // アップデートの不具合や誤操作（リセット等）があっても、1日前までは戻せる。
+      const today = todayKey();
+      if (localStorage.getItem(BACKUP_DATE_KEY) !== today) {
+        const prev = localStorage.getItem(KEY);
+        if (prev) {
+          localStorage.setItem(BACKUP_KEY, prev);
+          localStorage.setItem(BACKUP_DATE_KEY, today);
+        }
+      }
       localStorage.setItem(KEY, JSON.stringify(state));
     } catch (e) {
       console.warn('保存に失敗しました。', e);
@@ -251,6 +290,20 @@ const Storage = (() => {
     save();
   }
 
+  /** 自動バックアップ（最大1日前の状態）に戻す。誤リセット等からの復旧用 */
+  function restoreBackup() {
+    const backup = tryParse(localStorage.getItem(BACKUP_KEY));
+    if (!backup) return false;
+    state = backup;
+    localStorage.setItem(KEY, JSON.stringify(state));
+    return true;
+  }
+
+  /** バックアップが存在するか（復旧ボタンの表示判定用） */
+  function hasBackup() {
+    return !!tryParse(localStorage.getItem(BACKUP_KEY));
+  }
+
   function exportJSON() {
     return JSON.stringify(state, null, 2);
   }
@@ -293,7 +346,15 @@ const Storage = (() => {
     todayKey,
     getStreak,
     reset,
+    restoreBackup,
+    hasBackup,
     exportJSON,
     importJSON
   };
 })();
+
+// ブラウザが容量逼迫時などに localStorage を自動削除しないよう、永続化を要求しておく。
+// 対応していないブラウザ（file:// など）では黙って無視される。
+if (typeof navigator !== 'undefined' && navigator.storage && navigator.storage.persist) {
+  navigator.storage.persist().catch(() => {});
+}

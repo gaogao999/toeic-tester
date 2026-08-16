@@ -2595,6 +2595,22 @@
       renderStats();
       toast('学習記録をリセットしました');
     });
+
+    $('#restore-backup-btn')?.addEventListener('click', () => {
+      if (!Storage.hasBackup()) {
+        toast('バックアップがまだありません');
+        return;
+      }
+      if (!confirm('前日までの自動バックアップに戻します。今日の分の記録は消える可能性があります。よろしいですか？')) return;
+      if (Storage.restoreBackup()) {
+        syncFilterInputs();
+        renderStats();
+        renderHome();
+        toast('バックアップから復元しました');
+      } else {
+        toast('復元に失敗しました');
+      }
+    });
   }
 
   // ============================================================
