@@ -1497,7 +1497,39 @@
     full: { total: 40, minutes: 45 }
   };
 
-  const mock = { questions: [], index: 0, answers: [], endAt: 0, timer: null, startedAt: 0 };
+  // レベル判定のときは時間制限を外すぶん、問題数を少なくする
+  const ADAPTIVE_SIZES = { short: { total: 15 }, standard: { total: 20 }, full: { total: 30 } };
+
+  const MOCK_SIZE_LABELS = {
+    fixed: { short: '短め（20問・15分）', standard: '標準（30問・30分）', full: '本番想定（40問・45分）' },
+    adaptive: { short: '短め（15問）', standard: '標準（20問）', full: 'じっくり（30問）' }
+  };
+
+  // 単語だけ4段階（英検2級まで）、算数と長文は3段階しかないので上限で頭打ちにする
+  const MAX_LEVEL = { word: 4, math: 3, reading: 3 };
+
+  // 上下の向きが変わった回数がこれだけ溜まれば、レベルは十分に絞れたとみなす
+  const ENOUGH_REVERSALS = 6;
+  const MIN_ADAPTIVE_QUESTIONS = 10;
+
+  const mock = {
+    mode: 'fixed',
+    questions: [],
+    index: 0,
+    answers: [],
+    endAt: 0,
+    timer: null,
+    startedAt: 0,
+    // ここから下はレベル判定のときだけ使う
+    subject: 'both',
+    maxQuestions: 0,
+    level: 1,
+    streak: 0,
+    dir: 0,
+    reversals: [],
+    used: new Set(),
+    done: false
+  };
 
   /** 単語の4択（英単語 → 意味）を作る */
   function buildWordChoice(word) {
@@ -1507,6 +1539,7 @@
     return {
       kind: 'word',
       id: word.id,
+      level: word.level,
       tag: `単語 ／ ${word.category}`,
       question: word.word,
       choices: options.map((o) => o.meaning),
@@ -1520,6 +1553,7 @@
     return {
       kind: 'reading',
       id: `${passage.id}-${i + 1}`,
+      level: passage.level,
       tag: `長文読解 ／ ${passage.topic}`,
       passage,
       question: q.q,
@@ -1533,6 +1567,7 @@
     return {
       kind: 'math',
       id: p.id,
+      level: p.level,
       tag: `算数 ／ ${p.category}`,
       question: p.question,
       unit: p.unit,
@@ -1571,12 +1606,159 @@
     return questions;
   }
 
+  // ---------- レベル判定（適応型）----------
+  //
+  // やさしい問題から始めて、2問続けて正解したら1段上げ、1問間違えたら1段下げる。
+  // この上げ下げを繰り返すと、正答率がおよそ7割になる高さで行ったり来たりする。
+  // その折り返し地点の平均を「いまのレベル」とみなす。
+  // （2問上げ・1問下げの階段法。7割は AI 診断で使っている合格ラインとも揃う）
+
+  /** その科目・そのレベルで出せる問題の一覧 */
+  function poolFor(kind, level) {
+    const lv = Math.min(level, MAX_LEVEL[kind]);
+    if (kind === 'word') return WORD_DATA.filter((w) => w.level === lv);
+    if (kind === 'math') return MATH_DATA.filter((p) => p.level === lv);
+    const out = [];
+    READING_DATA.filter((r) => r.level === lv).forEach((r) =>
+      r.questions.forEach((q, i) => out.push({ passage: r, q, i }))
+    );
+    return out;
+  }
+
+  /** 出題の混ぜ具合。単語ばかりにならないよう重みで散らす */
+  const ADAPTIVE_KINDS = {
+    both: ['word', 'word', 'word', 'reading', 'math', 'math'],
+    english: ['word', 'word', 'word', 'reading', 'reading'],
+    math: ['math']
+  };
+
+  const questionKey = (kind, item) =>
+    kind === 'reading' ? `${item.passage.id}-${item.i + 1}` : String(item.id);
+
+  /**
+   * 階段の高さの上限。算数だけのときは3段しかないので、そこで頭打ちにする
+   * （4段目まで上げても出せる問題が無く、「英検2級」と呼ぶのも算数では意味がない）
+   */
+  const ladderTop = () => (mock.subject === 'math' ? 3 : 4);
+
+  /** 階段の高さの呼び名。英語は英検の級、算数だけのときは学年の段階 */
+  const ladderLabel = (level) =>
+    mock.subject === 'math' ? MATH_LEVEL_LABELS[level] : LEVEL_LABELS[level];
+
+  /** 近いレベルから順に探す。中央→下→上の順で、在庫切れでも止まらないようにする */
+  function levelsNear(level) {
+    const out = [level];
+    for (let d = 1; d <= 3; d++) {
+      if (level - d >= 1) out.push(level - d);
+      if (level + d <= ladderTop()) out.push(level + d);
+    }
+    return out;
+  }
+
+  /**
+   * いまのレベルから1問取り出す。
+   * 科目は重み付きで引き、その科目が尽きていたら他の科目、
+   * それでも無ければ近いレベルへと順に手を広げる。
+   */
+  function nextAdaptiveQuestion() {
+    const weighted = ADAPTIVE_KINDS[mock.subject];
+    // 引いた科目を先頭に、残りは控えとして後ろに並べる
+    const wanted = weighted[Math.floor(Math.random() * weighted.length)];
+    const kinds = [wanted, ...shuffle([...new Set(weighted)].filter((k) => k !== wanted))];
+
+    for (const lv of levelsNear(mock.level)) {
+      for (const kind of kinds) {
+        const pool = poolFor(kind, lv).filter((x) => !mock.used.has(questionKey(kind, x)));
+        if (!pool.length) continue;
+        const item = pool[Math.floor(Math.random() * pool.length)];
+        mock.used.add(questionKey(kind, item));
+        const q =
+          kind === 'word'
+            ? buildWordChoice(item)
+            : kind === 'math'
+              ? buildMathQuestion(item)
+              : buildReadingQuestion(item.passage, item.q, item.i);
+        // 語そのものの級ではなく、階段のどの高さで出したかを残す
+        q.askedAt = mock.level;
+        return q;
+      }
+    }
+    return null;
+  }
+
+  /** 正解なら2問で1段上げ、不正解なら即1段下げる。折り返した高さを控えておく */
+  function stepStaircase(isCorrect) {
+    const before = mock.level;
+
+    if (isCorrect) {
+      mock.streak += 1;
+      if (mock.streak >= 2) {
+        mock.level = Math.min(ladderTop(), mock.level + 1);
+        mock.streak = 0;
+      }
+    } else {
+      mock.streak = 0;
+      mock.level = Math.max(1, mock.level - 1);
+    }
+
+    const dir = mock.level > before ? 1 : mock.level < before ? -1 : 0;
+    if (dir !== 0) {
+      if (mock.dir !== 0 && dir !== mock.dir) mock.reversals.push(before);
+      mock.dir = dir;
+    }
+  }
+
+  /**
+   * 推定レベル。折り返し地点の平均を使う。
+   * 最初の折り返しは、下から上がってくる途中の勢いが残っているので捨てる。
+   * 折り返しが足りないときは、後半に出した問題の高さの平均で代える。
+   */
+  function estimateAdaptiveLevel() {
+    const rev = mock.reversals.length >= 3 ? mock.reversals.slice(1) : mock.reversals;
+    if (rev.length >= 2) {
+      return rev.reduce((a, b) => a + b, 0) / rev.length;
+    }
+    const asked = mock.questions.map((q) => q.askedAt);
+    const half = asked.slice(Math.floor(asked.length / 2));
+    if (!half.length) return 1;
+    return half.reduce((a, b) => a + b, 0) / half.length;
+  }
+
+  /** 十分に絞れたか。折り返しが溜まれば残り問題数にかかわらず終える */
+  function adaptiveShouldStop() {
+    if (mock.questions.length >= mock.maxQuestions) return true;
+    return mock.questions.length >= MIN_ADAPTIVE_QUESTIONS && mock.reversals.length >= ENOUGH_REVERSALS;
+  }
+
+  function isAnswerCorrect(q, given) {
+    return q.kind === 'math'
+      ? given !== null && given !== '' && isMathCorrect(given, q.answer)
+      : given === q.answer;
+  }
+
   function updateMockPlan() {
     const subject = $('#mock-subject').value;
-    const size = MOCK_SIZES[$('#mock-size').value];
+    const mode = $('#mock-format').value;
+    const sizeKey = $('#mock-size').value;
+
+    // 形式によって問題数も時間も変わるので、選択肢の文言ごと入れ替える
+    [...$('#mock-size').options].forEach((opt) => {
+      opt.textContent = MOCK_SIZE_LABELS[mode][opt.value];
+    });
+
     const label =
-      subject === 'math' ? '算数のみ' : subject === 'english' ? '英語のみ（長文＋単語）' : '英語6割・算数4割';
-    $('#mock-plan').textContent = `${label}／全 ${size.total} 問／制限時間 ${size.minutes} 分`;
+      subject === 'math' ? '算数のみ' : subject === 'english' ? '英語のみ（長文＋単語）' : '英語＋算数';
+
+    if (mode === 'adaptive') {
+      $('#mock-intro').textContent =
+        'やさしい問題から始めて、正解すると少しずつ難しく、間違えるとやさしくなります。行き来した高さから、いまの実力がどのあたりかを見積もります。';
+      $('#mock-plan').textContent = `${label}／最大 ${ADAPTIVE_SIZES[sizeKey].total} 問／時間制限なし（レベルが定まれば早めに終わります）`;
+    } else {
+      $('#mock-intro').textContent =
+        '本番と同じように、途中で答え合わせをせず最後にまとめて採点します。制限時間内に解き切る練習です。';
+      $('#mock-plan').textContent =
+        `${subject === 'both' ? '英語6割・算数4割' : label}／全 ${MOCK_SIZES[sizeKey].total} 問／制限時間 ${MOCK_SIZES[sizeKey].minutes} 分`;
+    }
   }
 
   function resetMockToSetup() {
@@ -1590,13 +1772,33 @@
 
   function startMock() {
     const subject = $('#mock-subject').value;
-    const size = MOCK_SIZES[$('#mock-size').value];
+    const mode = $('#mock-format').value;
+    const sizeKey = $('#mock-size').value;
 
-    mock.questions = buildMockQuestions(subject, size.total);
-    mock.answers = new Array(mock.questions.length).fill(null);
+    mock.mode = mode;
+    mock.subject = subject;
     mock.index = 0;
     mock.startedAt = Date.now();
-    mock.endAt = Date.now() + size.minutes * 60 * 1000;
+    mock.level = 1; // かならずやさしい問題から始める
+    mock.streak = 0;
+    mock.dir = 0;
+    mock.reversals = [];
+    mock.used = new Set();
+    mock.done = false;
+
+    if (mode === 'adaptive') {
+      mock.maxQuestions = ADAPTIVE_SIZES[sizeKey].total;
+      const first = nextAdaptiveQuestion();
+      mock.questions = first ? [first] : [];
+      mock.answers = first ? [null] : [];
+      mock.endAt = 0;
+    } else {
+      const size = MOCK_SIZES[sizeKey];
+      mock.maxQuestions = size.total;
+      mock.questions = buildMockQuestions(subject, size.total);
+      mock.answers = new Array(mock.questions.length).fill(null);
+      mock.endAt = Date.now() + size.minutes * 60 * 1000;
+    }
 
     if (mock.questions.length === 0) {
       toast('出題できる問題がありません');
@@ -1608,7 +1810,18 @@
     $('#mock-result').hidden = true;
     $('#mock-body').hidden = false;
 
-    startMockTimer();
+    // レベル判定は時間制限を設けない（急がせると実力より低く出る）
+    $('#mock-timer').hidden = mode === 'adaptive';
+    $('#mock-level').hidden = mode !== 'adaptive';
+    // レベル判定は前に戻れない（戻られると難易度の上げ下げが辻褄の合わないものになる）
+    $('#mock-prev').hidden = mode === 'adaptive';
+    $('.mock-nav').classList.toggle('solo', mode === 'adaptive');
+    $('#mock-note').textContent =
+      mode === 'adaptive'
+        ? '1問ずつ答えます。正解すると難しく、間違えるとやさしくなります。前の問題には戻れません。'
+        : '答えは最後にまとめて採点されます。飛ばして後から戻れます。';
+
+    if (mode === 'fixed') startMockTimer();
     renderMockQuestion();
   }
 
@@ -1642,11 +1855,14 @@
 
   function renderMockQuestion() {
     const q = mock.questions[mock.index];
-    const total = mock.questions.length;
+    const adaptive = mock.mode === 'adaptive';
+    // レベル判定は途中で終わることがあるので、進み具合は上限に対して見せる
+    const total = adaptive ? mock.maxQuestions : mock.questions.length;
 
-    $('#mock-counter').textContent = `${mock.index + 1} / ${total}`;
+    $('#mock-counter').textContent = adaptive ? `${mock.index + 1} 問目` : `${mock.index + 1} / ${total}`;
     $('#mock-progress').style.width = `${((mock.index + 1) / total) * 100}%`;
     $('#mock-tag').textContent = q.tag;
+    if (adaptive) $('#mock-level').textContent = `いまの難易度 ${ladderLabel(q.askedAt)}`;
 
     // 長文は本文を一緒に見せる
     if (q.kind === 'reading') {
@@ -1684,12 +1900,18 @@
     }
 
     $('#mock-prev').disabled = mock.index === 0;
-    $('#mock-next').textContent = mock.index === total - 1 ? '採点する' : '次へ →';
+    $('#mock-next').textContent =
+      !adaptive && mock.index === total - 1 ? '採点する' : '次へ →';
     window.scrollTo(0, 0);
   }
 
   function moveMock(step) {
     saveCurrentMockAnswer();
+    if (mock.mode === 'adaptive') {
+      if (step > 0) advanceAdaptive();
+      return;
+    }
+
     const next = mock.index + step;
     if (next < 0) return;
     if (next >= mock.questions.length) {
@@ -1700,6 +1922,33 @@
     renderMockQuestion();
   }
 
+  /** レベル判定の1問ぶんを確定させ、結果に応じて次の高さを決める */
+  function advanceAdaptive() {
+    const given = mock.answers[mock.index];
+    if (given === null || given === undefined || given === '') {
+      toast('答えてから次へ進みます');
+      return;
+    }
+
+    stepStaircase(isAnswerCorrect(mock.questions[mock.index], given));
+
+    if (adaptiveShouldStop()) {
+      finishMock();
+      return;
+    }
+
+    const next = nextAdaptiveQuestion();
+    if (!next) {
+      // 出せる問題を使い切った場合もそこで打ち切る
+      finishMock();
+      return;
+    }
+    mock.questions.push(next);
+    mock.answers.push(null);
+    mock.index += 1;
+    renderMockQuestion();
+  }
+
   function finishMock() {
     saveCurrentMockAnswer();
     stopMockTimer();
@@ -1707,10 +1956,7 @@
     const byKind = { word: { c: 0, n: 0 }, reading: { c: 0, n: 0 }, math: { c: 0, n: 0 } };
     const results = mock.questions.map((q, i) => {
       const given = mock.answers[i];
-      const isCorrect =
-        q.kind === 'math'
-          ? given !== null && isMathCorrect(given, q.answer)
-          : given === q.answer;
+      const isCorrect = isAnswerCorrect(q, given);
       Storage.recordAnswer(q.id, isCorrect);
       if (isCorrect) Storage.setLearned(q.id, true);
       byKind[q.kind].n += 1;
@@ -1723,10 +1969,13 @@
     const rate = Math.round((correct / total) * 100);
     const minutes = Math.max(1, Math.round((Date.now() - mock.startedAt) / 60000));
 
-    saveMockHistory({ date: new Date().toISOString(), correct, total, rate, minutes });
+    const adaptive = mock.mode === 'adaptive' ? buildAdaptiveSummary(results) : null;
 
-    const limitMinutes = MOCK_SIZES[$('#mock-size').value].minutes;
-    runDiagnosis({ correct, total, rate, minutes, limitMinutes, byKind });
+    saveMockHistory({ date: new Date().toISOString(), correct, total, rate, minutes, mode: mock.mode });
+
+    const limitMinutes = mock.mode === 'adaptive' ? null : MOCK_SIZES[$('#mock-size').value].minutes;
+    runDiagnosis({ correct, total, rate, minutes, limitMinutes, byKind, adaptive });
+    renderAdaptiveSummary(adaptive, results);
 
     $('#mock-body').hidden = true;
     $('#mock-result').hidden = false;
@@ -1766,6 +2015,89 @@
       .join('');
 
     window.scrollTo(0, 0);
+  }
+
+  /**
+   * 推定レベルを級の名前にする。
+   * 一番下から一度も上がれず、しかも取りこぼしが多いときだけ「5級未満」とする。
+   */
+  function adaptiveLevelLabel(estimate, byLevel) {
+    const low = byLevel[1];
+    const bottomedOut = estimate < 1.25 && low && low.answered >= 3 && low.correct / low.answered < 0.5;
+    if (bottomedOut) {
+      return mock.subject === 'math' ? `${MATH_LEVEL_LABELS[1]}より前` : '英検5級未満';
+    }
+    return ladderLabel(Math.min(ladderTop(), Math.max(1, Math.round(estimate))));
+  }
+
+  /** レベル判定の結果をまとめる。画面にも AI 診断にも同じものを渡す */
+  function buildAdaptiveSummary(results) {
+    const byLevel = {};
+    results.forEach((r) => {
+      const lv = r.q.askedAt;
+      byLevel[lv] = byLevel[lv] || { correct: 0, answered: 0 };
+      byLevel[lv].answered += 1;
+      if (r.isCorrect) byLevel[lv].correct += 1;
+    });
+
+    const estimate = estimateAdaptiveLevel();
+    const reached = Math.max(...results.map((r) => r.q.askedAt));
+
+    // どういう終わり方をしたかで、推定の確からしさが変わる
+    const shape =
+      mock.reversals.length >= 2
+        ? '上下を繰り返して落ち着いた'
+        : reached >= ladderTop()
+          ? '一番難しいところまで上がりきった'
+          : reached <= 1
+            ? '一番やさしいところから上がれなかった'
+            : '上下がまだ少ない';
+
+    return {
+      対象: mock.subject === 'math' ? '算数のみ' : mock.subject === 'english' ? '英語のみ' : '英語＋算数',
+      // 算数だけのときの「レベル」は学年の段階であって英検の級ではない
+      英検の級として使える: mock.subject !== 'math',
+      推定レベル: adaptiveLevelLabel(estimate, byLevel),
+      推定値: Math.round(estimate * 10) / 10,
+      最高到達難易度: ladderLabel(reached),
+      折り返し回数: mock.reversals.length,
+      測り方: shape,
+      難易度ごとの正答: Object.keys(byLevel)
+        .sort()
+        .map((lv) => ({
+          難易度: ladderLabel(lv),
+          正答: byLevel[lv].correct,
+          出題: byLevel[lv].answered
+        })),
+      出題順の難易度: results.map((r) => ({ 難易度: r.q.askedAt, 正解: r.isCorrect }))
+    };
+  }
+
+  /** 難易度がどう上下したかを棒グラフで見せる */
+  function renderAdaptiveSummary(adaptive, results) {
+    $('#mock-adaptive').hidden = !adaptive;
+    if (!adaptive) return;
+
+    const top = ladderTop();
+    $('#mock-adaptive-chart').innerHTML = results
+      .map((r, i) => {
+        const lv = r.q.askedAt;
+        const title = `${i + 1}問目 ${ladderLabel(lv)} ${r.isCorrect ? '正解' : '不正解'}`;
+        return `<span class="adaptive-step ${r.isCorrect ? 'ok' : 'ng'}"
+                      style="height:${(lv / top) * 100}%" title="${escapeHtml(title)}"></span>`;
+      })
+      .join('');
+
+    const rev = adaptive['折り返し回数'];
+    const level = adaptive['推定レベル'];
+    const what = mock.subject === 'math' ? '問題' : '単語';
+    const notes = {
+      '上下を繰り返して落ち着いた': `難易度が ${rev} 回上下しました。行き来した高さの平均から、いまの実力は ${level} あたりと見ています。`,
+      '一番難しいところまで上がりきった': `最後まで難易度が上がり続け、用意した中で一番難しい ${ladderLabel(top)} の問題まで正解できました。ここで測れるのは ${ladderLabel(top)} までです。`,
+      '一番やさしいところから上がれなかった': `一番やさしい ${ladderLabel(1)} から難易度を上げられませんでした。まずはここの${what}を確実にしていきましょう。`,
+      '上下がまだ少ない': `まだ難易度の上下が少ないため、後半に出した問題の高さから ${level} あたりと見ています。問題数を増やすとより正確になります。`
+    };
+    $('#mock-adaptive-note').textContent = notes[adaptive['測り方']];
   }
 
   /**
@@ -1855,6 +2187,7 @@
         const d = new Date(h.date);
         return `<div class="mock-history-row">
             <span>${d.getMonth() + 1}/${d.getDate()}</span>
+            <span class="mock-history-mode">${h.mode === 'adaptive' ? 'レベル判定' : '本番形式'}</span>
             <span class="mock-history-score">${h.correct}/${h.total}</span>
             <span class="mock-history-rate">${h.rate}%</span>
             <span class="mock-history-time">${h.minutes}分</span>
@@ -1864,6 +2197,7 @@
   }
 
   function initMock() {
+    $('#mock-format').addEventListener('change', updateMockPlan);
     $('#mock-subject').addEventListener('change', updateMockPlan);
     $('#mock-size').addEventListener('change', updateMockPlan);
     $('#mock-start').addEventListener('click', startMock);

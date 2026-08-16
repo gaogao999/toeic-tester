@@ -221,10 +221,12 @@ body {
 /* ---------- フィルタ ---------- */
 .filters {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  /* minmax(0,…) にしないと、選択肢の文字が長い列が枠からはみ出す */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
-.field { display: flex; flex-direction: column; gap: 4px; font-size: 0.78rem; color: var(--text-muted); }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; font-size: 0.78rem; color: var(--text-muted); }
+.field select { width: 100%; }
 .field select,
 .list-toolbar input,
 .list-toolbar select {
@@ -359,6 +361,8 @@ body {
 .quiz-question.sentence { font-size: 1.05rem; line-height: 1.9; text-align: left; }
 
 .answer-form { display: grid; gap: 10px; }
+/* display を指定した要素は hidden 属性だけでは隠れないので、ここで打ち消す */
+.answer-form[hidden] { display: none; }
 
 .answer-input {
   width: 100%;
@@ -936,6 +940,8 @@ body {
 .choice.is-picked { border-color: var(--primary); background: var(--surface); font-weight: 700; }
 
 .mock-nav { display: grid; grid-template-columns: 1fr 1.4fr; gap: 8px; margin-top: 14px; }
+/* 「前へ」が無いレベル判定では、「次へ」を1列いっぱいに広げる */
+.mock-nav.solo { grid-template-columns: 1fr; }
 
 .mock-breakdown { display: grid; gap: 8px; margin-bottom: 16px; text-align: left; }
 .mock-break-row {
@@ -962,7 +968,7 @@ body {
 .mock-history { display: grid; gap: 4px; }
 .mock-history-row {
   display: grid;
-  grid-template-columns: 3.5rem 1fr 3rem 3rem;
+  grid-template-columns: 3.2rem 4.5rem 1fr 3rem 3rem;
   gap: 8px;
   padding: 6px 0;
   border-bottom: 1px solid var(--border);
@@ -970,9 +976,55 @@ body {
   font-variant-numeric: tabular-nums;
 }
 .mock-history-row:last-child { border-bottom: none; }
+.mock-history-mode { color: var(--text-muted); }
 .mock-history-score { font-weight: 700; }
 .mock-history-rate { text-align: right; color: var(--green); font-weight: 700; }
 .mock-history-time { text-align: right; color: var(--text-muted); }
+
+/* ---------- レベル判定（適応型）---------- */
+
+.mock-level {
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.adaptive-summary {
+  margin: 20px 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  text-align: left;
+}
+
+/* 出題順に1本ずつ。棒の高さがそのまま難易度 */
+.adaptive-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 72px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.adaptive-step {
+  flex: 1;
+  min-width: 4px;
+  border-radius: 3px 3px 0 0;
+}
+.adaptive-step.ok { background: var(--green); }
+.adaptive-step.ng { background: var(--red); }
+
+.adaptive-note {
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: var(--text-muted);
+}
 
 /* スワイプでタブを移動できるので、横方向のジェスチャを妨げないようにする */
 body { touch-action: pan-y; }

@@ -462,8 +462,15 @@
     <div id="mock-setup">
       <div class="panel">
         <h2 class="panel-title">模擬試験</h2>
-        <p class="hint">本番と同じように、途中で答え合わせをせず最後にまとめて採点します。制限時間内に解き切る練習です。</p>
+        <p class="hint" id="mock-intro"></p>
         <div class="filters mock-filters">
+          <label class="field">
+            <span>形式</span>
+            <select id="mock-format">
+              <option value="adaptive" selected>レベル判定</option>
+              <option value="fixed">本番形式</option>
+            </select>
+          </label>
           <label class="field">
             <span>出題</span>
             <select id="mock-subject">
@@ -475,9 +482,9 @@
           <label class="field">
             <span>規模</span>
             <select id="mock-size">
-              <option value="short">短め（20問・15分）</option>
-              <option value="standard" selected>標準（30問・30分）</option>
-              <option value="full">本番想定（40問・45分）</option>
+              <option value="short">短め</option>
+              <option value="standard" selected>標準</option>
+              <option value="full">じっくり</option>
             </select>
           </label>
         </div>
@@ -494,6 +501,7 @@
     <div id="mock-body" hidden>
       <div class="mock-bar">
         <span class="mock-timer" id="mock-timer">00:00</span>
+        <span class="mock-level" id="mock-level" hidden></span>
         <span id="mock-counter">1 / 30</span>
         <button class="btn btn-ghost mock-quit" id="mock-quit">中断</button>
       </div>
@@ -528,6 +536,12 @@
         <h2 class="result-score"><span id="mock-score">0</span> / <span id="mock-total">0</span> 正解</h2>
         <p class="result-rate" id="mock-rate">正答率 0%</p>
         <div class="mock-breakdown" id="mock-breakdown"></div>
+
+        <section class="adaptive-summary" id="mock-adaptive" hidden>
+          <h3 class="diagnosis-title">📶 難易度の推移</h3>
+          <div class="adaptive-chart" id="mock-adaptive-chart"></div>
+          <p class="adaptive-note" id="mock-adaptive-note"></p>
+        </section>
 
         <section class="diagnosis" id="diagnosis">
           <h3 class="diagnosis-title">🤖 いまの実力診断</h3>
