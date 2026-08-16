@@ -1725,6 +1725,9 @@
 
     saveMockHistory({ date: new Date().toISOString(), correct, total, rate, minutes });
 
+    const limitMinutes = MOCK_SIZES[$('#mock-size').value].minutes;
+    runDiagnosis({ correct, total, rate, minutes, limitMinutes, byKind });
+
     $('#mock-body').hidden = true;
     $('#mock-result').hidden = false;
     $('#mock-score').textContent = correct;
@@ -1763,6 +1766,78 @@
       .join('');
 
     window.scrollTo(0, 0);
+  }
+
+  /**
+   * 採点のあとに実力診断を出す。
+   * AI を待たせないよう、採点結果は先に描き、診断だけ後から差し込む。
+   */
+  async function runDiagnosis(mockResult) {
+    $('#diagnosis-loading').hidden = false;
+    $('#diagnosis-body').hidden = true;
+    $('#diagnosis-loading').textContent = AI.hasKey()
+      ? 'AIが診断しています…'
+      : '診断しています…';
+
+    let d;
+    try {
+      d = await AI.diagnose(mockResult, daysUntilExam());
+    } catch (e) {
+      console.warn('診断に失敗しました。', e);
+      $('#diagnosis-loading').textContent = '診断を出せませんでした。';
+      return;
+    }
+
+    $('#diagnosis-level').textContent = d.level;
+    $('#diagnosis-reason').textContent = d.levelReason;
+    $('#diagnosis-comment').textContent = d.comment;
+
+    $('#diagnosis-strengths').innerHTML =
+      (d.strengths || []).map((x) => `<li>${escapeHtml(x)}</li>`).join('') ||
+      '<li class="muted">まだ判断できません</li>';
+
+    $('#diagnosis-weaknesses').innerHTML =
+      (d.weaknesses || [])
+        .map((w) => `<li><b>${escapeHtml(w.area)}</b><br>${escapeHtml(w.advice)}</li>`)
+        .join('') || '<li class="muted">まだ判断できません</li>';
+
+    $('#diagnosis-actions').innerHTML = (d.nextActions || [])
+      .map((x) => `<li>${escapeHtml(x)}</li>`)
+      .join('');
+
+    $('#diagnosis-cheer').textContent = d.encouragement || '';
+
+    // どちらの経路で出した診断かを明かす（AIの文章と機械判定を混同させないため）
+    $('#diagnosis-source').textContent = d.fallbackReason
+      ? `AIを呼べなかったため、正答率から判定しました（${d.fallbackReason}）`
+      : d.source === 'claude'
+        ? 'Claude による診断'
+        : '正答率からの判定（APIキーを設定するとAIが講評します）';
+
+    $('#diagnosis-loading').hidden = true;
+    $('#diagnosis-body').hidden = false;
+  }
+
+  function initApiKey() {
+    const input = $('#api-key');
+    const status = $('#api-key-status');
+    const show = () => {
+      status.textContent = AI.hasKey() ? '✓ 保存済み。AIが診断します。' : '未設定。正答率から判定します。';
+    };
+    show();
+
+    $('#api-key-save').addEventListener('click', () => {
+      AI.setKey(input.value);
+      input.value = '';
+      show();
+      toast(AI.hasKey() ? 'APIキーを保存しました' : 'APIキーを削除しました');
+    });
+    $('#api-key-clear').addEventListener('click', () => {
+      AI.setKey('');
+      input.value = '';
+      show();
+      toast('APIキーを削除しました');
+    });
   }
 
   // 模擬試験の結果は設定と一緒に保存しておく（直近5回ぶん）
@@ -2106,6 +2181,7 @@
     initMath();
     initReading();
     initMock();
+    initApiKey();
     initFlashcards();
     initQuiz();
     initTempo();

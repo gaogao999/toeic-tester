@@ -1104,3 +1104,65 @@ body { touch-action: pan-y; }
   font-size: 0.9rem;
   color: var(--text-muted);
 }
+
+/* ------------------------------------------------------------
+   模擬試験のあとの実力診断
+   ------------------------------------------------------------ */
+
+.diagnosis {
+  margin: 20px 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  text-align: left;
+}
+
+.diagnosis-title { margin: 0 0 10px; font-size: 0.95rem; font-weight: 700; }
+.diagnosis-loading { margin: 0; font-size: 0.88rem; color: var(--text-muted); }
+
+.diagnosis-level {
+  margin: 0 0 4px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+.diagnosis-reason { margin: 0 0 10px; font-size: 0.85rem; color: var(--text-muted); }
+.diagnosis-comment { margin: 0 0 14px; font-size: 0.92rem; line-height: 1.8; }
+
+.diagnosis-cols { display: grid; gap: 14px; margin-bottom: 6px; }
+.diagnosis-sub {
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.diagnosis-list { margin: 0 0 12px; padding-left: 1.3em; font-size: 0.88rem; line-height: 1.8; }
+.diagnosis-list li { margin-bottom: 6px; }
+.diagnosis-list .muted { color: var(--text-muted); list-style: none; margin-left: -1.3em; }
+
+.diagnosis-cheer {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.diagnosis-source { margin: 10px 0 0; font-size: 0.72rem; color: var(--text-muted); }
+
+@media (min-width: 520px) {
+  .diagnosis-cols { grid-template-columns: 1fr 1fr; }
+}
+
+.key-input {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+}
