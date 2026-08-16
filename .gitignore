@@ -1,0 +1,10 @@
+# 教材（著作物）と作業ファイルはコミットしない
+materials/
+data/raw/
+
+# Playwright 確認用
+node_modules/
+package.json
+package-lock.json
+
+.DS_Store
