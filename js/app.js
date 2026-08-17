@@ -333,6 +333,8 @@
       (r) => r.questions.some((q, i) => !Storage.isLearned(`${r.id}-${i + 1}`))
     ).length;
 
+    // データが無い科目は献立に出さない。達成できないノルマを残すと
+    // 「今日の分は達成」に一生ならず、続ける気を削ぐため
     return [
       {
         key: 'word',
@@ -341,7 +343,8 @@
         goal: quota.word,
         unit: '語',
         left: wordsLeft,
-        view: 'quiz'
+        view: 'quiz',
+        available: WORD_DATA.length > 0
       },
       {
         key: 'math',
@@ -350,7 +353,8 @@
         goal: quota.math,
         unit: '問',
         left: mathLeft,
-        view: 'math'
+        view: 'math',
+        available: MATH_DATA.length > 0
       },
       {
         key: 'reading',
@@ -360,9 +364,10 @@
         goal: readingLeft === 0 ? 4 : Math.min(...READING_DATA.map((r) => r.questions.length)),
         unit: '問',
         left: readingLeft,
-        view: 'reading'
+        view: 'reading',
+        available: READING_DATA.length > 0
       }
-    ];
+    ].filter((g) => g.available);
   }
 
   function renderTodayMenu() {
@@ -391,11 +396,13 @@
       .join('');
 
     const days = daysUntilExam();
-    const wordsLeft = goals[0].left;
+    const word = goals.find((g) => g.key === 'word');
     const quota = isWeekend() ? '土日' : '平日';
     $('#today-note').textContent =
       days > 0
-        ? `${quota}のノルマです。未習得の単語はあと ${wordsLeft} 語、試験まで ${days} 日。`
+        ? word
+          ? `${quota}のノルマです。未習得の単語はあと ${word.left} 語、試験まで ${days} 日。`
+          : `${quota}のノルマです。試験まで ${days} 日。単語データがまだありません。`
         : '試験日を過ぎました。';
   }
 
@@ -521,8 +528,10 @@
 
       const remaining = WORD_DATA.filter((w) => !Storage.isLearned(w.id)).length;
       const perDay = Math.ceil(remaining / days);
-      $('#countdown-pace').textContent =
-        remaining > 0
+      // 単語データが空のときに「全て覚えました」と出ると嘘になるので分ける
+      $('#countdown-pace').textContent = WORD_DATA.length === 0
+        ? '単語データがありません'
+        : remaining > 0
           ? `未習得 ${remaining} 語 → 1日 ${perDay} 語のペース`
           : '全ての単語を覚えました';
     } else {
