@@ -345,6 +345,13 @@ body {
   font-size: 0.8rem;
   font-weight: 600;
 }
+/* 同義語・対義語は注意ではなく参考情報なので、警告色にしない */
+.card-note.is-relation {
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-weight: 500;
+  line-height: 1.7;
+}
 
 .card-example {
   border-top: 1px solid var(--border);

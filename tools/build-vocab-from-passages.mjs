@@ -16,6 +16,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { MEANINGS, DROP, REWRITE, POS } from './passage-vocab-overrides.mjs';
+import { KEY_MEANINGS, RELATIONS, UNITS, WORD_LIST } from './toefl-junior-wordlist.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const load = (file, name) =>
@@ -291,22 +292,41 @@ const { words, dict } = collect();
 const gloss = loadGlossary();
 const phonetics = loadPhonetics();
 
+// 語彙練習リストにしか無い語も足す。本文には出ないが、同じ TOEFL Junior の
+// 教材なので根拠は同じ。ユニットの題材を出典として持たせる
+for (const [word, [unit, topic]] of Object.entries(UNITS)) {
+  if (!WORD_LIST.has(word)) continue;   // v3 の一覧に無い項目は採らない
+  if (words.has(word)) continue;
+  if (FUNCTION_WORDS.has(word) || DROP.has(word)) continue;
+  if (!KEY_MEANINGS[word] && !dict.has(word)) continue; // 意味が用意できないものは入れない
+  words.set(word, { count: 0, level: 3, sentence: '', from: unit, topic, fromList: true });
+}
+
 const entries = [...words.entries()]
-  // 1回しか出ない語も入れる。salinity や hemisphere のように、その分野の
-  // 鍵になる語が1回しか出ないことが多く、落とすとカバー率が実用水準に届かない
-  .filter(([, v]) => v.count >= 1)
+  // 本文に出る語はすべて入れる。1回しか出ない語も、その分野の鍵になることが
+  // 多いので落とさない。語彙練習リストにしか無い語（count が 0）も収録する
+  .filter(([, v]) => v.count >= 1 || v.fromList)
   .sort((a, b) => a[1].level - b[1].level || b[1].count - a[1].count)
   .map(([word, v], i) => {
     // 教材が付けた語注があればそれを使い、無ければ英和辞書から引く
-    // 手直し表 → 教材の語注 → 英和辞書 の順に採る
-    const meaning = MEANINGS[word] || gloss.get(word) || pickSense(dict.get(word) || '');
+    // 手直し表 → 語彙リストの Key Word → 教材の語注 → 英和辞書 の順に採る。
+    // Key Word は資料が直接与えている日本語なので、辞書より信用できる
+    const meaning = MEANINGS[word] || KEY_MEANINGS[word] || gloss.get(word) || pickSense(dict.get(word) || '');
+
+    // 同義語・対義語があれば補足に出す。単語カードの「⚠」欄に表示される
+    const rel = RELATIONS[word];
+    const note = rel
+      ? [rel.syn.length ? `同義語: ${rel.syn.join(', ')}` : '', rel.ant.length ? `対義語: ${rel.ant.join(', ')}` : '']
+          .filter(Boolean)
+          .join(' ／ ')
+      : '';
     return {
       id: i + 1,
       word,
       phonetic: phonetics.get(word) || '',
       pos: POS[word] || posOf(word, meaning),
       meaning,
-      note: '',
+      note,
       example: v.sentence.length <= 160 ? v.sentence : '',
       exampleJa: '',
       level: v.level,
@@ -324,7 +344,7 @@ function serialize(w) {
   const q = (v) => `'${String(v).replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
   return (
     `  { id: ${w.id}, word: ${q(w.word)}, phonetic: ${q(w.phonetic)}, pos: ${q(w.pos)}, ` +
-    `meaning: ${q(w.meaning)}, note: '', example: ${q(w.example)}, exampleJa: '', ` +
+    `meaning: ${q(w.meaning)}, note: ${q(w.note)}, example: ${q(w.example)}, exampleJa: '', ` +
     `level: ${w.level}, category: ${q(w.category)}, toefl: true }`
   );
 }

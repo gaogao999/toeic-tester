@@ -679,7 +679,11 @@
     $('#fc-pos').textContent = w.pos;
     $('#fc-pos').hidden = !w.pos;
     $('#fc-meaning').textContent = w.meaning;
-    $('#fc-note').textContent = w.note ? `⚠ ${w.note}` : '';
+    // 補足は2種類ある。「混同しやすい語」の注意と、同義語・対義語の参考情報。
+    // 後者は警告ではないので ⚠ を付けず、見た目も分ける
+    const isRelation = /^(同義語|対義語)/.test(w.note || '');
+    $('#fc-note').textContent = w.note ? (isRelation ? w.note : `⚠ ${w.note}`) : '';
+    $('#fc-note').classList.toggle('is-relation', isRelation);
     $('#fc-note').hidden = !w.note;
     $('#fc-example').textContent = w.example;
     // 取り込んだばかりで例文がない単語では、例文欄ごと隠す
