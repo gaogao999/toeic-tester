@@ -41,7 +41,9 @@
   const levelLabel = (level) => LEVEL_LABELS[level] || `レベル${level}`;
 
   // 算数は学年で示したほうが分かりやすいので、別の表示名を使う
-  const MATH_LEVEL_LABELS = { 1: '小学校の復習', 2: '中1の基本', 3: '中1の発展' };
+  // 算数も単語・長文と同じ4段階にそろえた。受けるのは EIS の Grade 8 入試なので、
+  // 日本の学年ではなくインター校の学年（Grade 7 ≒ 中1）で範囲を区切る
+  const MATH_LEVEL_LABELS = { 1: 'Grade 4', 2: 'Grade 5', 3: 'Grade 6', 4: 'Grade 7' };
   const mathLevelLabel = (level) => MATH_LEVEL_LABELS[level] || `レベル${level}`;
 
   let toastTimer = null;
@@ -1472,7 +1474,9 @@
     const a = toNumber(input);
     const b = toNumber(answer);
     if (Number.isFinite(a) && Number.isFinite(b)) return Math.abs(a - b) < 1e-9;
-    return String(input).trim().toLowerCase() === String(answer).trim().toLowerCase();
+    // 比（3:4）など数にならない答え。空白の入れ方で不正解にしないよう詰めて比べる
+    const flat = (t) => String(t).replace(/\s/g, '').toLowerCase();
+    return flat(input) === flat(answer);
   }
 
   function resetMathToSetup() {
@@ -1643,7 +1647,7 @@
   };
 
   // 単語と長文は4段階（CEFR B2 まで）、算数は3段階しかないので上限で頭打ちにする
-  const MAX_LEVEL = { word: 4, math: 3, reading: 4 };
+  const MAX_LEVEL = { word: 4, math: 4, reading: 4 };
 
   // 上下の向きが変わった回数がこれだけ溜まれば、レベルは十分に絞れたとみなす
   const ENOUGH_REVERSALS = 6;
@@ -1773,10 +1777,10 @@
     kind === 'reading' ? `${item.passage.id}-${item.i + 1}` : String(item.id);
 
   /**
-   * 階段の高さの上限。算数だけのときは3段しかないので、そこで頭打ちにする
-   * （4段目まで上げても出せる問題が無く、「B2」と呼ぶのも算数では意味がない）
+   * 階段の高さの上限。算数も Grade 4〜7 の4段になったので、いまはどちらも4。
+   * 段数が食い違ったときに気づけるよう MAX_LEVEL から引く（直接 4 と書かない）
    */
-  const ladderTop = () => (mock.subject === 'math' ? 3 : 4);
+  const ladderTop = () => (mock.subject === 'math' ? MAX_LEVEL.math : MAX_LEVEL.word);
 
   /** 階段の高さの呼び名。英語は CEFR、算数だけのときは学年の段階 */
   const ladderLabel = (level) =>
@@ -2265,10 +2269,15 @@
       (d.strengths || []).map((x) => `<li>${escapeHtml(x)}</li>`).join('') ||
       '<li class="muted">まだ判断できません</li>';
 
+    // 弱点が空でも理由は2つある。得意な分野が出ているなら「解いたが弱点は無かった」、
+    // 何も出ていないなら「まだ解答数が足りない」。同じ文言にすると誤解される
+    const noWeak = (d.strengths || []).length
+      ? '正答率が7割を下回る分野はありません'
+      : 'まだ判断できません';
     $('#diagnosis-weaknesses').innerHTML =
       (d.weaknesses || [])
         .map((w) => `<li><b>${escapeHtml(w.area)}</b><br>${escapeHtml(w.advice)}</li>`)
-        .join('') || '<li class="muted">まだ判断できません</li>';
+        .join('') || `<li class="muted">${noWeak}</li>`;
 
     $('#diagnosis-actions').innerHTML = (d.nextActions || [])
       .map((x) => `<li>${escapeHtml(x)}</li>`)

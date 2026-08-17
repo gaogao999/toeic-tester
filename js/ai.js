@@ -68,30 +68,53 @@ const AI = (() => {
     }));
   }
 
-  /** 分野別の正答率のうち、解答数が一定以上あるものだけ（少数の偶然を拾わないため） */
+  /**
+   * 分野別の正答率のうち、解答数が一定以上あるものだけ（少数の偶然を拾わないため）。
+   *
+   * どの科目の分野かも持たせる。「◯◯を復習しましょう」の案内先が
+   * 単語なのか算数なのかで変わるため。単語の分野は出典の長文のテーマなので、
+   * 長文と同じ名前になることがある。そのときは両方を覚えておく。
+   */
   function accuracyByCategory(minAnswers = 3) {
     const map = new Map();
-    const add = (name, rec) => {
+    const add = (name, rec, subject) => {
       if (!name) return;
-      const cur = map.get(name) || { correct: 0, wrong: 0 };
+      const cur = map.get(name) || { correct: 0, wrong: 0, subjects: new Set() };
       cur.correct += rec.correct;
       cur.wrong += rec.wrong;
+      if (rec.correct + rec.wrong > 0) cur.subjects.add(subject);
       map.set(name, cur);
     };
-    WORD_DATA.forEach((w) => add(w.category, Storage.getRecord(w.id)));
-    MATH_DATA.forEach((p) => add(p.category, Storage.getRecord(p.id)));
+    WORD_DATA.forEach((w) => add(w.category, Storage.getRecord(w.id), '単語'));
+    MATH_DATA.forEach((p) => add(p.category, Storage.getRecord(p.id), '算数'));
     READING_DATA.forEach((r) =>
-      r.questions.forEach((q, i) => add(r.topic, Storage.getRecord(`${r.id}-${i + 1}`)))
+      r.questions.forEach((q, i) => add(r.topic, Storage.getRecord(`${r.id}-${i + 1}`), '長文読解'))
     );
 
     return [...map.entries()]
       .map(([name, v]) => ({
         name,
         answered: v.correct + v.wrong,
-        accuracy: Math.round((v.correct / (v.correct + v.wrong)) * 100)
+        accuracy: Math.round((v.correct / (v.correct + v.wrong)) * 100),
+        subjects: [...v.subjects]
       }))
       .filter((x) => x.answered >= minAnswers)
       .sort((a, b) => a.accuracy - b.accuracy);
+  }
+
+  /**
+   * 弱点と呼ぶ line。正答率がこれ未満のものだけを「弱点」として挙げる。
+   * 70% は模擬試験の階段が落ち着く高さと同じ。判定の物差しを一本にするため。
+   */
+  const WEAK_LINE = 70;
+
+  /** 弱点への助言。案内先が科目でちがうので、分野が属する科目に合わせて出し分ける */
+  function weakAdvice(row) {
+    const s = row.subjects || [];
+    if (s.length === 1 && s[0] === '算数') return '算数の「分野」でこの分野に絞って解き直しましょう。';
+    if (s.length === 1 && s[0] === '長文読解') return 'このテーマの長文をもう一度読み、間違えた設問を確かめましょう。';
+    if (s.length === 1 && s[0] === '単語') return 'クイズの「対象」でこの分野の単語に絞って復習しましょう。';
+    return `${s.join('と')}のこの分野を、まとめて復習しましょう。`;
   }
 
   /** 診断の材料。AIに渡すものと、その場で計算するときの材料を兼ねる */
@@ -111,8 +134,10 @@ const AI = (() => {
         レベル判定: mockResult.adaptive || null
       },
       これまでの段階別正答率: accuracyByLevel(),
-      苦手な分野: weak.slice(0, 6),
-      得意な分野: weak.slice(-4).reverse(),
+      // 全部できていても「いちばん下の6つ」を弱点として挙げてしまわないよう、
+      // 正答率が線を下回っているものだけを弱点にする
+      苦手な分野: weak.filter((x) => x.accuracy < WEAK_LINE).slice(0, 6),
+      得意な分野: weak.filter((x) => x.accuracy >= WEAK_LINE).slice(-4).reverse(),
       過去の模擬試験: (Storage.getSettings().mockHistory || []).map((h) => ({
         正答率: h.rate,
         所要分: h.minutes
@@ -159,24 +184,32 @@ const AI = (() => {
     const weak = snapshot['苦手な分野'];
     const overTime = mock.制限分 !== null && mock.所要分 > mock.制限分;
 
-    const level = forGrade ? forGrade['推定レベル'] : reached || '判定するには解答数が不足';
+    // 算数だけの回で英語の段階を見出しに出しても意味がないので、算数の学年を見出しにする
+    const mathOnly = adaptive && !forGrade;
+
+    const level = forGrade
+      ? forGrade['推定レベル']
+      : mathOnly
+        ? adaptive['推定レベル']
+        : reached || '判定するには解答数が不足';
     const levelReason = forGrade
       ? adaptiveReason(forGrade)
-      : reached
-        ? `${reached} までの語で正答率70%以上を保てています。`
-        : '各段階の単語を5問以上解くと判定できます。';
+      : mathOnly
+        ? `${adaptiveReason(adaptive)}（算数の学年です。英語の段階は英語を含む回で測ります）`
+        : reached
+          ? `${reached} までの語で正答率70%以上を保てています。`
+          : '各段階の単語を5問以上解くと判定できます。';
 
     const notes = [];
     notes.push(
       forGrade
         ? `難易度を調整しながら ${mock.問題数} 問を解いた結果、いまの到達点は ${forGrade['推定レベル']} 相当と見ています。`
-        : reached
-          ? `段階ごとの正答率から、いまの到達点は ${reached} 相当と見ています。`
-          : '判定にはまだ解答数が足りません。各段階の単語を5問以上解くと判定できます。'
+        : mathOnly
+          ? `算数の難易度を上下させながら ${mock.問題数} 問を解いた結果、到達段階は ${adaptive['推定レベル']} でした。`
+          : reached
+            ? `段階ごとの正答率から、いまの到達点は ${reached} 相当と見ています。`
+            : '判定にはまだ解答数が足りません。各段階の単語を5問以上解くと判定できます。'
     );
-    if (adaptive && !forGrade) {
-      notes.push(`算数は難易度を上下させた結果、到達段階は ${adaptive['推定レベル']} でした。`);
-    }
     if (mock.制限分 === null) {
       notes.push(`所要 ${mock.所要分} 分。次は本番形式で、時間内に解き切る練習もしておきましょう。`);
     } else {
@@ -195,7 +228,7 @@ const AI = (() => {
       strengths: snapshot['得意な分野'].map((x) => `${x.name}（${x.accuracy}%）`),
       weaknesses: weak.slice(0, 3).map((x) => ({
         area: `${x.name}（${x.accuracy}%）`,
-        advice: 'クイズの「対象」で苦手な単語に絞って復習しましょう。'
+        advice: weakAdvice(x)
       })),
       nextActions: [
         weak[0] ? `${weak[0].name} を重点的に復習する` : '今日の学習メニューをこなす',
