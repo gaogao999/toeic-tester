@@ -363,12 +363,13 @@
         available: MATH_DATA.length > 0
       },
       {
-        key: 'reading',
+        key: 'passages',
         icon: '📕',
         name: '長文読解',
-        // 長文は1本あたりの設問数で数える。未読があれば1本、なければ復習1本
-        goal: readingLeft === 0 ? 4 : Math.min(...READING_DATA.map((r) => r.questions.length)),
-        unit: '問',
+        // 本文は最後まで読んで初めて練習になる。設問の数で数えると、
+        // 2問しかない本文を解いただけで達成になってしまう
+        goal: 1,
+        unit: '本',
         left: readingLeft,
         view: 'reading',
         available: READING_DATA.length > 0
@@ -1396,6 +1397,9 @@
   function showReadingResult() {
     const total = reading.passage.questions.length;
     const rate = Math.round((reading.correct / total) * 100);
+
+    // 献立は「何本読んだか」で数えるので、ここで1本ぶん記録する
+    Storage.completePassage();
 
     $('#reading-body').hidden = true;
     $('#reading-result').hidden = false;

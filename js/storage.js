@@ -265,8 +265,30 @@ const Storage = (() => {
       word: (day && day.word) || 0,
       math: (day && day.math) || 0,
       reading: (day && day.reading) || 0,
+      // 読み終えた長文の本数。献立はこちらで数える
+      passages: (day && day.passages) || 0,
       answered: (day && day.answered) || 0
     };
+  }
+
+  /**
+   * 長文を1本読み終えたことを記録する。
+   *
+   * 設問の数で数えると、設問が2問しかない本文を解いただけで
+   * 「今日の分は達成」になってしまう。300語読んで2問では練習にならないので、
+   * 献立では「何本読んだか」で数える。設問ごとの記録（day.reading）は
+   * 統計用にそのまま残す。
+   */
+  function completePassage() {
+    const key = todayKey();
+    let day = state.history.find((h) => h.date === key);
+    if (!day) {
+      day = { date: key, answered: 0, correct: 0, word: 0, math: 0, reading: 0 };
+      state.history.push(day);
+    }
+    day.passages = (day.passages || 0) + 1;
+    save();
+    return day.passages;
   }
 
   /** 今日を含む連続学習日数 */
@@ -403,6 +425,7 @@ const Storage = (() => {
     getStudiedDates,
     getDay,
     getTodayCounts,
+    completePassage,
     kindOf,
     todayKey,
     getStreak,
