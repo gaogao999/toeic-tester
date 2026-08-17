@@ -161,23 +161,14 @@
             <span class="row-chevron">›</span>
           </button>
         </div>
-        <!-- 入力式の4形式は1枚に畳む（1画面に収めるため） -->
-        <details class="row-fold">
-          <summary class="row-line">
-            <span class="row-icon">⌨️</span>
-            <span class="row-main">
-              <span class="row-name">入力して答える</span>
-              <span class="row-sub">意味→英単語／穴埋め／リスニング／スペル</span>
-            </span>
-            <span class="row-chevron">›</span>
-          </summary>
-          <div class="row-fold-body">
-            <button class="btn btn-secondary" data-quiz-mode="ja-en">🇯🇵 意味 → 英単語</button>
-            <button class="btn btn-secondary" data-quiz-mode="fill">✍️ 例文穴埋め</button>
-            <button class="btn btn-secondary" data-quiz-mode="listening">🎧 リスニング</button>
-            <button class="btn btn-secondary" data-quiz-mode="spell">⌨️ スペル練習</button>
-          </div>
-        </details>
+        <button class="row-line" data-quiz-mode="ja-en">
+          <span class="row-icon">⌨️</span>
+          <span class="row-main">
+            <span class="row-name">意味 → 英単語</span>
+            <span class="row-sub">日本語の意味を見て英単語を打つ</span>
+          </span>
+          <span class="row-chevron">›</span>
+        </button>
       </div>
 
       <!-- 出題範囲は1行の要約に畳む。開くと従来の4プルダウン -->
@@ -194,10 +185,9 @@
             <span>レベル</span>
             <select id="filter-level">
               <option value="all">すべて</option>
-              <option value="1">英検5級・4級</option>
-              <option value="2">英検3級</option>
-              <option value="3">英検準2級</option>
-              <option value="4">英検2級</option>
+              <option value="2">基礎 A2</option>
+              <option value="3">標準 B1</option>
+              <option value="4">応用 B2</option>
             </select>
           </label>
           <label class="field">
@@ -289,8 +279,6 @@
       <div class="panel quiz-panel">
         <p class="quiz-prompt-label" id="quiz-label"></p>
         <p class="quiz-question" id="quiz-question"></p>
-        <button class="btn btn-icon" id="quiz-replay" hidden>🔊 もう一度聞く</button>
-
         <form class="answer-form" id="quiz-form" autocomplete="off">
           <input
             type="text"
@@ -351,13 +339,24 @@
           <span>レベル</span>
           <select id="reading-level">
             <option value="all">すべて</option>
-            <option value="1">英検5級・4級</option>
-            <option value="2">英検3級（A2）</option>
-            <option value="3">英検準2級（B1）</option>
-            <option value="4">英検2級（B2）</option>
+            <option value="1">入門（A1）</option>
+            <option value="2">基礎 A2</option>
+            <option value="3">標準 B1</option>
+            <option value="4">応用 B2</option>
           </select>
         </label>
-        <div class="reading-list" id="reading-list"></div>
+        <button class="btn btn-primary btn-lg reading-random" id="reading-random">🎲 ランダムで1本読む</button>
+        <p class="hint">まだ全問正解していない本文から選びます。選ぶのに迷う時間をなくすためのボタンです。</p>
+        <details class="reading-pick">
+          <summary class="row-line">
+            <span class="row-main">
+              <span class="row-name">自分で選ぶ</span>
+              <span class="row-sub" id="reading-count"></span>
+            </span>
+            <span class="row-chevron">›</span>
+          </summary>
+          <div class="reading-list" id="reading-list"></div>
+        </details>
       </div>
       <p class="hint center">本文を読んでから設問に答えます。答えるとすぐ日本語の解説が出ます。</p>
     </div>
@@ -705,6 +704,24 @@
 
   <!-- ============ 設定（⚙） ============ -->
   <section class="view" id="view-settings">
+    <div class="panel">
+      <h2 class="panel-title">学習の設定</h2>
+      <label class="setting-row">
+        <span class="setting-main">
+          <span class="setting-name">単語を自動で読み上げる</span>
+          <span class="setting-sub">カードをめくったとき、4択が出たときに発音します</span>
+        </span>
+        <input type="checkbox" id="auto-speak" class="setting-toggle" />
+      </label>
+      <label class="setting-row">
+        <span class="setting-main">
+          <span class="setting-name">意味にふりがなを付ける</span>
+          <span class="setting-sub">読めない漢字があるときに。APIキーが必要です</span>
+        </span>
+        <input type="checkbox" id="show-furigana" class="setting-toggle" />
+      </label>
+    </div>
+
     <div class="panel">
       <h2 class="panel-title">AIの設定</h2>
       <p class="hint">

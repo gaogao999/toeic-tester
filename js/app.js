@@ -667,6 +667,27 @@
     box.hidden = !ja;
   }
 
+  /**
+   * 意味にふりがなを付けて出す。
+   * 読める漢字にまで付くと逆に読みにくいので、AI 側で小学校の漢字は外している。
+   * 「漆喰(しっくい)」の形で返るので、ruby に組み直す。
+   */
+  async function showMeaning(w) {
+    const el = $('#fc-meaning');
+    el.textContent = w.meaning;
+    if (!Storage.getSettings().furigana) return;
+
+    const ready = AI.cachedFurigana(w.meaning);
+    const text = ready || (AI.hasKey() ? await AI.addFurigana(w.meaning) : null);
+    if (!text) return;
+    if (fc.deck[fc.index] !== w) return; // 待っている間に次のカードへ移っていたら書き換えない
+
+    el.innerHTML = text.replace(
+      /([一-龯々]+)\(([ぁ-ん]+)\)/g,
+      (m, kanji, yomi) => `<ruby>${escapeHtml(kanji)}<rt>${escapeHtml(yomi)}</rt></ruby>`
+    );
+  }
+
   function renderFlashcard() {
     const w = fc.deck[fc.index];
     if (!w) return;
@@ -678,7 +699,7 @@
     $('#fc-category').textContent = w.category;
     $('#fc-pos').textContent = w.pos;
     $('#fc-pos').hidden = !w.pos;
-    $('#fc-meaning').textContent = w.meaning;
+    showMeaning(w);
     // 補足は2種類ある。「混同しやすい語」の注意と、同義語・対義語の参考情報。
     // 後者は警告ではないので ⚠ を付けず、見た目も分ける
     const isRelation = /^(同義語|対義語)/.test(w.note || '');
@@ -779,10 +800,7 @@
   };
 
   const MODE_LABELS = {
-    'ja-en': 'この意味を表す英単語を入力してください',
-    fill: '空所に入る語を入力してください',
-    listening: '読み上げられた単語を入力してください',
-    spell: '表示された単語をそのまま入力してください'
+    'ja-en': 'この意味を表す英単語を入力してください'
   };
 
   /** 採点用に表記を揃える（大小文字・前後の空白・記号の違いを吸収） */
@@ -799,38 +817,10 @@
    * 例文中の該当語を空所に置き換える。
    * 語形변化した形（-s / -ed / -ing など）も探し、その形も正解として受け付ける。
    */
-  function makeBlank(word, example) {
-    if (!example) return null;
-    const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const re = new RegExp(`\\b${escaped}(s|es|ed|d|ing|ies)?\\b`, 'i');
-    const match = example.match(re);
-    if (!match) return null;
-    return { text: example.replace(re, '______'), matched: match[0] };
-  }
-
   function buildQuestions(words, mode, length) {
-    let source = shuffle(words);
-    if (mode === 'fill') source = source.filter((w) => makeBlank(w.word, w.example));
-    source = source.slice(0, length);
-
-    return source.map((w) => {
-      const accepted = [w.word];
-      let prompt = '';
-
-      if (mode === 'ja-en') {
-        prompt = w.meaning;
-      } else if (mode === 'fill') {
-        const blank = makeBlank(w.word, w.example);
-        prompt = blank.text;
-        accepted.push(blank.matched); // 例文中の形でも正解にする
-      } else if (mode === 'listening') {
-        prompt = '🎧 音声を聞いてください';
-      } else {
-        prompt = w.word;
-      }
-
-      return { word: w, prompt, accepted };
-    });
+    return shuffle(words)
+      .slice(0, length)
+      .map((w) => ({ word: w, prompt: w.meaning, accepted: [w.word] }));
   }
 
   function resetQuizToSetup() {
@@ -860,11 +850,7 @@
     quiz.results = [];
 
     if (quiz.questions.length === 0) {
-      toast(
-        mode === 'fill'
-          ? '例文のある単語が範囲内にありません'
-          : '出題できる単語がありません'
-      );
+      toast('出題できる単語がありません');
       return;
     }
 
@@ -873,7 +859,6 @@
     $('#quiz-result').hidden = true;
     $('#tempo-body').hidden = true;
     $('#quiz-body').hidden = false;
-    $('#quiz-replay').hidden = mode !== 'listening';
     renderQuestion();
   }
 
@@ -887,16 +872,7 @@
     $('#quiz-score').textContent = `正解 ${quiz.correct}`;
     $('#quiz-label').textContent = MODE_LABELS[quiz.mode];
 
-    const questionEl = $('#quiz-question');
-    questionEl.classList.toggle('sentence', quiz.mode === 'fill');
-    if (quiz.mode === 'fill') {
-      questionEl.innerHTML = escapeHtml(q.prompt).replace(
-        '______',
-        '<span class="blank">______</span>'
-      );
-    } else {
-      questionEl.textContent = q.prompt;
-    }
+    $('#quiz-question').textContent = q.prompt;
 
     const input = $('#quiz-input');
     input.value = '';
@@ -906,8 +882,6 @@
     $('#quiz-form').hidden = false;
     $('#quiz-feedback').hidden = true;
     input.focus();
-
-    if (quiz.mode === 'listening') Speech.speak(q.word.word);
   }
 
   function showHint() {
@@ -1021,10 +995,6 @@
     $('#quiz-hint-btn').addEventListener('click', showHint);
     $('#quiz-next').addEventListener('click', nextQuestion);
     $('#result-retry').addEventListener('click', () => startQuiz(quiz.mode));
-    $('#quiz-replay').addEventListener('click', () => {
-      const q = quiz.questions[quiz.index];
-      if (q) Speech.speak(q.word.word);
-    });
   }
 
   // ============================================================
@@ -1298,6 +1268,26 @@
           </button>`;
       })
       .join('') || '<p class="hint">該当する長文がありません。</p>';
+
+    const done = list.filter((r) => readingSolved(r) === r.questions.length).length;
+    $('#reading-count').textContent = `${list.length} 本中 ${done} 本が全問正解`;
+  }
+
+  /**
+   * ランダムに1本選ぶ。
+   * まだ全問正解していない本文を優先する。全部終わっていたら、そのときは
+   * 全体から選び直す（復習になる）。何を読むか迷う時間をなくすためのもの。
+   */
+  function startRandomReading() {
+    const level = $('#reading-level').value;
+    const pool = READING_DATA.filter((r) => level === 'all' || String(r.level) === level);
+    if (!pool.length) {
+      toast('この難易度の長文がありません');
+      return;
+    }
+    const unfinished = pool.filter((r) => readingSolved(r) < r.questions.length);
+    const from = unfinished.length ? unfinished : pool;
+    startReading(from[Math.floor(Math.random() * from.length)].id);
   }
 
   function startReading(passageId) {
@@ -1427,6 +1417,7 @@
 
   function initReading() {
     $('#reading-level').addEventListener('change', showReadingList);
+    $('#reading-random').addEventListener('click', startRandomReading);
 
     $('#reading-list').addEventListener('click', (e) => {
       const item = e.target.closest('[data-passage]');
@@ -2322,6 +2313,20 @@
       show();
       toast('APIキーを削除しました');
     });
+    // 自動読み上げとふりがな。設定は保存され、次に開いたときも保たれる
+    const speak = $('#auto-speak');
+    const furi = $('#show-furigana');
+    speak.checked = !!Storage.getSettings().autoSpeak;
+    furi.checked = !!Storage.getSettings().furigana;
+    speak.addEventListener('change', (e) => {
+      Storage.updateSettings({ autoSpeak: e.target.checked });
+      toast(e.target.checked ? '単語を自動で読み上げます' : '自動読み上げを止めました');
+    });
+    furi.addEventListener('change', (e) => {
+      Storage.updateSettings({ furigana: e.target.checked });
+      if (e.target.checked && !AI.hasKey()) toast('APIキーを入れるとふりがなが付きます');
+    });
+
     $('#translation-clear').addEventListener('click', () => {
       if (!confirm('おぼえている例文の和訳を消しますか。次に見たときに作り直します。')) return;
       AI.clearTranslations();

@@ -1389,3 +1389,28 @@ details[open] .row-chevron { transform: rotate(90deg); }
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.85rem;
 }
+
+/* ---------- 設定の切り替え ---------- */
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-main { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.setting-name { font-size: 0.92rem; font-weight: 600; }
+.setting-sub { font-size: 0.76rem; color: var(--text-muted); line-height: 1.6; }
+.setting-toggle { width: 20px; height: 20px; flex-shrink: 0; accent-color: var(--primary); }
+
+/* ふりがな。読みが小さすぎると意味がないので、本文の6割ほどにする */
+ruby rt { font-size: 0.6em; color: var(--text-muted); font-weight: 400; }
+
+/* ---------- 長文読解の選び方 ---------- */
+.reading-random { width: 100%; margin-top: 10px; }
+.reading-pick { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 10px; }
+.reading-pick summary { cursor: pointer; list-style: none; }
+.reading-pick summary::-webkit-details-marker { display: none; }
+.reading-pick[open] .row-chevron { transform: rotate(90deg); }

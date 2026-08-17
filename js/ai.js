@@ -448,6 +448,95 @@ const AI = (() => {
     }
   }
 
+  // ------------------------------------------------------------
+  // ふりがな
+  // ------------------------------------------------------------
+  //
+  // 意味に使う漢字は、小学生・中学生には読めないものが混じる
+  // （漆喰・胞子・疫病・遺棄 など）。読めないと意味も覚えられないので、
+  // 和訳と同じやり方で、必要になったぶんだけ読みを作って貯める。
+
+  const FURIGANA_STORE = 'eis-app:furigana';
+
+  const FURIGANA_SYSTEM = [
+    '日本語にふりがなを付けてください。',
+    '',
+    '守ること:',
+    '- 漢字を含む語の直後に、その読みを丸かっこで書く。例: 漆喰(しっくい)を塗る',
+    '- 小学校で習う漢字（山・川・見る など）には付けない。読めるので邪魔になる。',
+    '- ひらがな・カタカナ・記号はそのまま残す。',
+    '- 訳したり言い換えたりしない。もとの文字はそのままにする。',
+    '- 結果だけを返す。前置きを付けない。'
+  ].join('\n');
+
+  function loadFurigana() {
+    try {
+      return JSON.parse(localStorage.getItem(FURIGANA_STORE) || '{}');
+    } catch (e) {
+      return {};
+    }
+  }
+
+  const cachedFurigana = (text) => loadFurigana()[text] || null;
+
+  /**
+   * ふりがなを付ける。付ける必要が無い（漢字が無い）ときは元の文字を返す。
+   * キーが無い・失敗したときは null を返し、画面はふりがな無しで出す。
+   */
+  async function addFurigana(text) {
+    if (!text) return null;
+    if (!/[一-龯]/.test(text)) return text; // 漢字が無ければそのまま
+
+    const hit = cachedFurigana(text);
+    if (hit) return hit;
+    if (!hasKey()) return null;
+
+    try {
+      const res = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': getKey(),
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: TRANSLATE_MODEL,
+          max_tokens: 300,
+          system: FURIGANA_SYSTEM,
+          messages: [{ role: 'user', content: text }]
+        })
+      });
+      if (!res.ok) throw new Error(`ふりがなの作成に失敗しました（${res.status}）`);
+
+      const data = await res.json();
+      if (data.stop_reason === 'refusal') return null;
+      const block = (data.content || []).find((b) => b.type === 'text');
+      const out = block && block.text.trim();
+      if (!out) return null;
+
+      try {
+        const all = loadFurigana();
+        all[text] = out;
+        localStorage.setItem(FURIGANA_STORE, JSON.stringify(all));
+      } catch (e) {
+        console.warn('ふりがなを保存できませんでした。', e);
+      }
+      return out;
+    } catch (e) {
+      console.warn('ふりがなの作成に失敗しました。', e);
+      return null;
+    }
+  }
+
+  function clearFurigana() {
+    try {
+      localStorage.removeItem(FURIGANA_STORE);
+    } catch (e) {
+      console.warn('ふりがなを消せませんでした。', e);
+    }
+  }
+
   /** 貯めた和訳の数。設定画面で見せる */
   const translationCount = () => Object.keys(loadTranslations()).length;
 
@@ -468,6 +557,9 @@ const AI = (() => {
     translateExample,
     cachedTranslation,
     translationCount,
-    clearTranslations
+    clearTranslations,
+    addFurigana,
+    cachedFurigana,
+    clearFurigana
   };
 })();

@@ -16,7 +16,10 @@
 export const DROP = new Set([
   'ow', 'mil', 'gon', 'wan', 'nah', 'yeah', 'hmm', 'huh', 'oops',
   'whin',      // 語形の取り違えで拾ってしまう植物名
-  'programme'  // program の英国綴り。重複になる
+  'programme', // program の英国綴り。重複になる
+  'anti',      // 接頭辞。単独の語ではない
+  'handed',    // 接尾辞（left-handed など）。単独の語ではない
+  'gam', 'trad', 'plat'  // 辞書にはあるが現代の教材では使わない語
 ]);
 
 export const MEANINGS = {
@@ -118,7 +121,94 @@ export const MEANINGS = {
   sideline: 'サイドライン',
   clog: 'ふさぐ、詰まらせる',
   odd: '奇妙な',
-  gate: '門、ゲート'
+  gate: '門、ゲート',
+
+  // ---- 総点検（audit-vocab.mjs）で見つかった誤り ----
+
+  // 否定を含む語。「ほとんど」と「ほとんど〜ない」は逆の意味になる
+  hardly: 'ほとんど〜ない',
+  scarcely: 'ほとんど〜ない',
+  rarely: 'めったに〜ない',
+  seldom: 'めったに〜ない',
+  barely: 'かろうじて〜する',
+
+  // 程度を表す副詞。辞書の第一義が古い用法を指している
+  quite: 'かなり、まったく',
+  fairly: 'かなり、公平に',
+  rather: 'むしろ、かなり',
+  nearly: 'もう少しで、ほぼ',
+  almost: 'ほとんど、もう少しで',
+
+  // 数。数字だけだと日本語として読めない
+  twelve: '十二', fourteen: '十四', fifteen: '十五', sixteen: '十六', nineteen: '十九',
+  twenty: '二十', thirty: '三十', forty: '四十', fifty: '五十', sixty: '六十',
+  seventy: '七十', hundred: '百', thousand: '千',
+
+  // 固有名詞との衝突・壊れていた語
+  man: '男、人',
+  sister: '姉妹',
+  loser: '敗者',
+  whale: '鯨',
+  python: 'ニシキヘビ',
+  term: '学期、用語',
+  pilot: 'パイロット、操縦士',
+
+  // 意味が長すぎて選択肢に収まらなかったもの
+  survive: '生き残る',
+  deter: '思いとどまらせる',
+  clarify: '明らかにする',
+  miscalculate: '計算を誤る',
+  undivided: '分かれていない',
+  imbalance: '不均衡',
+  glib: '口が達者な',
+  allergic: 'アレルギーの',
+  appreciate: '感謝する、よさが分かる',
+  squeak: 'チューチュー鳴く',
+  goggle: '目を丸くする',
+  reunite: '再会させる',
+  ruin: '台無しにする、廃墟',
+
+  // 同じ意味の語が並ばないよう、区別できる訳に分ける。
+  // 「意味→英単語」の形式では、訳が同じだと正解なのに不正解になるため
+  huge: '巨大な', gigantic: 'とてつもなく大きい', enormous: '莫大な', colossal: '巨大な建造物のような',
+  result: '結果', effect: '影響、効果', consequence: '結末', outcome: '成果',
+  work: '働く、仕事', job: '職', task: '課題、任務',
+  lot: 'たくさん', abundance: '豊富さ', plenty: '十分な量',
+  big: '大きい', large: '広い、大型の', loud: '（音が）大きい',
+  part: '部分', piece: '一片', portion: '一部、分け前',
+  move: '動く', operate: '操作する、作動する',
+  obvious: '明白な', evident: 'はっきりしている',
+  put: '置く', set: '据える、設定する', lay: '横たえる',
+  regular: '定期的な', usual: 'いつもの', ordinary: '普通の',
+  entirely: '完全に', purely: '純粋に',
+  unclear: 'はっきりしない', vague: '曖昧な', obscure: '分かりにくい',
+  gather: '集める', assemble: '組み立てる、集合させる', collect: '収集する',
+  herd: '（牛などの）群れ', flock: '（鳥などの）群れ', troop: '一団',
+  subtract: '引く（引き算）', draw: '描く', pull: '引っ張る',
+  fearful: '恐ろしい', horrible: 'ぞっとする', awful: 'ひどい',
+  people: '人々', folk: '民衆',
+  get: '手に入れる', receive: '受け取る',
+  see: '見る、見える', seem: '〜のように見える',
+  animal: '動物', beast: '獣',
+  home: '家庭', house: '家',
+  really: '本当に', actually: '実際は',
+  happen: '起こる', arise: '生じる',
+  place: '場所', site: '用地、現場',
+  thing: '物', object: '物体',
+  high: '高い', tall: '背が高い',
+  usually: 'たいてい', generally: '一般に',
+  use: '使う', spend: '費やす',
+  means: '手段', method: '方法',
+  sound: '音', noise: '騒音',
+  small: '小さい', little: '小さい、ほとんど無い',
+  movement: '動き', exercise: '運動、練習',
+  example: '例', instance: '実例',
+  away: '離れて', apart: 'ばらばらに',
+  understand: '理解する', comprehend: '十分に理解する',
+  allow: '許す', permit: '許可する',
+  chance: '機会', accident: '事故',
+  trip: '旅行', journey: '（長い）旅',
+  fast: '速い', quick: 'すばやい'
 };
 
 /**
@@ -138,6 +228,8 @@ export const POS = {
 /** 語形を原形に寄せる（-ing 形が見出し語になってしまうもの） */
 export const REWRITE = {
   learned: 'learn',
+  working: 'work',
+  decided: 'decide',
   climbing: 'climb',
   wondering: 'wonder',
   laughing: 'laugh',
