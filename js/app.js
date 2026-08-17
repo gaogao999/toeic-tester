@@ -26,12 +26,17 @@
     })[c]);
   }
 
-  // 難易度は英検の級で示す。データ側の level は 1〜4 のまま、表示だけを切り替える
+  // 難易度は CEFR で示す。データ側の level は 1〜4 のまま、表示だけを切り替える。
+  //
+  // 以前は「英検◯級」と出していたが、EIS が英検を基準にしている証拠は無く、
+  // こちらで勝手に置いた物差しだった。いまの単語と長文は TOEFL Junior 教材から
+  // 取っており、ETS が CEFR との対応を公表しているので、そちらで示す。
+  // 教材の3分冊（Basic / Intermediate / Advanced）が level 2 / 3 / 4 に対応する。
   const LEVEL_LABELS = {
-    1: '英検5級・4級',
-    2: '英検3級',
-    3: '英検準2級',
-    4: '英検2級'
+    1: '入門（A1）',
+    2: '基礎 A2',
+    3: '標準 B1',
+    4: '応用 B2'
   };
   const levelLabel = (level) => LEVEL_LABELS[level] || `レベル${level}`;
 
@@ -300,7 +305,7 @@
     renderFilterSummary();
   }
 
-  /** 畳んだ出題範囲の1行要約（例: 英検3級 ・ まだ覚えていない ・ 10問） */
+  /** 畳んだ出題範囲の1行要約（例: 基礎 A2 ・ まだ覚えていない ・ 10問） */
   function renderFilterSummary() {
     const text = (sel) => {
       const el = $(sel);
@@ -1630,7 +1635,7 @@
     adaptive: { short: '短め（15問）', standard: '標準（20問）', full: 'じっくり（30問）' }
   };
 
-  // 単語と長文は4段階（英検2級/CEFR B2 まで）、算数は3段階しかないので上限で頭打ちにする
+  // 単語と長文は4段階（CEFR B2 まで）、算数は3段階しかないので上限で頭打ちにする
   const MAX_LEVEL = { word: 4, math: 3, reading: 4 };
 
   // 上下の向きが変わった回数がこれだけ溜まれば、レベルは十分に絞れたとみなす
@@ -1762,11 +1767,11 @@
 
   /**
    * 階段の高さの上限。算数だけのときは3段しかないので、そこで頭打ちにする
-   * （4段目まで上げても出せる問題が無く、「英検2級」と呼ぶのも算数では意味がない）
+   * （4段目まで上げても出せる問題が無く、「B2」と呼ぶのも算数では意味がない）
    */
   const ladderTop = () => (mock.subject === 'math' ? 3 : 4);
 
-  /** 階段の高さの呼び名。英語は英検の級、算数だけのときは学年の段階 */
+  /** 階段の高さの呼び名。英語は CEFR、算数だけのときは学年の段階 */
   const ladderLabel = (level) =>
     mock.subject === 'math' ? MATH_LEVEL_LABELS[level] : LEVEL_LABELS[level];
 
@@ -2150,7 +2155,7 @@
     const low = byLevel[1];
     const bottomedOut = estimate < 1.25 && low && low.answered >= 3 && low.correct / low.answered < 0.5;
     if (bottomedOut) {
-      return mock.subject === 'math' ? `${MATH_LEVEL_LABELS[1]}より前` : '英検5級未満';
+      return mock.subject === 'math' ? `${MATH_LEVEL_LABELS[1]}より前` : 'A1未満';
     }
     return ladderLabel(Math.min(ladderTop(), Math.max(1, Math.round(estimate))));
   }
@@ -2180,8 +2185,8 @@
 
     return {
       対象: mock.subject === 'math' ? '算数のみ' : mock.subject === 'english' ? '英語のみ' : '英語＋算数',
-      // 算数だけのときの「レベル」は学年の段階であって英検の級ではない
-      英検の級として使える: mock.subject !== 'math',
+      // 算数だけのときの「レベル」は学年の段階であって CEFR ではない
+      CEFRで語れる: mock.subject !== 'math',
       推定レベル: adaptiveLevelLabel(estimate, byLevel),
       推定値: Math.round(estimate * 10) / 10,
       最高到達難易度: ladderLabel(reached),

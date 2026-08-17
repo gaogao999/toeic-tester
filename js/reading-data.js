@@ -7,11 +7,11 @@
  * 各エントリの構造:
  *   id        : 一意なID（設問のIDは r1-1 のように連番で作られる）
  *   title     : 本文の見出し
- *   level     : 難易度。単語データと同じ4段階で、CEFR と対応させている
- *                 1 = 英検5級・4級（A1 まで）
- *                 2 = 英検3級（A2）      … TOEFL Junior Basic 相当
- *                 3 = 英検準2級（B1）    … TOEFL Junior B1 相当
- *                 4 = 英検2級（B2）      … TOEFL Junior Advanced B2 相当
+ *   level     : 難易度。単語データと同じ4段階で、CEFR で示す
+ *                 1 = A1（書き下ろしの2本のみ）
+ *                 2 = A2  … TOEFL Junior Basic
+ *                 3 = B1  … TOEFL Junior Intermediate
+ *                 4 = B2  … TOEFL Junior Advanced
  *               レベルが上がるほど本文を長くしている（TOEFL Junior は 250〜400語）
  *   topic     : 題材の分野
  *   words     : 語数の目安
