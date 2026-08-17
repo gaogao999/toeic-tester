@@ -906,4 +906,5 @@ const MATH_DATA = [
   { id: 'm884', question: 'Anna is 9 years old. In 4 years, Anna\'s parent will be 3 times as old as Anna. How old is the parent now?', answer: '35', unit: '歳', explanation: '4 年後、Anna は 13 歳。親はその 3 倍で 39 歳。いまは 39 − 4 = 35 歳。', level: 5, category: '方程式' }
 ];
 
-const MATH_CATEGORIES = [...new Set(MATH_DATA.map((p) => p.category))];
+// 分野の一覧。習う順（tools/math-relevel.mjs の CATEGORY_ORDER）
+const MATH_CATEGORIES = ['四則計算', 'わり算', '計算の順序', '概数と位取り', '数のきまり', '約数と倍数', '分数', '小数', '単位と量', '単位量あたり', '平均', '割合', '比', '速さ', '文章題', '正負の数', '文字式', '方程式', '不等式', '比例と反比例', '座標', '平面図形', '円', '立体図形', 'データの活用'];

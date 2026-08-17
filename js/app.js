@@ -159,7 +159,17 @@
 
   document.addEventListener('click', (e) => {
     const target = e.target.closest('[data-view]');
-    if (target) showView(target.dataset.view);
+    if (!target) return;
+    // 習得マップのマスは「その単元・その学年に絞って算数へ」。
+    // showView より先に絞り込みを保存する（画面を開くときに設定を読むため）
+    if (target.dataset.mcat) {
+      Storage.updateSettings({
+        mathCategory: target.dataset.mcat,
+        mathLevel: target.dataset.mlv,
+        mathScope: 'all'
+      });
+    }
+    showView(target.dataset.view);
   });
 
   // ============================================================
@@ -273,7 +283,15 @@
     badge.querySelector('b').textContent = streak;
   }
 
-  /** 弱点分野を横断で集める。正答率の低い順（十分に解いた分野だけ） */
+  /**
+   * 弱点分野を横断で集める。正答率の低い順（十分に解いた分野だけ）。
+   *
+   * **正答率が7割を下回るものだけ**を弱点と呼ぶ。ただ低い順に並べて上から3つ取ると、
+   * 全部できている人にも「伸ばせる分野: 100%」と出てしまう。
+   * 7割は模擬試験の階段が落ち着く高さ・AI診断の合格ラインと同じ線。
+   */
+  const WEAK_LINE = 70;
+
   function weakRows(minAnswered) {
     const readingItems = READING_DATA.flatMap((r) =>
       r.questions.map((q, i) => ({ id: `${r.id}-${i + 1}`, category: r.topic }))
@@ -283,7 +301,7 @@
       ...accuracyByCategory(readingItems).map((r) => ({ ...r, subject: '長文読解', view: 'reading' })),
       ...accuracyByCategory(MATH_DATA).map((r) => ({ ...r, subject: '算数', view: 'math' }))
     ]
-      .filter((r) => r.answered >= minAnswered)
+      .filter((r) => r.answered >= minAnswered && r.rate < WEAK_LINE)
       .sort((a, b) => a.rate - b.rate);
   }
 
@@ -1490,6 +1508,12 @@
   }
 
   function resetMathToSetup() {
+    // 習得マップから飛んでくると設定だけが変わっているので、選択欄を合わせ直す
+    const s = Storage.getSettings();
+    $('#math-category').value = s.mathCategory;
+    $('#math-level').value = s.mathLevel;
+    $('#math-scope').value = s.mathScope;
+
     updateMathCount();
     $('#math-body').hidden = true;
     $('#math-result').hidden = true;
@@ -2596,6 +2620,7 @@
       .join('');
 
     renderMasteryByLevel();
+    renderMathMap();
   }
 
   /**
@@ -2660,6 +2685,108 @@
   }
 
   /**
+   * 算数の「単元 × 学年」の習得マップ。
+   *
+   * 模擬試験が返すのは「Grade 5 相当」という**数ひとつ**で、
+   * どの単元に穴があるかは分からなかった。25単元 × 5学年のマス目にすると
+   * 「計算は G6 まで進んでいるが図形は G4 で止まっている」が一目で分かる。
+   *
+   * マスの色は単語の習得段階バーと同じ考え方（覚えた＝濃い緑）。
+   * **マスを押すとその単元・その学年に絞って出題**する。
+   * 穴が見えても埋めに行けないと意味がないため。
+   */
+  function mathMapCell(problems) {
+    if (problems.length === 0) return null; // その学年にその単元の問題が無い
+    const counts = {};
+    problems.forEach((p) => {
+      const k = masteryStage(Storage.getRecord(p.id));
+      counts[k] = (counts[k] || 0) + 1;
+    });
+    const done = (counts.mastered || 0) + (counts.almost || 0);
+    const touched = problems.length - (counts.new || 0);
+    return {
+      total: problems.length,
+      done,
+      touched,
+      weak: counts.weak || 0,
+      // 0〜3 の4段。**凡例の4つとちょうど対応させる。**
+      // 5段にしていたときは、暗いテーマで中間の2つが見分けられなかった
+      //   0 まだ / 1 やった（半分未満）/ 2 覚えてきた（半分以上）/ 3 仕上がり（全部）
+      shade:
+        touched === 0 ? 0
+        : done === problems.length ? 3
+        : done * 2 >= problems.length ? 2
+        : 1
+    };
+  }
+
+  function renderMathMap() {
+    const box = $('#math-map');
+    if (!box) return;
+
+    const levels = [...new Set(MATH_DATA.map((p) => p.level))].sort((a, b) => a - b);
+    // 単元の並びは MATH_CATEGORIES。習う順に並べてあるので、
+    // 上から下へ読むとそのまま学年が上がっていく
+    const cats = MATH_CATEGORIES;
+
+    // 問題を (単元, 学年) ごとに1回だけ振り分ける。
+    // マスごとに MATH_DATA を filter すると 884 問 × 125 マスを走ることになる
+    const bucket = new Map();
+    for (const p of MATH_DATA) {
+      const key = `${p.category} ${p.level}`;
+      const arr = bucket.get(key);
+      if (arr) arr.push(p);
+      else bucket.set(key, [p]);
+    }
+    const cellAt = (cat, lv) => mathMapCell(bucket.get(`${cat} ${lv}`) || []);
+
+    const head =
+      '<div class="mm-row mm-head"><span class="mm-name"></span>' +
+      levels.map((lv) => `<span class="mm-cell mm-th">G${lv + 2}</span>`).join('') +
+      '<span class="mm-sum">計</span></div>';
+
+    // 次にやるとよい1つ。まだ手を付けていないマスのうち、いちばんやさしい学年のもの
+    let next = null;
+
+    const rows = cats
+      .map((cat) => {
+        let done = 0;
+        let total = 0;
+        const cells = levels
+          .map((lv) => {
+            const c = cellAt(cat, lv);
+            if (!c) return '<span class="mm-cell mm-none" aria-hidden="true"></span>';
+            done += c.done;
+            total += c.total;
+            if (c.touched === 0 && (!next || lv < next.lv)) next = { cat, lv };
+            const title = `${cat} / Grade ${lv + 2}｜覚えた ${c.done} / ${c.total} 問`;
+            return `<button class="mm-cell mm-s${c.shade}${c.weak ? ' has-weak' : ''}"
+                        data-view="math" data-mcat="${escapeHtml(cat)}" data-mlv="${lv}"
+                        title="${escapeHtml(title)}" aria-label="${escapeHtml(title)}"></button>`;
+          })
+          .join('');
+        return `<div class="mm-row">
+            <button class="mm-name" data-view="math" data-mcat="${escapeHtml(cat)}" data-mlv="all"
+                    title="${escapeHtml(cat)} を全部解く">${escapeHtml(cat)}</button>
+            ${cells}
+            <span class="mm-sum">${done}/${total}</span>
+          </div>`;
+      })
+      .join('');
+
+    box.innerHTML = head + rows;
+
+    const hint = $('#math-map-next');
+    hint.hidden = false;
+    if (next) {
+      hint.innerHTML = `まだ手を付けていない中でいちばんやさしいのは
+        <button class="linkish" data-view="math" data-mcat="${escapeHtml(next.cat)}" data-mlv="${next.lv}">${escapeHtml(next.cat)}（Grade ${next.lv + 2}）</button> です。`;
+    } else {
+      hint.textContent = 'すべての単元に手が付いています。薄いマスを埋めていきましょう。';
+    }
+  }
+
+  /**
    * 分野ごとの正答率を出す。
    * items は { id, category } を持つ配列で、学習履歴から正解数と解答数を集計する。
    */
@@ -2689,7 +2816,11 @@
     const rows = weakRows(4).slice(0, 3);
     $('#stats-weak-areas').innerHTML =
       rows.map(weakRowHtml).join('') ||
-      '<p class="hint">まだ解答が少なく、分野を絞れません。学習を進めるとここに出ます。</p>';
+      `<p class="hint">${
+        Storage.getStats().totalAnswers > 0
+          ? '正答率が7割を下回る分野はありません。下の単元マップで、まだ薄いところを埋めていきましょう。'
+          : 'まだ解答が少なく、分野を絞れません。学習を進めるとここに出ます。'
+      }</p>`;
   }
 
   function renderAccuracyByCategory() {

@@ -9,7 +9,7 @@
  *   node tools/emit-math.mjs
  */
 import { readFileSync, writeFileSync } from 'node:fs';
-import { RELEVEL, FIXES, FIGURES } from './math-relevel.mjs';
+import { RELEVEL, FIXES, FIGURES, CATEGORY_ORDER } from './math-relevel.mjs';
 
 const url = (p) => new URL(p, import.meta.url);
 
@@ -97,8 +97,16 @@ const header = `/**
 const MATH_DATA = [
 `;
 
-// 分野の一覧。app.js が絞り込みの選択肢を作るのに使うので、必ず一緒に書き出す
-const footer = `];\n\nconst MATH_CATEGORIES = [...new Set(MATH_DATA.map((p) => p.category))];\n`;
+// 分野の一覧。絞り込みの選択肢と単元マップの行の並びになるので、**習う順**で書き出す。
+// 出現順のままだと、手作り問題に無い単元（わり算など）が末尾にまとまってしまう
+const used = [...new Set(all.map((p) => p.category))];
+const unordered = used.filter((c) => !CATEGORY_ORDER.includes(c));
+if (unordered.length) throw new Error(`並び順の表に無い分野: ${unordered.join(', ')}`);
+const orderedCats = CATEGORY_ORDER.filter((c) => used.includes(c));
+
+const footer =
+  '];\n\n// 分野の一覧。習う順（tools/math-relevel.mjs の CATEGORY_ORDER）\n' +
+  `const MATH_CATEGORIES = [${orderedCats.map((c) => `'${esc(c)}'`).join(', ')}];\n`;
 
 writeFileSync(url('../js/math-data.js'), header + all.map(line).join(',\n') + '\n' + footer);
 

@@ -1460,6 +1460,113 @@ ruby rt { font-size: 0.6em; color: var(--text-muted); font-weight: 400; }
 .reading-pick[open] .row-chevron { transform: rotate(90deg); }
 
 /* ---------- レベルごとの覚え具合 ---------- */
+/* ---- 算数の単元マップ ----
+   たて 25 単元 × よこ 5 学年。スマホの幅（約 360px）に収めるため、
+   単元名の欄は固定幅にして、マスは残りを等分する。 */
+.math-map {
+  display: grid;
+  gap: 3px;
+  margin-bottom: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.mm-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(5, 22px) 40px;
+  gap: 3px;
+  align-items: center;
+}
+.mm-head { margin-bottom: 2px; }
+.mm-th, .mm-sum {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-align: center;
+}
+.mm-sum { text-align: right; }
+
+.mm-name {
+  /* 単元名。ボタンだが行として見えるようにする */
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0 2px 0 0;
+  font: inherit;
+  font-size: 0.72rem;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mm-name:hover { color: var(--primary); }
+
+.mm-cell {
+  appearance: none;
+  height: 22px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0;
+  cursor: pointer;
+}
+.mm-cell.mm-th { border: 0; cursor: default; height: auto; }
+
+/* 濃さの4段。凡例の4つとちょうど対応する。
+   間を広く取っているのは、暗いテーマだと中間色が見分けられなくなるため */
+.mm-s0 { background: var(--surface); }
+.mm-s1 { background: color-mix(in srgb, var(--green) 26%, var(--surface)); }
+.mm-s2 { background: color-mix(in srgb, var(--green) 60%, var(--surface)); border-color: color-mix(in srgb, var(--green) 60%, var(--surface)); }
+.mm-s3 { background: var(--green); border-color: var(--green); }
+/* 問題が存在しない学年。押せないので枠だけ薄く残す */
+.mm-none {
+  background: repeating-linear-gradient(
+    -45deg, transparent, transparent 3px, var(--border) 3px, var(--border) 4px
+  );
+  border-style: dashed;
+  cursor: default;
+}
+/* 間違えたまま戻っている問題があるマスに赤い点を出す */
+.mm-cell.has-weak { position: relative; }
+.mm-cell.has-weak::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--red);
+}
+
+.mm-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+.mm-chip {
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+.math-map-next { margin: 0 0 10px; }
+.math-map-next[hidden] { display: none; }
+
+/* 文中に置くボタン。リンクのように見せる */
+.linkish {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .mastery-levels { display: grid; gap: 14px; margin-bottom: 12px; }
 
 .mastery-head {
