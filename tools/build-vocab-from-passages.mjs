@@ -15,7 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MEANINGS, DROP, REWRITE, POS } from './passage-vocab-overrides.mjs';
+import { MEANINGS, DROP, REWRITE, POS, EXAMPLES } from './passage-vocab-overrides.mjs';
 import { KEY_MEANINGS, RELATIONS, UNITS, WORD_LIST } from './toefl-junior-wordlist.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -327,7 +327,7 @@ const entries = [...words.entries()]
       pos: POS[word] || posOf(word, meaning),
       meaning,
       note,
-      example: v.sentence.length <= 160 ? v.sentence : '',
+      example: EXAMPLES[word] || (v.sentence.length <= 160 ? v.sentence : ''),
       exampleJa: '',
       level: v.level,
       category: TOPIC_TO_CATEGORY[v.topic] || '読解の名詞',

@@ -225,6 +225,14 @@ export const POS = {
   glorious: 'adj.', following: 'adj.', determined: 'adj.'
 };
 
+/**
+ * 例文の差し替え。本文から機械的に切り出すと、別語を拾うことがある。
+ * bite は "for a little bit"（名詞の bit）を bite の過去形と取り違えていた。
+ */
+export const EXAMPLES = {
+  bite: 'The dog does not bite, but he barks at strangers.'
+};
+
 /** 語形を原形に寄せる（-ing 形が見出し語になってしまうもの） */
 export const REWRITE = {
   learned: 'learn',

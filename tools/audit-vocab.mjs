@@ -103,6 +103,7 @@ const IRREGULAR_FORMS = {
   see: ['saw', 'seen'], find: ['found'], think: ['thought'], tell: ['told'],
   buy: ['bought'], bring: ['brought'], catch: ['caught'], child: ['children'],
   woman: ['women'], tooth: ['teeth'], mouse: ['mice'], life: ['lives'], leaf: ['leaves'],
+  knife: ['knives'], wolf: ['wolves'], shelf: ['shelves'], lead: ['led'], hold: ['held'],
   eat: ['ate', 'eaten'], fall: ['fell'], feel: ['felt'], fly: ['flew'], grow: ['grew'],
   hear: ['heard'], hold: ['held'], keep: ['kept'], lose: ['lost'], meet: ['met'],
   pay: ['paid'], rise: ['rose'], sit: ['sat'], send: ['sent'], speak: ['spoke'],
@@ -111,14 +112,20 @@ const IRREGULAR_FORMS = {
   bad: ['worse', 'worst'], begin: ['began', 'begun'], choose: ['chose'], drive: ['drove'],
   sell: ['sold'], sing: ['sang'], swim: ['swam'], understand: ['understood']
 };
+/** その語が例文の中に何らかの語形で現れているか */
+function appearsIn(word, example) {
+  const ex = example.toLowerCase();
+  const w = word.toLowerCase();
+  const forms = new Set([w]);
+  if (w.endsWith('e')) forms.add(w.slice(0, -1));       // give → giv(ing)
+  if (w.endsWith('y')) forms.add(w.slice(0, -1) + 'i'); // dry → dri(es)
+  forms.add(w.slice(0, Math.max(4, w.length - 3)));     // 長い語の語幹
+  (IRREGULAR_FORMS[w] || []).forEach((f) => forms.add(f));
+  return [...forms].some((f) => f.length >= 3 && ex.includes(f));
+}
+
 check('error', '例文に見出し語が含まれない',
-  WORD_DATA.filter((w) => {
-    if (!w.example) return false;
-    const ex = w.example.toLowerCase();
-    const stem = w.word.toLowerCase().slice(0, Math.max(4, w.word.length - 3));
-    if (ex.includes(stem)) return false;
-    return !(IRREGULAR_FORMS[w.word.toLowerCase()] || []).some((f) => ex.includes(f));
-  }),
+  WORD_DATA.filter((w) => w.example && !appearsIn(w.word, w.example)),
   '別の語の例文が付いている');
 
 // ---- 7. 品詞 ----

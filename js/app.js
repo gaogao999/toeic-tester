@@ -2561,20 +2561,68 @@
       })
       .join('');
 
-    // ボックス分布
-    const counts = new Array(Storage.MAX_BOX + 1).fill(0);
-    WORD_DATA.forEach((w) => { counts[Storage.getRecord(w.id).box] += 1; });
-    const names = ['未習得', '1日後', '3日後', '7日後', '14日後', '30日後'];
-    $('#box-dist').innerHTML = counts
-      .map((count, i) => {
-        const width = (count / WORD_DATA.length) * 100;
-        return `<div class="box-row">
-            <span class="box-name">${names[i] || `箱${i}`}</span>
-            <span class="box-track"><span class="box-fill" style="width:${width}%"></span></span>
-            <span class="box-num">${count}</span>
+    renderMasteryByLevel();
+  }
+
+  /**
+   * レベルごとの覚え具合を、1本の帯で見せる。
+   *
+   * これまでは Leitner の箱を「1日後・3日後…」と復習間隔で並べていたが、
+   * 何を意味する数字なのか伝わらなかった。覚えた度合いは箱の番号から作り、
+   * 濃さで表す。濃い緑で埋まればそのレベルは仕上がり、という読み方になる。
+   */
+  const MASTERY_STAGES = [
+    { key: 'mastered', name: '覚えた', hint: '5回以上続けて正解' },
+    { key: 'almost', name: 'ほぼ覚えた', hint: '3〜4回正解' },
+    { key: 'vague', name: 'うろ覚え', hint: '1〜2回正解' },
+    { key: 'weak', name: '苦手', hint: '間違えて箱が戻った' },
+    { key: 'new', name: 'まだ', hint: '一度も解いていない' }
+  ];
+
+  /** 学習記録から、その語がどの段階かを決める */
+  function masteryStage(rec) {
+    const answered = rec.correct + rec.wrong;
+    if (answered === 0) return 'new';
+    if (rec.box >= Storage.MAX_BOX) return 'mastered';
+    if (rec.box >= 3) return 'almost';
+    if (rec.box >= 1) return 'vague';
+    return 'weak'; // 箱0まで戻っている＝間違え続けている
+  }
+
+  function renderMasteryByLevel() {
+    const levels = [...new Set(WORD_DATA.map((w) => w.level))].sort();
+
+    $('#mastery-levels').innerHTML = levels
+      .map((lv) => {
+        const words = WORD_DATA.filter((w) => w.level === lv);
+        const counts = {};
+        words.forEach((w) => {
+          const k = masteryStage(Storage.getRecord(w.id));
+          counts[k] = (counts[k] || 0) + 1;
+        });
+        const done = (counts.mastered || 0) + (counts.almost || 0);
+
+        const segments = MASTERY_STAGES.filter((st) => counts[st.key])
+          .map((st) => {
+            const pct = (counts[st.key] / words.length) * 100;
+            return `<span class="mastery-seg is-${st.key}" style="width:${pct}%"
+                          title="${st.name} ${counts[st.key]}語"></span>`;
+          })
+          .join('');
+
+        return `<div class="mastery-row">
+            <div class="mastery-head">
+              <span class="mastery-level">${levelLabel(lv)}</span>
+              <span class="mastery-num">${done} / ${words.length} 語</span>
+            </div>
+            <div class="mastery-bar">${segments}</div>
           </div>`;
       })
       .join('');
+
+    $('#mastery-legend').innerHTML = MASTERY_STAGES.map(
+      (st) => `<span class="mastery-key"><i class="mastery-chip is-${st.key}"></i>${st.name}</span>`
+    ).join('');
   }
 
   /**
