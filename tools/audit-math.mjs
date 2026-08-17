@@ -198,8 +198,13 @@ function recompute(q) {
 
   m = q.match(/Round (\d+) to the nearest (ten|hundred|thousand)\./);
   if (m) { const u = { ten: 10, hundred: 100, thousand: 1000 }[m[2]]; return Math.round(+m[1] / u) * u; }
-  m = q.match(/In the number (\d+), what digit is in the (thousands|hundreds|tens|ones) place\?/);
-  if (m) { const k = ['thousands', 'hundreds', 'tens', 'ones'].indexOf(m[2]); return Number(m[1][k]); }
+  // 位は**右から**数える。左から数えると桁数が変わったとたんにずれる
+  m = q.match(/In the number (\d+), what digit is in the (ten thousands|thousands|hundreds|tens|ones) place\?/);
+  if (m) {
+    const back = ['ones', 'tens', 'hundreds', 'thousands', 'ten thousands'].indexOf(m[2]);
+    const d = m[1];
+    return back < d.length ? Number(d[d.length - 1 - back]) : 0;
+  }
 
   // 数の並び。前3つの差／比が一定なら、その続きを出す
   m = q.match(/next number in the pattern: ([\d, ]+), \.\.\./);
@@ -295,7 +300,10 @@ function evalExpr(src) {
  * 図形の分野なのに図が無い問題を落とす。ただし理由があって付けないものは
  * ここに書き出しておく（黙って抜けているのか、決めて外したのかを区別するため）。
  */
-const FIGURE_CATEGORIES = ['平面図形', '円', '立体図形', '座標'];
+// 図が**必ず要る**分野。図が無ければ落とす
+const FIGURE_REQUIRED = ['平面図形', '円', '立体図形', '座標'];
+// 図が**あってもよい**分野。ぼうグラフは「データの活用」だが図がないと読めない
+const FIGURE_ALLOWED = [...FIGURE_REQUIRED, 'データの活用'];
 const NO_FIGURE_OK = {
   m99: '負の座標。いまの描画が第1象限しか描けない',
   m117: '一般の四角形の話。図を出すと「この四角形の」と読めてしまう'
@@ -326,7 +334,7 @@ export function audit(list) {
     if (!p.explanation) fail(p, '解説が空');
     else if (!/[ぁ-んァ-ヶ一-龥]/.test(p.explanation)) fail(p, '解説に日本語がない');
     if (!p.category) fail(p, 'カテゴリが空');
-    if (![1, 2, 3, 4].includes(p.level)) fail(p, `レベルが不正: ${p.level}`);
+    if (![1, 2, 3, 4, 5].includes(p.level)) fail(p, `レベルが不正: ${p.level}`);
 
     // 解説に「undefined」「NaN」「Infinity」が混じっていないか（テンプレートの事故）
     if (/undefined|NaN|Infinity/.test(`${p.question} ${p.explanation} ${p.answer}`)) fail(p, '生成の事故（undefined/NaN）');
@@ -349,10 +357,12 @@ export function audit(list) {
     if (p.figure) {
       figured++;
       if (!kinds.includes(p.figure.kind)) fail(p, `描けない図の形: ${p.figure.kind}`);
-      if (!FIGURE_CATEGORIES.includes(p.category)) warn(p, `図形以外の分野に図が付いている（${p.category}）`);
-    } else if (FIGURE_CATEGORIES.includes(p.category) && !NO_FIGURE_OK[p.id]) {
+      if (!FIGURE_ALLOWED.includes(p.category)) warn(p, `図の付く想定でない分野に図がある（${p.category}）`);
+    } else if (FIGURE_REQUIRED.includes(p.category) && !NO_FIGURE_OK[p.id]) {
       fail(p, '図形の分野なのに図が無い');
     }
+    // グラフを見せずに「グラフによると」と聞く問題は解きようがない
+    if (/bar chart|graph shows/i.test(p.question) && !p.figure) fail(p, 'グラフの問題なのに図が無い');
 
     // 検算
     const expected = recompute(p.question);
@@ -388,7 +398,8 @@ function report(list, label) {
 if (process.argv[1] && process.argv[1].endsWith('audit-math.mjs')) {
   if (process.argv.includes('--gen')) {
     const mods = await Promise.all([
-      import('./math-g4.mjs'), import('./math-g5.mjs'), import('./math-g6.mjs'), import('./math-g7.mjs')
+      import('./math-g3.mjs'), import('./math-g4.mjs'),
+      import('./math-g5.mjs'), import('./math-g6.mjs'), import('./math-g7.mjs')
     ]);
     report(mods.flatMap((m) => m.build()), 'ジェネレータ出力');
   } else {

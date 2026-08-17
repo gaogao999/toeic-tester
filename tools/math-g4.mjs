@@ -10,7 +10,7 @@
  */
 import { rng, int, pick, ints, gcd, problem, collect } from './math-gen.mjs';
 
-const G = 1; // レベル1 = Grade 4
+const G = 2; // レベル2 = Grade 4
 
 export function arithmetic(seed, n) {
   const r = rng(seed);
@@ -205,8 +205,12 @@ export function geometry(seed, n) {
   for (let i = 0; i < n; i++) {
     const kind = i % 4;
     if (kind === 0) {
-      const w = int(r, 4, 18);
-      const h = int(r, 3, 15);
+      // long のほうが wide より短いと言い回しがおかしくなる
+      const a = int(r, 4, 18);
+      const b = int(r, 3, 15);
+      const w = Math.max(a, b);
+      const h = Math.min(a, b);
+      if (w === h) { i--; continue; }
       out.push(problem({
         question: `A rectangle is ${w} cm long and ${h} cm wide. What is its area?`,
         answer: w * h, unit: 'cm²',
@@ -215,8 +219,11 @@ export function geometry(seed, n) {
         grade: G, category: '平面図形'
       }));
     } else if (kind === 1) {
-      const w = int(r, 4, 18);
-      const h = int(r, 3, 15);
+      const a = int(r, 4, 18);
+      const b = int(r, 3, 15);
+      const w = Math.max(a, b);
+      const h = Math.min(a, b);
+      if (w === h) { i--; continue; }
       out.push(problem({
         question: `A rectangle is ${w} cm long and ${h} cm wide. What is its perimeter?`,
         answer: 2 * (w + h), unit: 'cm',

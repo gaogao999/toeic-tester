@@ -34,7 +34,8 @@ const stale = [...Object.keys(FIXES), ...Object.keys(FIGURES)].filter((id) => !R
 if (stale.length) throw new Error(`存在しない ID の手直し・図がある: ${stale.join(', ')}`);
 
 const mods = await Promise.all([
-  import('./math-g4.mjs'), import('./math-g5.mjs'), import('./math-g6.mjs'), import('./math-g7.mjs')
+  import('./math-g3.mjs'), import('./math-g4.mjs'),
+  import('./math-g5.mjs'), import('./math-g6.mjs'), import('./math-g7.mjs')
 ]);
 
 // 既存と問題文がぶつかるものは捨てる（同じ問題が2回出ると学習にならない）
@@ -73,7 +74,7 @@ const byCat = {};
 all.forEach((p) => { byLevel[p.level] = (byLevel[p.level] || 0) + 1; byCat[p.category] = (byCat[p.category] || 0) + 1; });
 
 const header = `/**
- * 算数・数学のデータ。Grade 4 から Grade 7 までの内容をひととおり入れてある。
+ * 算数・数学のデータ。Grade 3 から Grade 7 までの内容をひととおり入れてある。
  *
  * 受けるのは EIS の Grade 8 入試なので、日本の学年ではなく **インター校の学年** で
  * 範囲を決めている（Grade 7 ≒ 中1。確率のように日本の中1にない単元も入る）。
@@ -83,14 +84,15 @@ const header = `/**
  *   answer      … 答え。文字列だが採点は数として比べる（'3/4' と '0.75' はどちらも正解）
  *   unit        … 単位。表示だけに使う。答えに単位を書かせない
  *   explanation … 解説。**日本語。** 解けなかったときに読むものなので
- *   level       … 1=Grade 4, 2=Grade 5, 3=Grade 6, 4=Grade 7
+ *   level       … 1=Grade 3, 2=Grade 4, 3=Grade 5, 4=Grade 6, 5=Grade 7
+ *   figure      … 図の形の指定（あれば）。SVG に組み立てるのは js/math-figure.js
  *   category    … 分野。絞り込みに使う
  *
- * m1〜m${kept.length} は手作りのデータ。m${kept.length + 1} 以降は tools/math-g4〜g7.mjs が作っている。
+ * m1〜m${kept.length} は手作りのデータ。m${kept.length + 1} 以降は tools/math-g3〜g7.mjs が作っている。
  * 作り直すときは \`node tools/emit-math.mjs\`、点検は \`node tools/audit-math.mjs\`。
  * 乱数は固定のたねから振るので、作り直しても同じ問題・同じ ID になる。
  *
- * 件数 ${all.length}（${Object.entries(byLevel).map(([k, v]) => `Grade ${Number(k) + 3}: ${v}`).join(' / ')}）
+ * 件数 ${all.length}（${Object.entries(byLevel).map(([k, v]) => `Grade ${Number(k) + 2}: ${v}`).join(' / ')}）
  */
 const MATH_DATA = [
 `;

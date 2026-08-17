@@ -10,7 +10,7 @@
  */
 import { rng, int, pick, gcd, lcm, problem, collect } from './math-gen.mjs';
 
-const G = 2; // レベル2 = Grade 5
+const G = 3; // レベル3 = Grade 5
 
 export function orderOfOperations(seed, n) {
   const r = rng(seed);

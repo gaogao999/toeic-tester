@@ -136,6 +136,45 @@ const MathFigure = (() => {
     );
   }
 
+  /**
+   * 二等辺三角形。**等しい2辺に同じしるし（|）を入れる。**
+   * 「等しい辺が2本ある」と気づけるかがこの問題のねらいなので、
+   * 長さを書くだけでなく、しるしでも見せる
+   */
+  function isoTriangle(f) {
+    const base = f.base;
+    const side = f.side;
+    // 底辺の半分と斜辺から高さを出す。実際の形どおりに描く
+    const h = Math.sqrt(Math.max(side * side - (base / 2) ** 2, 1));
+    const [w, hh] = fit(base, h, W - 2 * PAD - 40, H - 2 * PAD - 22);
+    const cx = W / 2;
+    const y = (H - hh) / 2;
+    const bl = [cx - w / 2, y + hh];
+    const br = [cx + w / 2, y + hh];
+    const apex = [cx, y];
+
+    // 辺の中点に、辺と直交する短い線を引く
+    const tick = (p, q) => {
+      const mx = (p[0] + q[0]) / 2;
+      const my = (p[1] + q[1]) / 2;
+      const dx = q[0] - p[0];
+      const dy = q[1] - p[1];
+      const len = Math.hypot(dx, dy) || 1;
+      const nx = (-dy / len) * 5;
+      const ny = (dx / len) * 5;
+      return line(mx - nx, my - ny, mx + nx, my + ny, 'f-edge');
+    };
+
+    return svg(
+      poly([bl, br, apex]) +
+        tick(bl, apex) +
+        tick(br, apex) +
+        label(bl[0] - 6, y + hh / 2, withUnit(side, f.unit), 'f-label', 'end') +
+        label(br[0] + 6, y + hh / 2, withUnit(side, f.unit), 'f-label', 'start') +
+        label(cx, y + hh + 18, withUnit(base, f.unit))
+    );
+  }
+
   function parallelogram(f) {
     const [w, h] = fit(f.base, f.height, W - 2 * PAD - 50, H - 2 * PAD - 20);
     const slant = Math.min(34, w * 0.28);
@@ -382,6 +421,48 @@ const MathFigure = (() => {
     );
   }
 
+  /**
+   * ぼうグラフ。**棒に数字は書かない。**
+   * 目盛りから読み取らせるのが Grade 3 のねらいなので、数字を書くと問題が成り立たない
+   */
+  function bars(f) {
+    const ox = 34;
+    const oy = H - 30;
+    const top = 26;
+    const maxV = Math.max(...f.values);
+    // 目盛りの刻み。棒の高さが目盛りにぴったり載るよう、値はすべて整数にしてある
+    const step = maxV <= 6 ? 1 : maxV <= 12 ? 2 : maxV <= 30 ? 5 : 10;
+    const ticks = Math.ceil(maxV / step);
+    const sy = (oy - top) / (ticks * step);
+    const slot = (W - ox - 18) / f.values.length;
+    const bw = Math.min(30, slot * 0.6);
+
+    let grid = '';
+    for (let i = 1; i <= ticks; i++) {
+      const y = oy - i * step * sy;
+      grid += line(ox, y, W - 14, y, 'f-grid') + label(ox - 6, y + 4, String(i * step), 'f-tick', 'end');
+    }
+    const cols = f.values
+      .map((v, i) => {
+        const x = ox + slot * i + (slot - bw) / 2;
+        const h = v * sy;
+        return (
+          poly([[x, oy - h], [x + bw, oy - h], [x + bw, oy], [x, oy]], 'f-face') +
+          label(x + bw / 2, oy + 14, String(f.labels[i]), 'f-tick')
+        );
+      })
+      .join('');
+
+    return svg(
+      grid +
+        line(ox, top - 8, ox, oy, 'f-axis') +
+        line(ox, oy, W - 14, oy, 'f-axis') +
+        label(ox - 6, oy + 4, '0', 'f-tick', 'end') +
+        (f.yLabel ? label(ox + 4, 14, f.yLabel, 'f-mini', 'start') : '') +
+        cols
+    );
+  }
+
   // ---------- 立体図形 ----------
   //
   // 斜投影で描く。奥に向かう辺は右上へ一定量ずらす。
@@ -531,9 +612,9 @@ const MathFigure = (() => {
   }
 
   const RENDERERS = {
-    rect, triangle, parallelogram, trapezoid, rhombus,
+    rect, triangle, isoTriangle, parallelogram, trapezoid, rhombus,
     straightLine, triangleAngles, parallelLines, polygon,
-    circle, sector, points,
+    circle, sector, points, bars,
     box, cube, cylinder, prism, pyramid, cone
   };
 

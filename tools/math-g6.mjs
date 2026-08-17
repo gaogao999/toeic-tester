@@ -9,7 +9,7 @@
  */
 import { rng, int, pick, gcd, reduce, problem, collect } from './math-gen.mjs';
 
-const G = 3; // レベル3 = Grade 6
+const G = 4; // レベル4 = Grade 6
 
 export function fractionMulDiv(seed, n) {
   const r = rng(seed);

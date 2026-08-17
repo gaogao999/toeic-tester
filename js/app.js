@@ -43,7 +43,7 @@
   // 算数は学年で示したほうが分かりやすいので、別の表示名を使う
   // 算数も単語・長文と同じ4段階にそろえた。受けるのは EIS の Grade 8 入試なので、
   // 日本の学年ではなくインター校の学年（Grade 7 ≒ 中1）で範囲を区切る
-  const MATH_LEVEL_LABELS = { 1: 'Grade 4', 2: 'Grade 5', 3: 'Grade 6', 4: 'Grade 7' };
+  const MATH_LEVEL_LABELS = { 1: 'Grade 3', 2: 'Grade 4', 3: 'Grade 5', 4: 'Grade 6', 5: 'Grade 7' };
   const mathLevelLabel = (level) => MATH_LEVEL_LABELS[level] || `レベル${level}`;
 
   let toastTimer = null;
@@ -1658,7 +1658,7 @@
   };
 
   // 単語と長文は4段階（CEFR B2 まで）、算数は3段階しかないので上限で頭打ちにする
-  const MAX_LEVEL = { word: 4, math: 4, reading: 4 };
+  const MAX_LEVEL = { word: 4, math: 5, reading: 4 };
 
   // 上下の向きが変わった回数がこれだけ溜まれば、レベルは十分に絞れたとみなす
   const ENOUGH_REVERSALS = 6;
@@ -1801,7 +1801,7 @@
   /** 近いレベルから順に探す。中央→下→上の順で、在庫切れでも止まらないようにする */
   function levelsNear(level) {
     const out = [level];
-    for (let d = 1; d <= 3; d++) {
+    for (let d = 1; d < ladderTop(); d++) {
       if (level - d >= 1) out.push(level - d);
       if (level + d <= ladderTop()) out.push(level + d);
     }

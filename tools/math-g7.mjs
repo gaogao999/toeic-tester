@@ -10,7 +10,7 @@
  */
 import { rng, int, pick, gcd, reduce, problem, collect } from './math-gen.mjs';
 
-const G = 4; // レベル4 = Grade 7
+const G = 5; // レベル5 = Grade 7
 
 export function integers(seed, n) {
   const r = rng(seed);
@@ -365,7 +365,9 @@ export function inequalities(seed, n) {
     } else if (kind === 1) {
       const a = int(r, 2, 8), x = int(r, 2, 12), b = int(r, 1, 15);
       out.push(problem({
-        question: `Solve: −${a}x + ${b} < ${-a * x + b}. The answer has the form x > k. What is k?`,
+        // 問題文の負の数は組版用のマイナス（−）でそろえる。
+        // 式の中に「−5x」と「-30」が混じると読みづらい（答えの文字列は素の - のまま。採点が数で比べるため）
+        question: `Solve: −${a}x + ${b} < ${String(-a * x + b).replace('-', '−')}. The answer has the form x > k. What is k?`,
         answer: x,
         explanation: `${b} を移項して −${a}x < ${-a * x}。負の数 −${a} で割るので不等号の向きが変わり x > ${x}。k = ${x}。`,
         grade: G, category: '不等式'
