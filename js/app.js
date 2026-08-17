@@ -109,6 +109,8 @@
     return WORD_DATA.filter((w) => {
       if (s.level !== 'all' && String(w.level) !== String(s.level)) return false;
       if (s.category !== 'all' && w.category !== s.category) return false;
+      // 教材由来の語だけに絞る（toefl の印は tools/build-gloss-vocab.mjs が付ける）
+      if (s.source === 'toefl' && !w.toefl) return false;
       return matchesScope(w, s.scope);
     });
   }
@@ -401,6 +403,7 @@
   function syncFilterInputs() {
     const s = Storage.getSettings();
     $('#filter-level').value = s.level;
+    $('#filter-source').value = s.source || 'all';
     $('#filter-category').value = s.category;
     $('#filter-scope').value = s.scope;
     $('#list-scope').value = s.scope;
@@ -419,6 +422,10 @@
 
     $('#filter-level').addEventListener('change', (e) => {
       Storage.updateSettings({ level: e.target.value });
+      updateFilterCount();
+    });
+    $('#filter-source').addEventListener('change', (e) => {
+      Storage.updateSettings({ source: e.target.value });
       updateFilterCount();
     });
     catSelect.addEventListener('change', (e) => {
