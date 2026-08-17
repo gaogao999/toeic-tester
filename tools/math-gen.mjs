@@ -60,8 +60,11 @@ export const fmt = (v) => String(v);
  * 問題を作るヘルパ。
  * category と grade は呼び出し側で決め、ここでは形だけ整える。
  */
-export function problem({ question, answer, unit = '', explanation, grade, category }) {
-  return { question, answer: String(answer), unit, explanation, level: grade, category };
+export function problem({ question, answer, unit = '', explanation, grade, category, figure = null }) {
+  const p = { question, answer: String(answer), unit, explanation, level: grade, category };
+  // 図は形の指定だけを持つ。SVG を組み立てるのは js/math-figure.js の仕事
+  if (figure) p.figure = figure;
+  return p;
 }
 
 /**

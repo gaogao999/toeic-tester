@@ -752,6 +752,46 @@ body {
   line-height: 1.7;
 }
 
+/* ---- 算数の図 ----
+   SVG の中の色は必ずここの変数を通す。SVG に色を直書きすると明暗の切り替えで
+   線が背景に埋もれる（黒い線をダークの背景に置いてしまう）。 */
+.math-figure {
+  margin: 0 0 18px;
+  padding: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.math-figure[hidden] { display: none; }
+.math-figure svg {
+  display: block;
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.math-figure .f-face { fill: var(--primary); fill-opacity: 0.1; stroke: var(--primary); stroke-width: 2; stroke-linejoin: round; }
+/* 奥の面。手前より薄くして前後が分かるようにする */
+.math-figure .f-back { fill-opacity: 0.04; stroke-opacity: 0.45; }
+.math-figure .f-edge { stroke: var(--primary); stroke-width: 2; stroke-linecap: round; fill: none; }
+.math-figure .f-dash { stroke: var(--primary); stroke-width: 1.6; stroke-dasharray: 5 4; stroke-opacity: 0.75; fill: none; }
+.math-figure .f-grid { stroke: var(--border); stroke-width: 1; }
+.math-figure .f-axis { stroke: var(--text-muted); stroke-width: 1.6; }
+.math-figure .f-arc { stroke: var(--text-muted); stroke-width: 1.6; fill: none; }
+/* 問われている角。ここだけ色を変えて、どこを答えるのか一目で分かるようにする */
+.math-figure .f-arc-ask { stroke: var(--orange); stroke-width: 2.4; }
+.math-figure .f-right { fill: none; stroke: var(--text-muted); stroke-width: 1.4; }
+.math-figure .f-dot { fill: var(--primary); stroke: none; }
+
+.math-figure text { font-family: inherit; }
+.math-figure .f-label { font-size: 13px; font-weight: 700; fill: var(--text); }
+.math-figure .f-inner { font-size: 12px; font-weight: 700; fill: var(--text-muted); }
+.math-figure .f-mini { font-size: 11px; font-weight: 600; fill: var(--text-muted); }
+.math-figure .f-ask { font-size: 15px; font-weight: 800; fill: var(--orange); }
+.math-figure .f-tick { font-size: 10px; font-weight: 600; fill: var(--text-muted); }
+
 .math-input-row { display: flex; align-items: center; gap: 10px; }
 .math-input-row .answer-input { flex: 1; }
 .math-unit {

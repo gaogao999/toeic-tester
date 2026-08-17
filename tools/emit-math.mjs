@@ -9,7 +9,7 @@
  *   node tools/emit-math.mjs
  */
 import { readFileSync, writeFileSync } from 'node:fs';
-import { RELEVEL, FIXES } from './math-relevel.mjs';
+import { RELEVEL, FIXES, FIGURES } from './math-relevel.mjs';
 
 const url = (p) => new URL(p, import.meta.url);
 
@@ -25,11 +25,13 @@ if (existing.length !== Object.keys(RELEVEL).length) throw new Error('手作り�
 
 const kept = existing.map((p) => {
   const [level, category] = RELEVEL[p.id];
-  return { ...p, ...(FIXES[p.id] || {}), level, category };
+  const fixed = { ...p, ...(FIXES[p.id] || {}), level, category };
+  if (FIGURES[p.id]) fixed.figure = FIGURES[p.id];
+  return fixed;
 });
 
-const staleFix = Object.keys(FIXES).filter((id) => !existing.some((p) => p.id === id));
-if (staleFix.length) throw new Error(`存在しない ID の手直しがある: ${staleFix.join(', ')}`);
+const stale = [...Object.keys(FIXES), ...Object.keys(FIGURES)].filter((id) => !RELEVEL[id]);
+if (stale.length) throw new Error(`存在しない ID の手直し・図がある: ${stale.join(', ')}`);
 
 const mods = await Promise.all([
   import('./math-g4.mjs'), import('./math-g5.mjs'), import('./math-g6.mjs'), import('./math-g7.mjs')
@@ -49,9 +51,22 @@ for (const p of mods.flatMap((m) => m.build())) {
 const all = [...kept, ...added];
 
 const esc = (s) => String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n');
+/** 図の指定。数値と、あらかじめ決めた語だけを書き出す（データに任意の文字列を入れない） */
+const figureLiteral = (f) =>
+  '{ ' +
+  Object.entries(f)
+    .map(([k, v]) => {
+      if (Array.isArray(v)) return `${k}: [${v.map((x) => (Array.isArray(x) ? `[${x.join(', ')}]` : JSON.stringify(x))).join(', ')}]`;
+      return `${k}: ${typeof v === 'number' || typeof v === 'boolean' ? v : `'${esc(v)}'`}`;
+    })
+    .join(', ') +
+  ' }';
+
 const line = (p) =>
   `  { id: '${p.id}', question: '${esc(p.question)}', answer: '${esc(p.answer)}', unit: '${esc(p.unit || '')}', ` +
-  `explanation: '${esc(p.explanation)}', level: ${p.level}, category: '${esc(p.category)}' }`;
+  `explanation: '${esc(p.explanation)}', level: ${p.level}, category: '${esc(p.category)}'` +
+  (p.figure ? `, figure: ${figureLiteral(p.figure)}` : '') +
+  ' }';
 
 const byLevel = {};
 const byCat = {};

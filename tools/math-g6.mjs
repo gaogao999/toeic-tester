@@ -181,6 +181,7 @@ export function circles(seed, n) {
         question: `A circle has a radius of ${rad} cm. What is its circumference? (Use 3.14)`,
         answer: Math.round(2 * rad * 3.14 * 100) / 100, unit: 'cm',
         explanation: `円周 = 直径 × 3.14 = ${2 * rad} × 3.14 = ${Math.round(2 * rad * 3.14 * 100) / 100} cm。`,
+        figure: { kind: 'circle', r: rad, show: 'r', unit: 'cm' },
         grade: G, category: '円'
       }));
     } else if (kind === 1) {
@@ -188,6 +189,7 @@ export function circles(seed, n) {
         question: `A circle has a radius of ${rad} cm. What is its area? (Use 3.14)`,
         answer: Math.round(rad * rad * 3.14 * 100) / 100, unit: 'cm²',
         explanation: `円の面積 = 半径 × 半径 × 3.14 = ${rad} × ${rad} × 3.14 = ${Math.round(rad * rad * 3.14 * 100) / 100} cm²。`,
+        figure: { kind: 'circle', r: rad, show: 'r', unit: 'cm' },
         grade: G, category: '円'
       }));
     } else {
@@ -196,6 +198,7 @@ export function circles(seed, n) {
         question: `A circle has a diameter of ${d} cm. What is its radius?`,
         answer: rad, unit: 'cm',
         explanation: `半径は直径の半分。${d} ÷ 2 = ${rad} cm。`,
+        figure: { kind: 'circle', d, show: 'd', ask: 'r', unit: 'cm' },
         grade: G, category: '円'
       }));
     }
@@ -214,6 +217,7 @@ export function solids(seed, n) {
         question: `A prism has a triangular base with a base of ${b} cm and a height of ${ht} cm. The prism is ${len} cm long. What is its volume?`,
         answer: ((b * ht) / 2) * len, unit: 'cm³',
         explanation: `角柱の体積 = 底面積 × 高さ。底面積は ${b} × ${ht} ÷ 2 = ${(b * ht) / 2} cm²。${(b * ht) / 2} × ${len} = ${((b * ht) / 2) * len} cm³。`,
+        figure: { kind: 'prism', base: b, height: ht, length: len, unit: 'cm' },
         grade: G, category: '立体図形'
       }));
     } else if (kind === 1) {
@@ -223,6 +227,7 @@ export function solids(seed, n) {
         question: `A cylinder has a radius of ${rad} cm and a height of ${ht} cm. What is its volume? (Use 3.14)`,
         answer: v, unit: 'cm³',
         explanation: `円柱の体積 = 底面積 × 高さ = ${rad} × ${rad} × 3.14 × ${ht} = ${v} cm³。`,
+        figure: { kind: 'cylinder', r: rad, h: ht, unit: 'cm' },
         grade: G, category: '立体図形'
       }));
     } else {
@@ -231,6 +236,7 @@ export function solids(seed, n) {
         question: `A cube has edges of ${s} cm. What is its surface area?`,
         answer: 6 * s * s, unit: 'cm²',
         explanation: `立方体の面は6つ。1面は ${s} × ${s} = ${s * s} cm²。${s * s} × 6 = ${6 * s * s} cm²。`,
+        figure: { kind: 'cube', s, unit: 'cm' },
         grade: G, category: '立体図形'
       }));
     }

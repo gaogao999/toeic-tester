@@ -120,3 +120,48 @@ export const FIXES = {
   m79: { explanation: '2乗を先に計算する。2² = 4、3 × 2 = 6。足して 4 + 6 = 10。' },
   m97: { explanation: '反比例の式に x = 9 を入れる。36 ÷ 9 = 4。' }
 };
+
+/**
+ * 手作り問題に付ける図。**問題文と答えには触れない。**
+ *
+ * 形の指定だけを持ち、SVG を組み立てるのは `js/math-figure.js`。
+ * 描ける形の一覧は `MathFigure.kinds` にある。
+ *
+ * 図を付けないもの:
+ *   - m99（座標の読み取り）は負の座標。いまの描画が第1象限しか描けないので見送り
+ *   - m117 は「四角形の内角の和」で n が問題文に無い。図で四角形を見せると
+ *     「この四角形の」と読めてしまい、一般の四角形の話だと伝わらない
+ */
+export const FIGURES = {
+  m104: { kind: 'rect', w: 8, h: 5, unit: 'cm' },
+  m105: { kind: 'rect', w: 8, h: 5, unit: 'cm' },
+  m106: { kind: 'rect', w: 7, h: 7, unit: 'cm' },
+  m107: { kind: 'circle', r: 5, show: 'r', unit: 'cm' },
+  m108: { kind: 'triangle', base: 10, height: 6, unit: 'cm' },
+  m109: { kind: 'triangleAngles', a: 50, b: 60 },
+  m110: { kind: 'straightLine', a: 115 },
+  m111: { kind: 'circle', r: 10, show: 'r', unit: 'cm' },
+  m112: { kind: 'circle', r: 5, show: 'r', unit: 'cm' },
+  m113: { kind: 'trapezoid', top: 6, bottom: 10, height: 5, unit: 'cm' },
+  m114: { kind: 'triangleAngles', a: 90, b: 35 },
+  // 面積が分かっていて1辺を問う。図には面積を書き、辺に ? を置く
+  m115: { kind: 'rect', w: 9, h: 9, unit: 'cm', area: 81, ask: '1辺 ?' },
+  m116: { kind: 'parallelogram', base: 12, height: 7, unit: 'cm' },
+  m118: { kind: 'triangle', base: 8, height: 6, unit: 'cm', area: 24, askHeight: true },
+  m119: { kind: 'sector', r: 6, angle: 90, unit: 'cm' },
+  m120: { kind: 'sector', r: 9, angle: 120, unit: 'cm' },
+  m121: { kind: 'rhombus', d1: 8, d2: 6, unit: 'cm' },
+  m122: { kind: 'polygon', n: 5 },
+  m123: { kind: 'cube', s: 4, unit: 'cm' },
+  m124: { kind: 'box', a: 5, b: 3, c: 2, unit: 'cm' },
+  m125: { kind: 'box', a: 6, b: 4, c: 5, unit: 'cm' },
+  m126: { kind: 'prism', area: 12, length: 7, unit: 'cm' },
+  // 「面はいくつあるか」なので寸法は書かない。関係ない数字は迷いのもと
+  m127: { kind: 'prism', plain: true },
+  m128: { kind: 'cube', plain: true },
+  m129: { kind: 'cylinder', r: 4, h: 6, unit: 'cm' },
+  m130: { kind: 'box', a: 3, b: 4, c: 5, unit: 'cm' },
+  m131: { kind: 'cylinder', r: 5, h: 10, unit: 'cm' },
+  m132: { kind: 'cone', r: 3, h: 8, unit: 'cm' },
+  m133: { kind: 'pyramid', area: 27, h: 5, unit: 'cm' }
+};

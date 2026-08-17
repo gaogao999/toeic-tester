@@ -234,6 +234,9 @@ node tools/stamp-version.mjs   # js/app.js の APP_VERSION を書き換える
 
 学年ごとの問題数は **Grade 4: 153 問 / Grade 5: 177 問 / Grade 6: 177 問 / Grade 7: 221 問**。
 
+- **図形の問題には図が付きます。** 入試は図を読ませるので、文章だけにしていません。
+  問われている角や辺は**オレンジの `?`**で示します。長さは必ず数字でも書いてあるので、
+  図の見た目の比だけで解く必要はありません（細長い図形は見やすさのために少し詰めて描いています）。
 - Enter で採点、もう一度 Enter で次の問題へ（単語クイズと同じ操作です）。
 - 答えは `0.75` でも `3/4` でも正解になります。`1,000` のようなカンマ、前後の空白も吸収します。
 - 比を答える問題（`3:4`）は空白の入れ方を問いません。
@@ -341,6 +344,7 @@ index.html              画面のマークアップ
 css/style.css           スタイル（ダークモード対応・スマホ対応）
 js/data.js              単語データ 2,920 語（tools が生成する）
 js/math-data.js         算数の問題データ 728 問
+js/math-figure.js       算数の図を SVG で描く
 js/reading-data.js      長文読解のデータ 134 本 / 設問 523 問
 js/storage.js           学習履歴の保存と間隔反復のロジック
 js/ai.js                実力診断・例文の和訳・ふりがな（Claude API）
@@ -450,6 +454,26 @@ node tools/audit-math.mjs    # 点検。エラー0件になるまで直す
 乱数は固定のたねから振っているので、**何度作り直しても同じ問題・同じ ID**になります。
 学習記録は ID で保存されているので、ここが崩れると記録がずれます。
 
+### 図
+
+図形の問題 155 問のうち **153 問に図**が付きます（残り2問は理由があって付けていません）。
+
+データが持つのは形の指定だけで、SVG に組み立てるのは `js/math-figure.js` です。
+
+```js
+{ id: 'm104', question: '…', figure: { kind: 'rect', w: 8, h: 5, unit: 'cm' } }
+```
+
+描ける形は 18 種類 — `rect` `triangle` `parallelogram` `trapezoid` `rhombus`
+`straightLine` `triangleAngles` `parallelLines` `polygon` `circle` `sector` `points`
+`box` `cube` `cylinder` `prism` `pyramid` `cone`。
+
+色は CSS 変数（`css/style.css` の `.math-figure .f-*`）から取るので、
+**ダークテーマでもそのまま読めます**。SVG 側に色は書きません。
+
+図を足したら必ず目で見て確かめてください。点検は「図形の分野なのに図が無い」
+「描けない形を指定している」までは見ますが、**線が重なっていないかまでは見ません。**
+
 ### 点検が見ていること
 
 `tools/audit-math.mjs` は、**問題文を読み直して答えを計算しなおします**。
@@ -460,6 +484,7 @@ node tools/audit-math.mjs    # 点検。エラー0件になるまで直す
 - 問題文の重複、ID の重複、レベルの不正
 - 小数が4桁以上（何桁書けば正解か分からない問題を作らないため）
 - `undefined` や `NaN` が文字列に混じっていないか
+- 図形の分野なのに図が無い／`MathFigure` が描けない形を指定している
 
 ### データの形
 

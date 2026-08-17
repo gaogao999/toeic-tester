@@ -186,6 +186,7 @@ export function area(seed, n) {
         question: `A triangle has a base of ${b} cm and a height of ${h} cm. What is its area?`,
         answer: (b * h) / 2, unit: 'cm²',
         explanation: `三角形の面積 = 底辺 × 高さ ÷ 2 = ${b} × ${h} ÷ 2 = ${(b * h) / 2} cm²。`,
+        figure: { kind: 'triangle', base: b, height: h, unit: 'cm' },
         grade: G, category: '平面図形'
       }));
     } else if (kind === 1) {
@@ -194,6 +195,7 @@ export function area(seed, n) {
         question: `A parallelogram has a base of ${b} cm and a height of ${h} cm. What is its area?`,
         answer: b * h, unit: 'cm²',
         explanation: `平行四辺形の面積 = 底辺 × 高さ = ${b} × ${h} = ${b * h} cm²。`,
+        figure: { kind: 'parallelogram', base: b, height: h, unit: 'cm' },
         grade: G, category: '平面図形'
       }));
     } else if (kind === 2) {
@@ -203,6 +205,7 @@ export function area(seed, n) {
         question: `A trapezoid has parallel sides of ${a} cm and ${b} cm, and a height of ${h} cm. What is its area?`,
         answer: ((a + b) * h) / 2, unit: 'cm²',
         explanation: `台形の面積 = (上底 + 下底) × 高さ ÷ 2 = (${a} + ${b}) × ${h} ÷ 2 = ${((a + b) * h) / 2} cm²。`,
+        figure: { kind: 'trapezoid', top: a, bottom: b, height: h, unit: 'cm' },
         grade: G, category: '平面図形'
       }));
     } else {
@@ -211,6 +214,7 @@ export function area(seed, n) {
         question: `A square has sides of ${s} cm. What is its area?`,
         answer: s * s, unit: 'cm²',
         explanation: `正方形の面積 = 1辺 × 1辺 = ${s} × ${s} = ${s * s} cm²。`,
+        figure: { kind: 'rect', w: s, h: s, unit: 'cm' },
         grade: G, category: '平面図形'
       }));
     }
@@ -229,6 +233,7 @@ export function volume(seed, n) {
         question: `A rectangular box is ${a} cm by ${b} cm by ${c} cm. What is its volume?`,
         answer: a * b * c, unit: 'cm³',
         explanation: `直方体の体積 = たて × よこ × 高さ = ${a} × ${b} × ${c} = ${a * b * c} cm³。`,
+        figure: { kind: 'box', a, b, c, unit: 'cm' },
         grade: G, category: '立体図形'
       }));
     } else if (kind === 1) {
@@ -237,15 +242,17 @@ export function volume(seed, n) {
         question: `A cube has edges of ${s} cm. What is its volume?`,
         answer: s ** 3, unit: 'cm³',
         explanation: `立方体の体積 = 1辺³ = ${s} × ${s} × ${s} = ${s ** 3} cm³。`,
+        figure: { kind: 'cube', s, unit: 'cm' },
         grade: G, category: '立体図形'
       }));
     } else {
+      // 体積の単位換算。立体そのものを問うていないので単位の分野に入れる
       const v = int(r, 2, 20) * 1000;
       out.push(problem({
         question: `A tank holds ${v} cm³ of water. How many litres is that?`,
         answer: v / 1000, unit: 'L',
         explanation: `1 L = 1000 cm³ なので ${v} ÷ 1000 = ${v / 1000} L。`,
-        grade: G, category: '立体図形'
+        grade: G, category: '単位と量'
       }));
     }
   }
@@ -318,6 +325,7 @@ export function coordinates(seed, n) {
         question: `Point A is at (${x}, ${y}). Point B is at (${x + dx}, ${y}). What is the distance from A to B?`,
         answer: dx, unit: '目盛り',
         explanation: `y が同じなので横に並んでいる。${x + dx} − ${x} = ${dx}。`,
+        figure: { kind: 'points', pts: [[x, y], [x + dx, y]], labels: ['A', 'B'] },
         grade: G, category: '座標'
       }));
     } else if (kind === 1) {
@@ -326,6 +334,7 @@ export function coordinates(seed, n) {
         question: `A rectangle has corners at (${x}, ${y}), (${x + w}, ${y}), (${x + w}, ${y + h}) and (${x}, ${y + h}). What is its area?`,
         answer: w * h, unit: '平方目盛り',
         explanation: `よこは ${x + w} − ${x} = ${w}、たては ${y + h} − ${y} = ${h}。${w} × ${h} = ${w * h}。`,
+        figure: { kind: 'points', pts: [[x, y], [x + w, y], [x + w, y + h], [x, y + h]], closed: true },
         grade: G, category: '座標'
       }));
     } else {
@@ -334,6 +343,7 @@ export function coordinates(seed, n) {
         question: `Point P is at (${x}, ${y}). It moves up ${dy} units. What is its new y-coordinate?`,
         answer: y + dy,
         explanation: `上に動くと y が増える。${y} + ${dy} = ${y + dy}。`,
+        figure: { kind: 'points', pts: [[x, y]], labels: ['P'] },
         grade: G, category: '座標'
       }));
     }

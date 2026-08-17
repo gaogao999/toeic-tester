@@ -211,6 +211,7 @@ export function geometry(seed, n) {
         question: `A rectangle is ${w} cm long and ${h} cm wide. What is its area?`,
         answer: w * h, unit: 'cm²',
         explanation: `長方形の面積 = たて × よこ = ${w} × ${h} = ${w * h} cm²。`,
+        figure: { kind: 'rect', w, h, unit: 'cm' },
         grade: G, category: '平面図形'
       }));
     } else if (kind === 1) {
@@ -220,6 +221,7 @@ export function geometry(seed, n) {
         question: `A rectangle is ${w} cm long and ${h} cm wide. What is its perimeter?`,
         answer: 2 * (w + h), unit: 'cm',
         explanation: `まわりの長さ = (${w} + ${h}) × 2 = ${2 * (w + h)} cm。`,
+        figure: { kind: 'rect', w, h, unit: 'cm' },
         grade: G, category: '平面図形'
       }));
     } else if (kind === 2) {
@@ -228,6 +230,7 @@ export function geometry(seed, n) {
         question: `Two angles are on a straight line. One angle is ${a}°. What is the other angle?`,
         answer: 180 - a, unit: '°',
         explanation: `一直線は 180°。180 − ${a} = ${180 - a}°。`,
+        figure: { kind: 'straightLine', a },
         grade: G, category: '平面図形'
       }));
     } else {
@@ -238,6 +241,7 @@ export function geometry(seed, n) {
         question: `Two angles of a triangle are ${a}° and ${b}°. What is the third angle?`,
         answer: 180 - a - b, unit: '°',
         explanation: `三角形の内角の和は 180°。180 − ${a} − ${b} = ${180 - a - b}°。`,
+        figure: { kind: 'triangleAngles', a, b },
         grade: G, category: '平面図形'
       }));
     }

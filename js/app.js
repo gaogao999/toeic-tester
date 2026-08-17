@@ -1470,6 +1470,16 @@
     return NaN;
   }
 
+  /**
+   * 図を出す。図の無い問題も多いので、呼び出し側では分岐させない。
+   * SVG は数値から組み立てたものだけで、外から来た文字列は入らない
+   */
+  function showFigure(el, spec) {
+    const svg = MathFigure.render(spec);
+    el.innerHTML = svg;
+    el.hidden = !svg;
+  }
+
   function isMathCorrect(input, answer) {
     const a = toNumber(input);
     const b = toNumber(answer);
@@ -1515,6 +1525,7 @@
     $('#math-score').textContent = `正解 ${mathQuiz.correct}`;
     $('#math-tag').textContent = `${p.category} ／ ${mathLevelLabel(p.level)}`;
     $('#math-question').textContent = p.question;
+    showFigure($('#math-figure'), p.figure);
     $('#math-unit').textContent = p.unit;
     $('#math-unit').hidden = !p.unit;
 
@@ -1713,6 +1724,7 @@
       question: p.question,
       unit: p.unit,
       answer: p.answer,
+      figure: p.figure,
       explanation: p.explanation
     };
   }
@@ -2016,6 +2028,7 @@
     }
 
     $('#mock-question').textContent = q.question;
+    showFigure($('#mock-figure'), q.figure);
 
     if (q.kind === 'math') {
       $('#mock-choices').innerHTML = '';

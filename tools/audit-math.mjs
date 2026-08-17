@@ -289,12 +289,32 @@ function evalExpr(src) {
   return i === tokens.length && Number.isFinite(v) ? v : null;
 }
 
+/**
+ * 図の点検。
+ *
+ * 図形の分野なのに図が無い問題を落とす。ただし理由があって付けないものは
+ * ここに書き出しておく（黙って抜けているのか、決めて外したのかを区別するため）。
+ */
+const FIGURE_CATEGORIES = ['平面図形', '円', '立体図形', '座標'];
+const NO_FIGURE_OK = {
+  m99: '負の座標。いまの描画が第1象限しか描けない',
+  m117: '一般の四角形の話。図を出すと「この四角形の」と読めてしまう'
+};
+
+/** js/math-figure.js が実際に描ける形の一覧を読み出す */
+function figureKinds() {
+  const src = readFileSync(new URL('../js/math-figure.js', import.meta.url), 'utf8');
+  return new Function(`${src}; return MathFigure.kinds;`)();
+}
+
 export function audit(list) {
   errors.length = 0;
   warns.length = 0;
   const seenQ = new Map();
   const seenId = new Set();
+  const kinds = figureKinds();
   let checked = 0;
+  let figured = 0;
 
   for (const p of list) {
     if (p.id) {
@@ -325,6 +345,15 @@ export function audit(list) {
     if (seenQ.has(key)) fail(p, `問題文が ${seenQ.get(key)} と重複`);
     else seenQ.set(key, p.id || key.slice(0, 20));
 
+    // 図
+    if (p.figure) {
+      figured++;
+      if (!kinds.includes(p.figure.kind)) fail(p, `描けない図の形: ${p.figure.kind}`);
+      if (!FIGURE_CATEGORIES.includes(p.category)) warn(p, `図形以外の分野に図が付いている（${p.category}）`);
+    } else if (FIGURE_CATEGORIES.includes(p.category) && !NO_FIGURE_OK[p.id]) {
+      fail(p, '図形の分野なのに図が無い');
+    }
+
     // 検算
     const expected = recompute(p.question);
     if (expected === null) continue;
@@ -334,13 +363,13 @@ export function audit(list) {
     if (!near(expected, numeric)) fail(p, `答えが合わない（検算 ${expected} / データ ${p.answer}）`);
   }
 
-  return { checked, total: list.length };
+  return { checked, figured, total: list.length };
 }
 
 function report(list, label) {
-  const { checked, total } = audit(list);
+  const { checked, figured, total } = audit(list);
   console.log(`\n== ${label} ==`);
-  console.log(`件数 ${total}／検算できた ${checked} 問（${Math.round((checked / total) * 100)}%）`);
+  console.log(`件数 ${total}／検算できた ${checked} 問（${Math.round((checked / total) * 100)}%）／図あり ${figured} 問`);
   const byLevel = {};
   const byCat = {};
   list.forEach((p) => { byLevel[p.level] = (byLevel[p.level] || 0) + 1; byCat[p.category] = (byCat[p.category] || 0) + 1; });

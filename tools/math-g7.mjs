@@ -199,6 +199,7 @@ export function angles(seed, n) {
         question: `Two parallel lines are cut by a transversal. One angle is ${a}°. What is the co-interior (same-side interior) angle?`,
         answer: 180 - a, unit: '°',
         explanation: `平行線の同側内角の和は 180°。180 − ${a} = ${180 - a}°。`,
+        figure: { kind: 'parallelLines', a },
         grade: G, category: '平面図形'
       }));
     } else if (kind === 1) {
@@ -207,6 +208,7 @@ export function angles(seed, n) {
         question: `What is the sum of the interior angles of a polygon with ${sides} sides?`,
         answer: (sides - 2) * 180, unit: '°',
         explanation: `内角の和 = (n − 2) × 180°。(${sides} − 2) × 180 = ${(sides - 2) * 180}°。`,
+        figure: { kind: 'polygon', n: sides },
         grade: G, category: '平面図形'
       }));
     } else if (kind === 2) {
@@ -215,6 +217,7 @@ export function angles(seed, n) {
         question: `What is the size of one interior angle of a regular polygon with ${sides} sides?`,
         answer: ((sides - 2) * 180) / sides, unit: '°',
         explanation: `内角の和は (${sides} − 2) × 180 = ${(sides - 2) * 180}°。正多角形なので ${sides} で割って ${((sides - 2) * 180) / sides}°。`,
+        figure: { kind: 'polygon', n: sides, regular: true },
         grade: G, category: '平面図形'
       }));
     } else {
@@ -226,6 +229,7 @@ export function angles(seed, n) {
         question: `A sector has a radius of ${rad} cm and a central angle of ${ang}°. What is its area? (Use 3.14)`,
         answer: area, unit: 'cm²',
         explanation: `おうぎ形は円の ${ang}/360 の部分。${rad} × ${rad} × 3.14 × ${ang}/360 = ${area} cm²。`,
+        figure: { kind: 'sector', r: rad, angle: ang, unit: 'cm' },
         grade: G, category: '平面図形'
       }));
     }
@@ -243,6 +247,7 @@ export function solids(seed, n) {
       out.push(problem({
         question: `A rectangular box is ${a} cm by ${b} cm by ${c} cm. What is its surface area?`,
         answer: 2 * (a * b + b * c + a * c), unit: 'cm²',
+        figure: { kind: 'box', a, b, c, unit: 'cm' },
         explanation: `向かい合う面が2枚ずつ。(${a}×${b} + ${b}×${c} + ${a}×${c}) × 2 = ${2 * (a * b + b * c + a * c)} cm²。`,
         grade: G, category: '立体図形'
       }));
@@ -252,6 +257,7 @@ export function solids(seed, n) {
       out.push(problem({
         question: `A cylinder has a radius of ${rad} cm and a height of ${ht} cm. What is its total surface area? (Use 3.14)`,
         answer: s, unit: 'cm²',
+        figure: { kind: 'cylinder', r: rad, h: ht, unit: 'cm' },
         explanation: `上下の円が ${rad} × ${rad} × 3.14 × 2 = ${Math.round(2 * rad * rad * 3.14 * 100) / 100} cm²。側面は 円周 × 高さ = ${Math.round(2 * rad * 3.14 * 100) / 100} × ${ht} = ${Math.round(2 * rad * 3.14 * ht * 100) / 100} cm²。合わせて ${s} cm²。`,
         grade: G, category: '立体図形'
       }));
@@ -262,6 +268,7 @@ export function solids(seed, n) {
       out.push(problem({
         question: `A pyramid has a square base with sides of ${s} cm and a height of ${ht} cm. What is its volume?`,
         answer: (s * s * ht) / 3, unit: 'cm³',
+        figure: { kind: 'pyramid', s, h: ht, unit: 'cm' },
         explanation: `角錐の体積 = 底面積 × 高さ ÷ 3 = ${s} × ${s} × ${ht} ÷ 3 = ${(s * s * ht) / 3} cm³。`,
         grade: G, category: '立体図形'
       }));
