@@ -272,6 +272,8 @@ function posOf(word, sense) {
   if (/^[…～]/.test(s)) return 'v.';
   // サ変・受身・可能はまず動詞
   if (/(する|される|できる)$/.test(s)) return 'v.';
+  // 「費用のかかる」「栄光ある」は連体形なので形容詞
+  if (/(のある|のかかる|のない|ある)$/.test(s) && s.length >= 3) return 'adj.';
   // ウ段で終わるものは動詞。ただし「〜的」などは除く
   if (/[るうくぐすつぬぶむ]$/.test(s) && !/(名|物|者|所|人|事|数|量)$/.test(s)) return 'v.';
   // 「〜な」「〜的」「〜の」は形容詞（male→男性の, human→人間の）
@@ -290,7 +292,9 @@ const gloss = loadGlossary();
 const phonetics = loadPhonetics();
 
 const entries = [...words.entries()]
-  .filter(([, v]) => v.count >= 2) // 1回きりの語は覚える優先度が低い
+  // 1回しか出ない語も入れる。salinity や hemisphere のように、その分野の
+  // 鍵になる語が1回しか出ないことが多く、落とすとカバー率が実用水準に届かない
+  .filter(([, v]) => v.count >= 1)
   .sort((a, b) => a[1].level - b[1].level || b[1].count - a[1].count)
   .map(([word, v], i) => {
     // 教材が付けた語注があればそれを使い、無ければ英和辞書から引く
@@ -337,7 +341,8 @@ if (process.argv.includes('--emit')) {
  *   2 = Basic(A2)  3 = Intermediate(B1)  4 = Advanced(B2)
  * 教材そのものが難易度順に並んでいるので、外部の物差しを持ち込んでいない。
  *
- * 2回以上出てくる語だけを収録している（1回きりの語は覚える優先度が低い）。
+ * 本文に出てくる語はすべて収録する。1回しか出ない語も、その分野の鍵に
+ * なることが多いので落とさない（頻度は出題順の手がかりとして持っている）。
  *
  * 意味は次の順で決めている:
  *   ① tools/passage-vocab-overrides.mjs の手直し
@@ -362,7 +367,7 @@ const WORD_DATA = [\n`;
   entries.forEach((e) => (byLevel[e.level] = (byLevel[e.level] || 0) + 1));
   console.log(`教材 ${MATERIAL.length} 本から抽出`);
   console.log(`  異なり語（辞書に当たったもの）: ${words.size}`);
-  console.log(`  2回以上出る語で意味が引けたもの: ${entries.length}`);
+  console.log(`  収録（意味が引けたもの）: ${entries.length}`);
   console.log(`  レベル別: ${JSON.stringify(byLevel)}`);
   console.log(`  発音記号あり: ${entries.filter((e) => e.phonetic).length}`);
   console.log(`  例文あり: ${entries.filter((e) => e.example).length}`);

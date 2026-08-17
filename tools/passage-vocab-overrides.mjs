@@ -13,7 +13,11 @@
  * DROP に入れた語は収録しない（間投詞や略語の断片）。
  */
 
-export const DROP = new Set(['ow', 'mil', 'gon', 'wan', 'nah', 'yeah', 'hmm', 'huh', 'oops']);
+export const DROP = new Set([
+  'ow', 'mil', 'gon', 'wan', 'nah', 'yeah', 'hmm', 'huh', 'oops',
+  'whin',      // 語形の取り違えで拾ってしまう植物名
+  'programme'  // program の英国綴り。重複になる
+]);
 
 export const MEANINGS = {
   // ① 固有名詞との衝突
@@ -103,7 +107,18 @@ export const MEANINGS = {
   force: '力、強制する',
   scene: '場面、現場',
   report: '報告、報告する',
-  feeling: '気持ち、感覚'
+  feeling: '気持ち、感覚',
+
+  // 1回しか出ない語を入れて増えたぶんの手直し
+  meaning: '意味',
+  border: '国境、境界',
+  cast: '配役、投げる',
+  plague: '疫病',
+  representative: '代表者',
+  sideline: 'サイドライン',
+  clog: 'ふさぐ、詰まらせる',
+  odd: '奇妙な',
+  gate: '門、ゲート'
 };
 
 /**
@@ -115,7 +130,9 @@ export const POS = {
   late: 'adj.', high: 'adj.', low: 'adj.', long: 'adj.', deep: 'adj.', near: 'adj.',
   right: 'adj.', straight: 'adj.', quick: 'adj.', slow: 'adj.', loud: 'adj.',
   // 「呪い」「勢い」のように名詞でも「い」で終わるもの
-  curse: 'n.', smile: 'n.', wish: 'n.', doubt: 'n.', battle: 'n.', prize: 'n.'
+  curse: 'n.', smile: 'n.', wish: 'n.', doubt: 'n.', battle: 'n.', prize: 'n.',
+  meaning: 'n.', overnight: 'adv.', representative: 'n.', expensive: 'adj.',
+  glorious: 'adj.', following: 'adj.', determined: 'adj.'
 };
 
 /** 語形を原形に寄せる（-ing 形が見出し語になってしまうもの） */
