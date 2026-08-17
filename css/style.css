@@ -102,7 +102,8 @@ body {
   padding: 6px;
 }
 
-/* 下タブ。常に画面下に固定する（1画面完結の前提） */
+/* 下タブ。常に画面下に固定する（1画面完結の前提）。
+   指で押す的なので、Apple の指針にある 44px より十分に大きく取る */
 .bottom-nav {
   position: fixed;
   left: 0;
@@ -110,7 +111,7 @@ body {
   bottom: 0;
   z-index: 20;
   display: flex;
-  height: 56px;
+  height: 68px;
   background: var(--surface);
   border-top: 1px solid var(--border);
   padding-bottom: env(safe-area-inset-bottom);
@@ -122,23 +123,26 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 4px;
   border: none;
   background: none;
   color: var(--text-muted);
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
+  /* 押した手ごたえを出す。的が大きいだけだと押せたか分かりにくい */
+  transition: background 0.12s ease;
 }
-.tab-icon { font-size: 1.15rem; line-height: 1; }
+.tab:active { background: var(--surface-2); }
+.tab-icon { font-size: 1.35rem; line-height: 1; }
 .tab.is-active { color: var(--primary); font-weight: 700; }
 
 .container {
   max-width: 720px;
   margin: 0 auto;
   /* 下タブに隠れないよう、下に余白を足す */
-  padding: 14px 16px calc(72px + env(safe-area-inset-bottom));
+  padding: 14px 16px calc(84px + env(safe-area-inset-bottom));
 }
 
 .view { display: none; }
@@ -1459,3 +1463,13 @@ ruby rt { font-size: 0.6em; color: var(--text-muted); font-weight: 400; }
   border-radius: 3px;
   border: 1px solid var(--border);
 }
+
+/* リビジョン。タイトルの添え物なので、目立たせない */
+.app-version {
+  font-size: 0.62rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  white-space: nowrap;
+  margin-left: 2px;
+}
+.app-title { display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; }

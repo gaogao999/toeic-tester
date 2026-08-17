@@ -468,6 +468,14 @@
   // ============================================================
 
   // 受験日は固定。EIS Grade 8 の入学試験日
+  /**
+   * 画面の左上に出すリビジョン。
+   * ビルド工程が無いので実行時に git を読めない。コミットの直前に
+   * tools/stamp-version.mjs で書き換える。
+   * スマホで開いたときに、手元のものが最新かを確かめるためのもの。
+   */
+  const APP_VERSION = '2026-08-17 (36d0c4e)';
+
   const EXAM_DATE = '2027-01-07';
 
   const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
@@ -2283,6 +2291,10 @@
   // 初期化のときに一度描くだけでは古いままになる
   let refreshAiStatus = () => {};
 
+  function initVersion() {
+    $('#app-version').textContent = APP_VERSION;
+  }
+
   function initApiKey() {
     const input = $('#api-key');
     const status = $('#api-key-status');
@@ -2764,6 +2776,7 @@
     initMath();
     initReading();
     initMock();
+    initVersion();
     initApiKey();
     initFlashcards();
     initQuiz();

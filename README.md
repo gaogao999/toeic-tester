@@ -49,6 +49,16 @@ npx http-server -p 8000
 
 ## 機能
 
+### 画面左上のリビジョン
+タイトルの横に、いま動いているリビジョン（日付と短縮ハッシュ）が出ます。
+**スマートフォンで開いたときに、手元のものが最新かを確かめるためのものです。**
+
+ビルド工程が無いので実行時に git を読めません。かわりにコミットの直前に刻みます。
+
+```bash
+node tools/stamp-version.mjs   # js/app.js の APP_VERSION を書き換える
+```
+
 ### ホーム
 **試験日までの残り日数 → 今日の学習メニュー → カレンダー** の3つだけの構成です。
 アプリを開いてすぐ「あと何日か」「今日は何をやるか」が分かるようにしてあります。
@@ -323,6 +333,7 @@ tools/
   passage-vocab-overrides.mjs    意味・品詞・例文の手直し表
   toefl-junior-wordlist.mjs      語彙練習リスト（Key Word の意味・同義語・ユニット）
   audit-vocab.mjs                単語データの総点検
+  stamp-version.mjs              画面に出すリビジョンを刻む
   build-reading-*.mjs            教材PDFから長文を取り込むパイプライン
 
 data/raw/               取り込み元データの置き場所（gitignore 済み）
