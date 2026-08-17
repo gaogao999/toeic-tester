@@ -147,6 +147,7 @@
     if (name === 'mock') resetMockToSetup();
     if (name === 'list') renderListFromTop();
     if (name === 'stats') renderStats();
+    if (name === 'settings') refreshAiStatus();
   }
 
   document.addEventListener('click', (e) => {
@@ -623,6 +624,43 @@
     if (!empty) renderFlashcard();
   }
 
+  /**
+   * 例文の和訳を出す。
+   *
+   * 教材から取り込んだ語には和訳が付いていないので、APIキーがあれば
+   * めくったときにその1文だけ訳す。訳は貯めるので、二度目からは即出る。
+   * キーが無ければ何も出さない（英文だけでも読める）。
+   */
+  async function showExampleJa(w) {
+    const box = $('#fc-example-ja');
+    if (!w.example) {
+      box.hidden = true;
+      return;
+    }
+
+    // データに元から和訳があるものと、訳済みのものは待たせずに出す
+    const ready = w.exampleJa || AI.cachedTranslation(w.example);
+    if (ready) {
+      box.textContent = ready;
+      box.hidden = false;
+      return;
+    }
+    if (!AI.hasKey()) {
+      box.hidden = true;
+      return;
+    }
+
+    box.textContent = '和訳を作っています…';
+    box.hidden = false;
+
+    const ja = await AI.translateExample(w.example);
+
+    // 待っている間に別のカードへ移っていたら書き換えない
+    if (fc.deck[fc.index] !== w) return;
+    box.textContent = ja || '';
+    box.hidden = !ja;
+  }
+
   function renderFlashcard() {
     const w = fc.deck[fc.index];
     if (!w) return;
@@ -638,9 +676,9 @@
     $('#fc-note').textContent = w.note ? `⚠ ${w.note}` : '';
     $('#fc-note').hidden = !w.note;
     $('#fc-example').textContent = w.example;
-    $('#fc-example-ja').textContent = w.exampleJa;
     // 取り込んだばかりで例文がない単語では、例文欄ごと隠す
     $('#fc-example-box').hidden = !w.example;
+    showExampleJa(w);
 
     const rec = Storage.getRecord(w.id);
     $('#fc-learned-badge').hidden = !rec.learned;
@@ -2237,12 +2275,26 @@
     $('#diagnosis-body').hidden = false;
   }
 
+  // 設定画面を開くたびに呼ぶ。和訳の件数はカードをめくるたびに増えるので、
+  // 初期化のときに一度描くだけでは古いままになる
+  let refreshAiStatus = () => {};
+
   function initApiKey() {
     const input = $('#api-key');
     const status = $('#api-key-status');
+    const trStatus = $('#translation-status');
+
     const show = () => {
-      status.textContent = AI.hasKey() ? '✓ 保存済み。AIが診断します。' : '未設定。正答率から判定します。';
+      status.textContent = AI.hasKey()
+        ? '✓ 保存済み。診断を文章で書き、例文に和訳を付けます。'
+        : '未設定。診断は正答率から判定し、例文は英文だけを出します。';
+
+      // 和訳は一度作ると貯まる。消す手段があることも見せておく
+      const n = AI.translationCount();
+      trStatus.textContent = n > 0 ? `例文の和訳を ${n} 件おぼえています。` : '例文の和訳はまだありません。';
+      $('#translation-clear').hidden = n === 0;
     };
+    refreshAiStatus = show;
     show();
 
     $('#api-key-save').addEventListener('click', () => {
@@ -2256,6 +2308,12 @@
       input.value = '';
       show();
       toast('APIキーを削除しました');
+    });
+    $('#translation-clear').addEventListener('click', () => {
+      if (!confirm('おぼえている例文の和訳を消しますか。次に見たときに作り直します。')) return;
+      AI.clearTranslations();
+      show();
+      toast('和訳を消しました');
     });
   }
 

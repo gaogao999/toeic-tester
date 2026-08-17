@@ -706,11 +706,14 @@
   <!-- ============ 設定（⚙） ============ -->
   <section class="view" id="view-settings">
     <div class="panel">
-      <h2 class="panel-title">AI診断の設定</h2>
+      <h2 class="panel-title">AIの設定</h2>
       <p class="hint">
-        模擬試験のあとの診断を <b>AIに書かせる</b>ための設定です。<b>空のままでも診断は出ます</b>
-        （その場合は級ごとの正答率から機械的に判定します）。
+        APIキーを入れると、次の2つが使えます。<b>空のままでもアプリは動きます。</b>
       </p>
+      <ul class="hint setting-uses">
+        <li><b>模擬試験の診断を文章で書く</b> — 空なら級ごとの正答率から機械的に判定します</li>
+        <li><b>単語カードの例文に和訳を付ける</b> — 空なら英文だけを表示します</li>
+      </ul>
       <label class="field">
         <span>Anthropic APIキー</span>
         <input type="password" id="api-key" class="key-input" placeholder="sk-ant-..." autocomplete="off" spellcheck="false" />
@@ -720,6 +723,10 @@
         <button class="btn btn-danger-ghost" id="api-key-clear">削除</button>
       </div>
       <p class="hint" id="api-key-status"></p>
+      <div class="translation-box">
+        <p class="hint" id="translation-status"></p>
+        <button class="btn btn-ghost btn-small" id="translation-clear">和訳を消す</button>
+      </div>
       <p class="hint">
         ⚠ キーはこのブラウザの中だけに保存され、学習データの書き出しには含まれません。
         ただし<b>ブラウザに保存する以上、この端末を使える人には読めます</b>。

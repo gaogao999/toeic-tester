@@ -351,5 +351,121 @@ const AI = (() => {
     }
   }
 
-  return { diagnose, getKey, setKey, hasKey, accuracyByLevel };
+  // ============================================================
+  // 例文の和訳
+  // ============================================================
+  //
+  // 単語 2,300 語ぶんの和訳を先に用意するのは現実的でないので、
+  // カードをめくったときにその1文だけ訳す。実際に見る語は限られるので、
+  // 全部を用意するより無駄がない。
+  //
+  // 訳したものは localStorage に貯める。同じ文を二度訳さない。
+  // 学習データとは別のキーに置く（書き出しに混ざらないように）。
+
+  const TRANSLATION_STORE = 'eis-app:translations';
+
+  // 1文を訳すだけなので、速くて安いモデルを使う。診断のほうは opus のまま。
+  // カードをめくってから訳が出るまでの待ち時間がそのまま体験になるため。
+  const TRANSLATE_MODEL = 'claude-haiku-4-5';
+
+  function loadTranslations() {
+    try {
+      return JSON.parse(localStorage.getItem(TRANSLATION_STORE) || '{}');
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveTranslation(text, ja) {
+    try {
+      const all = loadTranslations();
+      all[text] = ja;
+      localStorage.setItem(TRANSLATION_STORE, JSON.stringify(all));
+    } catch (e) {
+      // 容量が尽きても学習は続けられるので、黙って諦める
+      console.warn('和訳を保存できませんでした。', e);
+    }
+  }
+
+  /** 訳済みなら即返す。まだなら null */
+  function cachedTranslation(text) {
+    return loadTranslations()[text] || null;
+  }
+
+  const TRANSLATE_SYSTEM = [
+    '英文を日本語に訳してください。',
+    '',
+    '守ること:',
+    '- 訳文だけを返す。前置き・説明・引用符を付けない。',
+    '- 読むのは中学生。平易で自然な日本語にする。直訳調にしない。',
+    '- 固有名詞はカタカナにする。'
+  ].join('\n');
+
+  /**
+   * 例文を訳す。APIキーが無ければ null を返す（画面側は和訳を出さないだけ）。
+   * 失敗しても投げない。和訳が出ないだけで学習は止めない。
+   */
+  async function translateExample(text) {
+    if (!text) return null;
+
+    const hit = cachedTranslation(text);
+    if (hit) return hit;
+    if (!hasKey()) return null;
+
+    try {
+      const res = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': getKey(),
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: TRANSLATE_MODEL,
+          max_tokens: 400,
+          system: TRANSLATE_SYSTEM,
+          messages: [{ role: 'user', content: text }]
+        })
+      });
+
+      if (!res.ok) throw new Error(`翻訳に失敗しました（${res.status}）`);
+
+      const data = await res.json();
+      if (data.stop_reason === 'refusal') return null;
+
+      const block = (data.content || []).find((b) => b.type === 'text');
+      const ja = block && block.text.trim();
+      if (!ja) return null;
+
+      saveTranslation(text, ja);
+      return ja;
+    } catch (e) {
+      console.warn('例文の和訳に失敗しました。', e);
+      return null;
+    }
+  }
+
+  /** 貯めた和訳の数。設定画面で見せる */
+  const translationCount = () => Object.keys(loadTranslations()).length;
+
+  function clearTranslations() {
+    try {
+      localStorage.removeItem(TRANSLATION_STORE);
+    } catch (e) {
+      console.warn('和訳を消せませんでした。', e);
+    }
+  }
+
+  return {
+    diagnose,
+    getKey,
+    setKey,
+    hasKey,
+    accuracyByLevel,
+    translateExample,
+    cachedTranslation,
+    translationCount,
+    clearTranslations
+  };
 })();
