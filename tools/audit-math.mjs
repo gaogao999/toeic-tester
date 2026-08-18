@@ -310,21 +310,25 @@ function evalExpr(src) {
  * 解くのは日本語話者の子で、**算数でなく英語でつまずかせないこと**が大事。
  * ここに挙げるのは「英語圏の教室では通じるが、日本の子には別の意味に読める」言い回し。
  *
- * つづりの英式・米式は、どちらが正しいという話ではなく **そろっていること**が大事。
- * 教材（TOEFL Junior）と長文が英式寄りなので英式に統一している。
+ * つづりは **米式に統一**する。受けるのがアメリカ式の学校（EIS）だから。
+ * meters / liters / color / candy。英式（metres / litres / colour）は使わない。
  */
 const BAD_WORDING = [
   { re: /\blots of\b/i, why: '「たくさんの」と読まれる。「◯ tenths」「◯ groups of」にする' },
   { re: /\bof a number\b/i, why: '何を指すか曖昧。具体的に書く' }
 ];
-const US_SPELLING = [
-  { re: /\bmeters?\b/i, use: 'metres' },
-  { re: /\bliters?\b/i, use: 'litres' },
-  { re: /\bkilometers?\b/i, use: 'kilometres' },
-  { re: /\bcentimeters?\b/i, use: 'centimetres' },
-  { re: /\bmilliliters?\b/i, use: 'millilitres' },
-  { re: /\bcolors?\b/i, use: 'colour' },
-  { re: /\bcandies|\bcandy\b/i, use: 'sweets' }
+const BR_SPELLING = [
+  { re: /\bmetres?\b/i, use: 'meters' },
+  { re: /\blitres?\b/i, use: 'liters' },
+  { re: /\bkilometres?\b/i, use: 'kilometers' },
+  { re: /\bcentimetres?\b/i, use: 'centimeters' },
+  { re: /\bmillimetres?\b/i, use: 'millimeters' },
+  { re: /\bmillilitres?\b/i, use: 'milliliters' },
+  { re: /\bcolours?\b/i, use: 'color' },
+  { re: /\bsweets\b/i, use: 'candy / candies' },
+  { re: /\bpetrol\b/i, use: 'gas' },
+  { re: /\btrapezium\b/i, use: 'trapezoid' },
+  { re: /\bmaths\b/i, use: 'math' }
 ];
 
 const FIGURE_REQUIRED = ['平面図形', '円', '立体図形', '座標'];
@@ -392,7 +396,7 @@ export function audit(list) {
 
     // 英語の言い回し
     for (const b of BAD_WORDING) if (b.re.test(p.question)) fail(p, `読み違えられる言い回し: ${b.why}`);
-    for (const u of US_SPELLING) if (u.re.test(p.question)) fail(p, `つづりが英式でない（${u.use} に）`);
+    for (const u of BR_SPELLING) if (u.re.test(p.question)) fail(p, `つづりが米式でない（${u.use} に）`);
 
     // 検算
     const expected = recompute(p.question);

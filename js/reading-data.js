@@ -1392,10 +1392,10 @@ const READING_DATA = [
     topic: '理科',
     words: 260,
     passage:
-      'The octopus has no shell, no sharp teeth for fighting, and a soft body that many sea animals would be happy to eat. Yet octopuses have survived in the oceans for millions of years. Their secret is one of the most surprising skills in the animal world: they can change the colour and even the texture of their skin in less than a second.\n' +
-      'The skin of an octopus contains thousands of tiny bags of colour. Each bag is surrounded by small muscles. When the muscles pull, the bag opens wide and its colour shows; when they relax, the colour almost disappears. By controlling millions of these muscles at once, the octopus can produce spots, stripes, or waves of colour that move across its body. Under the colour bags, other special cells reflect light, which helps the animal match the blue and green of the sea.\n' +
-      'Colour is only half of the trick. An octopus can also raise small bumps on its skin to copy the rough surface of a rock or a piece of coral. Sitting still on the sea floor, a hiding octopus is almost impossible to see, even from very close.\n' +
-      'Strangely, scientists believe that octopuses cannot see colours with their eyes. How can an animal copy colours it cannot see? Some researchers think the skin itself can sense light, working like millions of very simple eyes. The idea has not been fully proved, but tests have shown that skin taken from an octopus reacts to light even when it is no longer connected to the brain.',
+      'The octopus has no shell, no sharp teeth for fighting, and a soft body that many sea animals would be happy to eat. Yet octopuses have survived in the oceans for millions of years. Their secret is one of the most surprising skills in the animal world: they can change the color and even the texture of their skin in less than a second.\n' +
+      'The skin of an octopus contains thousands of tiny bags of color. Each bag is surrounded by small muscles. When the muscles pull, the bag opens wide and its color shows; when they relax, the color almost disappears. By controlling millions of these muscles at once, the octopus can produce spots, stripes, or waves of color that move across its body. Under the color bags, other special cells reflect light, which helps the animal match the blue and green of the sea.\n' +
+      'Color is only half of the trick. An octopus can also raise small bumps on its skin to copy the rough surface of a rock or a piece of coral. Sitting still on the sea floor, a hiding octopus is almost impossible to see, even from very close.\n' +
+      'Strangely, scientists believe that octopuses cannot see colors with their eyes. How can an animal copy colors it cannot see? Some researchers think the skin itself can sense light, working like millions of very simple eyes. The idea has not been fully proved, but tests have shown that skin taken from an octopus reacts to light even when it is no longer connected to the brain.',
     glossary: [
       { w: 'texture', m: '手ざわり、表面の質感' },
       { w: 'muscle', m: '筋肉' },
@@ -1414,15 +1414,15 @@ const READING_DATA = [
         explanation: '第1段落の最後で「皮膚の色と質感を1秒以内に変えられる」と主題を示し、以降の段落でその仕組みを説明しています。'
       },
       {
-        q: 'What happens when the small muscles pull the bag of colour?',
+        q: 'What happens when the small muscles pull the bag of color?',
         choices: [
           'The bag moves to another part of the body.',
-          'The colour almost disappears.',
-          'The bag opens and its colour shows.',
+          'The color almost disappears.',
+          'The bag opens and its color shows.',
           'The skin becomes rough like a rock.'
         ],
         answer: 2,
-        explanation: '第2段落に「When the muscles pull, the bag opens wide and its colour shows」とあります。色が消えるのは筋肉がゆるんだときです。'
+        explanation: '第2段落に「When the muscles pull, the bag opens wide and its color shows」とあります。色が消えるのは筋肉がゆるんだときです。'
       },
       {
         q: 'In the third paragraph, "the trick" refers to the octopus\'s ability to',
@@ -1433,21 +1433,21 @@ const READING_DATA = [
           'find food on the sea floor'
         ],
         answer: 1,
-        explanation: '「Colour is only half of the trick」の trick は、身を隠す技のこと。色に加えて皮膚の凹凸でも岩やサンゴに似せる、と続きます。'
+        explanation: '「Color is only half of the trick」の trick は、身を隠す技のこと。色に加えて皮膚の凹凸でも岩やサンゴに似せる、と続きます。'
       },
       {
         q: 'In the second paragraph, the word "they" in "when they relax" refers to',
-        choices: ['the colours', 'the bags', 'the octopuses', 'the muscles'],
+        choices: ['the colors', 'the bags', 'the octopuses', 'the muscles'],
         answer: 3,
         explanation: '「When the muscles pull ... when they relax」と対になっているので、they は the muscles を指します。'
       },
       {
         q: 'What evidence supports the idea that octopus skin can sense light?',
         choices: [
-          'Octopuses always change colour at night.',
+          'Octopuses always change color at night.',
           'Octopus eyes are larger than human eyes.',
           'Skin removed from an octopus still reacts to light.',
-          'Octopuses cannot copy the colour of coral.'
+          'Octopuses cannot copy the color of coral.'
         ],
         answer: 2,
         explanation: '最終段落に「skin taken from an octopus reacts to light even when it is no longer connected to the brain」とあります。脳とつながっていなくても反応することが根拠です。'
@@ -1464,7 +1464,7 @@ const READING_DATA = [
     passage:
       'For the past month, fifteen students from our school have been attending Westbrook College, our sister school near Melbourne, Australia. The exchange, now in its third year, gives Grade 8 and 9 students the chance to live with an Australian host family and attend regular classes taught entirely in English.\n' +
       'The days at Westbrook were long, but few students complained. Classes ran from 8:40 to 3:20, followed by sport or music, and in the evenings there was homework in English as well — more than one student fell asleep at the kitchen table during the first week. At first, several students found it difficult to follow discussions in class. "For the first week I understood about half of what my teachers said," admits Natcha, a Grade 8 student. "I was too shy to ask anyone to repeat things. My host sister taught me to say, could you say that again, more slowly? After that, everything changed."\n' +
-      'Ms. Suda, the teacher who accompanied the group, believes that living with a family, rather than in a hotel, is what makes the programme work. "In a hotel, our students would speak Thai to each other every evening," she explains. "In a host family, they must use English from breakfast to bedtime. Real progress happens at the dinner table, not in the classroom."\n' +
+      'Ms. Suda, the teacher who accompanied the group, believes that living with a family, rather than in a hotel, is what makes the program work. "In a hotel, our students would speak Thai to each other every evening," she explains. "In a host family, they must use English from breakfast to bedtime. Real progress happens at the dinner table, not in the classroom."\n' +
       'The Australian families seem to have gained something as well. Several hosts attended the farewell assembly, where they said goodbye in the Thai phrases they had learned from their guests, and some are already planning holidays in Thailand next year. The two schools will now begin preparing the return visit, when Westbrook students will spend a month in Bangkok. Application forms for next year\'s exchange will be available from the school office in January, and, if this year is any guide, they will disappear quickly.',
     glossary: [
       { w: 'exchange', m: '交換留学' },
@@ -1476,7 +1476,7 @@ const READING_DATA = [
         q: 'What is this article mainly about?',
         choices: [
           'The history of a school in Melbourne.',
-          'A one-month student exchange programme in Australia.',
+          'A one-month student exchange program in Australia.',
           'How to apply for a host family.',
           'The differences between Thai and Australian classes.'
         ],
@@ -1514,7 +1514,7 @@ const READING_DATA = [
       {
         q: 'The writer says the application forms "will disappear quickly." This suggests that',
         choices: [
-          'the exchange programme is very popular',
+          'the exchange program is very popular',
           'the school prints very few forms',
           'the office often loses documents',
           'the deadline is earlier than last year'
@@ -2865,7 +2865,7 @@ const READING_DATA = [
         choices: [
           'She doesn\'t wear nice shirts.',
           'She is older than the boy\'s teacher.',
-          'She enjoys eating candy and sweets,',
+          'She enjoys eating candy and sweet snacks.',
           'She is concerned about the boy\'s health.'
         ],
         answer: 3,
@@ -3464,7 +3464,7 @@ const READING_DATA = [
       {
         q: 'What is suggested about Ms. DeBow?',
         choices: [
-          'She always wins this award:',
+          'She always wins this award.',
           'She is a very good teacher.',
           'She has lived in Mesopotamia.',
           'She used to work at another school.'
@@ -6734,7 +6734,7 @@ const READING_DATA = [
         q: 'What does the author imply about the students using cheat sheets?',
         choices: [
           'They are not prepared enough for their exams.',
-          'They should have to leave school after the exams:',
+          'They should have to leave school after the exams.',
           'They are shamelessly hurting the school\'s reputation.',
           'They spent their time and effort doing the wrong thing.'
         ],
@@ -7352,7 +7352,7 @@ const READING_DATA = [
     words: 237,
     passage:
       'Studies about social groups are a very interesting aspect of psychology because they show how differently people act when they are influenced by the thoughts and emotions of others. Studies have found that different people respond differently to group situations. When placed in a group, some people tend to dominate; they are natural leaders. However, the majority of people take a passive role.' + '\n' +
-      'When in a group, most people rarely work as hard as they do alone. This phenomenon is known as "social loafing." There are several explanations for why it occurs, but mainly it\'s because the responsibility and the reward are divided in more ways. People are more willing to let others do the work for them and rely on other people. When people are alone, they have to take care of themselves. This gives them incentive to work harder. Also, when people are in groups they tend to adopt the opinions of the people that they are with. Time and again studies have shown that people forget themselves and act on the will of the group rather than sticking to their own principles. This is called the "conformity pressure," and very few people can honestly say that they do not fall prey to this. If someone is in a group of people who love the theatre, they will not tell them how much they hate it for fear of being left out of the group.',
+      'When in a group, most people rarely work as hard as they do alone. This phenomenon is known as "social loafing." There are several explanations for why it occurs, but mainly it\'s because the responsibility and the reward are divided in more ways. People are more willing to let others do the work for them and rely on other people. When people are alone, they have to take care of themselves. This gives them incentive to work harder. Also, when people are in groups they tend to adopt the opinions of the people that they are with. Time and again studies have shown that people forget themselves and act on the will of the group rather than sticking to their own principles. This is called the "conformity pressure," and very few people can honestly say that they do not fall prey to this. If someone is in a group of people who love the theater, they will not tell them how much they hate it for fear of being left out of the group.',
     glossary: [
       { w: 'dominate', m: '支配する' },
       { w: 'social loafing', m: '社会的手抜き' },
@@ -7371,7 +7371,7 @@ const READING_DATA = [
         explanation: '「責任と報酬がより多くに分割される」は、直前の social loafing（集団だと手を抜く現象）が起こる主な理由として挙げられている。原因の説明。'
       },
       {
-        q: 'Why is someone in a group that loves the theatre mentioned in the passage?',
+        q: 'Why is someone in a group that loves the theater mentioned in the passage?',
         choices: [
           'To indicate people stick to their principles',
           'To describe the result of conformity pressure',

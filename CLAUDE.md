@@ -48,7 +48,7 @@ index.html
 
 | ファイル | 中身 | 件数 |
 | --- | --- | --- |
-| `js/data.js` | 単語 | 2,920 |
+| `js/data.js` | 単語 | 2,919 |
 | `js/math-data.js` | 算数 | 884 |
 | `js/reading-data.js` | 長文読解 | 134 本 / 523 問 |
 
@@ -138,9 +138,10 @@ tools/audit-math.mjs        点検
 - **英語でつまずかせない。** 解くのは日本語話者の子。英語圏の教室では通じても
   別の意味に読まれる言い回しは使わない（`lots of` は「たくさんの」と読まれた）。
   点検の `BAD_WORDING` に貯めてある
-- **つづりは英式で統一**（metres / litres / colour / sweets）。どちらが正しいかではなく
-  **そろっていること**が大事。教材と長文が英式寄りなのでそれに合わせている。
-  点検の `US_SPELLING` が米式を弾く
+- **つづりは米式で統一**（meters / liters / color / candy / theater）。
+  **受けるのがアメリカ式の学校（EIS）だから。**英式（metres / litres / colour）は使わない。
+  算数は `audit-math.mjs` の `BR_SPELLING`、単語・長文は `audit-vocab.mjs` が弾く。
+  ただし固有名詞は別（`Defence of Fort McHenry` は史実の詩の題名なのでそのまま）
 
 ### 図
 

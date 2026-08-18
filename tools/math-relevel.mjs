@@ -192,16 +192,15 @@ export const CATEGORY_ORDER = [
 /**
  * 手作り問題の英語のつづりをそろえる表。
  *
- * 生成ぶんは英式（metres / litres / colour）で統一しているのに、
- * 手作りの4問だけ米式（meters / liters / candy）が混ざっていた。
- * 同じアプリの中で単位のつづりが揺れると、読む側は別のものかと迷う。
+ * **受けるのはアメリカ式の学校（EIS）なので、つづりは米式に統一する。**
+ * meters / liters / color / candy。metres・litres・colour は使わない。
  *
- * どちらが正しいという話ではなく、**そろっていること**が大事。
- * 教材（TOEFL Junior）と長文が英式寄りなので英式に寄せる。
+ * 同じアプリの中で単位のつづりが揺れると、読む側は別のものかと迷う。
+ * 点検（audit-math.mjs の BR_SPELLING）が英式を弾く。
  */
 export const SPELLING = {
-  m31: 'A map scale is 1:50000. A distance of 3 cm on the map is how many kilometres in real life?',
-  m40: 'Five friends share 2 kg of sweets equally. How many grams does each get?',
-  m41: 'A tank holds 45 litres. It is 2/3 full. How many litres are in it?',
-  m98: 'A car uses 8 litres of fuel for 100 km. How many litres does it use for 250 km?'
+  m31: 'A map scale is 1:50000. A distance of 3 cm on the map is how many kilometers in real life?',
+  m40: 'Five friends share 2 kg of candy equally. How many grams does each get?',
+  m41: 'A tank holds 45 liters. It is 2/3 full. How many liters are in it?',
+  m98: 'A car uses 8 liters of fuel for 100 km. How many liters does it use for 250 km?'
 };

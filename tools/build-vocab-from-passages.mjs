@@ -15,7 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MEANINGS, DROP, REWRITE, POS, EXAMPLES } from './passage-vocab-overrides.mjs';
+import { MEANINGS, DROP, REWRITE, POS, EXAMPLES, SPELLING_FIX } from './passage-vocab-overrides.mjs';
 import { KEY_MEANINGS, RELATIONS, UNITS, WORD_LIST } from './toefl-junior-wordlist.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -178,6 +178,7 @@ export function collect() {
         let head = candidates(raw).find((c) => dict.has(c));
         if (!head) continue;
         head = REWRITE[head] || head;          // -ing 形などを原形へ寄せる
+        head = SPELLING_FIX[head] || head;     // 英式のつづりは米式へ（アメリカ式の学校を受けるため）
         if (FUNCTION_WORDS.has(head)) continue;
         if (DROP.has(head)) continue;          // 間投詞や略語の断片は収録しない
 

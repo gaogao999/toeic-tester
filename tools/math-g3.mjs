@@ -86,7 +86,7 @@ export function division(seed, n) {
     } else {
       const rem = int(r, 1, b - 1);
       out.push(problem({
-        question: `${b * q + rem} sweets are shared equally among ${b} children. How many does each child get?`,
+        question: `${b * q + rem} candies are shared equally among ${b} children. How many does each child get?`,
         answer: q, unit: '個',
         explanation: `${b * q + rem} ÷ ${b} = ${q} あまり ${rem}。1人分は ${q} 個で、${rem} 個あまる。`,
         grade: G, category: 'わり算'
@@ -219,11 +219,11 @@ export function decimals(seed, n) {
 export function measurement(seed, n) {
   const r = rng(seed);
   const table = [
-    { q: (v) => `How many millimetres are in ${v} centimetres?`, f: (v) => v * 10, a: [3, 6, 8, 12, 14], u: 'mm', e: (v) => `1 cm は 10 mm。${v} × 10 = ${v * 10} mm。` },
-    { q: (v) => `How many metres are in ${v} kilometres?`, f: (v) => v * 1000, a: [2, 3, 4, 7], u: 'm', e: (v) => `1 km は 1000 m。${v} × 1000 = ${v * 1000} m。` },
+    { q: (v) => `How many millimeters are in ${v} centimeters?`, f: (v) => v * 10, a: [3, 6, 8, 12, 14], u: 'mm', e: (v) => `1 cm は 10 mm。${v} × 10 = ${v * 10} mm。` },
+    { q: (v) => `How many meters are in ${v} kilometers?`, f: (v) => v * 1000, a: [2, 3, 4, 7], u: 'm', e: (v) => `1 km は 1000 m。${v} × 1000 = ${v * 1000} m。` },
     { q: (v) => `How many grams are in ${v} kilograms?`, f: (v) => v * 1000, a: [2, 3, 5, 8], u: 'g', e: (v) => `1 kg は 1000 g。${v} × 1000 = ${v * 1000} g。` },
     { q: (v) => `How many seconds are in ${v} minutes?`, f: (v) => v * 60, a: [2, 4, 6, 9], u: '秒', e: (v) => `1 分は 60 秒。${v} × 60 = ${v * 60} 秒。` },
-    { q: (v) => `How many centimetres are in ${v} metres?`, f: (v) => v * 100, a: [3, 5, 6, 9], u: 'cm', e: (v) => `1 m は 100 cm。${v} × 100 = ${v * 100} cm。` }
+    { q: (v) => `How many centimeters are in ${v} meters?`, f: (v) => v * 100, a: [3, 5, 6, 9], u: 'cm', e: (v) => `1 m は 100 cm。${v} × 100 = ${v * 100} cm。` }
   ];
   const out = [];
   for (let i = 0; i < n; i++) {
@@ -364,7 +364,7 @@ export function barCharts(seed, n) {
     { labels: ['Mina', 'Tom', 'Anna', 'Ken'], what: 'books each child read', unit: '冊', yLabel: '冊' },
     { labels: ['Mon', 'Tue', 'Wed', 'Thu'], what: 'glasses of water drunk each day', unit: '杯', yLabel: '杯' },
     { labels: ['Cats', 'Dogs', 'Birds', 'Fish'], what: 'pets kept by the class', unit: 'ひき', yLabel: 'ひき' },
-    { labels: ['Red', 'Blue', 'Green', 'Yellow'], what: 'children who chose each colour', unit: '人', yLabel: '人' }
+    { labels: ['Red', 'Blue', 'Green', 'Yellow'], what: 'children who chose each color', unit: '人', yLabel: '人' }
   ];
   const out = [];
   for (let i = 0; i < n; i++) {

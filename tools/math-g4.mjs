@@ -181,11 +181,11 @@ export function decimals(seed, n) {
 export function measurement(seed, n) {
   const r = rng(seed);
   const table = [
-    { q: (v) => `How many centimetres are in ${v} metres?`, f: (v) => v * 100, a: [2, 3, 4, 5, 7, 8], u: 'cm', e: (v) => `1 m = 100 cm なので ${v} × 100 = ${v * 100} cm。` },
+    { q: (v) => `How many centimeters are in ${v} meters?`, f: (v) => v * 100, a: [2, 3, 4, 5, 7, 8], u: 'cm', e: (v) => `1 m = 100 cm なので ${v} × 100 = ${v * 100} cm。` },
     { q: (v) => `How many grams are in ${v} kilograms?`, f: (v) => v * 1000, a: [2, 3, 4, 6, 9], u: 'g', e: (v) => `1 kg = 1000 g なので ${v} × 1000 = ${v * 1000} g。` },
-    { q: (v) => `How many millilitres are in ${v} litres?`, f: (v) => v * 1000, a: [2, 3, 5, 6, 8], u: 'mL', e: (v) => `1 L = 1000 mL なので ${v} × 1000 = ${v * 1000} mL。` },
+    { q: (v) => `How many milliliters are in ${v} liters?`, f: (v) => v * 1000, a: [2, 3, 5, 6, 8], u: 'mL', e: (v) => `1 L = 1000 mL なので ${v} × 1000 = ${v * 1000} mL。` },
     { q: (v) => `How many minutes are in ${v} hours?`, f: (v) => v * 60, a: [2, 3, 4, 5, 6, 7], u: '分', e: (v) => `1 時間 = 60 分なので ${v} × 60 = ${v * 60} 分。` },
-    { q: (v) => `How many millimetres are in ${v} centimetres?`, f: (v) => v * 10, a: [4, 7, 9, 12, 15], u: 'mm', e: (v) => `1 cm = 10 mm なので ${v} × 10 = ${v * 10} mm。` }
+    { q: (v) => `How many millimeters are in ${v} centimeters?`, f: (v) => v * 10, a: [4, 7, 9, 12, 15], u: 'mm', e: (v) => `1 cm = 10 mm なので ${v} × 10 = ${v * 10} mm。` }
   ];
   const out = [];
   for (let i = 0; i < n; i++) {

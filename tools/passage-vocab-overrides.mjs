@@ -230,7 +230,23 @@ export const POS = {
  * bite は "for a little bit"（名詞の bit）を bite の過去形と取り違えていた。
  */
 export const EXAMPLES = {
-  bite: 'The dog does not bite, but he barks at strangers.'
+  bite: 'The dog does not bite, but he barks at strangers.',
+  // 教材の例文は「eat sweets（お菓子）」で、意味の「甘い」と品詞が合っていなかった。
+  // アメリカ式のつづりに直したついでに、形容詞の例文に差し替える
+  sweet: 'The mango was so sweet that I ate two more slices.'
+};
+
+/** 見出し語のつづりを米式に寄せる（受けるのがアメリカ式の学校なので） */
+export const SPELLING_FIX = {
+  theatre: 'theater',
+  colour: 'color',
+  favourite: 'favorite',
+  realise: 'realize',
+  organise: 'organize',
+  behaviour: 'behavior',
+  neighbour: 'neighbor',
+  programme: 'program',
+  practise: 'practice'
 };
 
 /** 語形を原形に寄せる（-ing 形が見出し語になってしまうもの） */

@@ -139,6 +139,35 @@ check('warn', '品詞と意味の形が合わない（動詞なのに名詞の�
   WORD_DATA.filter((w) => w.pos === 'v.' && /(こと|もの|人|者|物|性|力|化)$/.test(w.meaning.split('、')[0])),
   '');
 
+/**
+ * 同じ語が2回入っていないか。
+ * `theater` と `theatre` が別々の見出し語として入っていた（同じ語の英式・米式）。
+ * 子は「別の単語」として2回覚えることになる。
+ */
+const byWord = new Map();
+WORD_DATA.forEach((w) => {
+  const k = w.word.toLowerCase();
+  if (!byWord.has(k)) byWord.set(k, []);
+  byWord.get(k).push(w);
+});
+check('error', '同じ見出し語が2回ある',
+  [...byWord.values()].filter((v) => v.length > 1).map((v) => v[0]),
+  'どちらか1つに絞る');
+
+/**
+ * 英式のつづり。**受けるのはアメリカ式の学校（EIS）なので米式にそろえる。**
+ * 見出し語と例文の両方を見る。
+ * ただし固有名詞（Defence of Fort McHenry は史実の詩の題名）は除く。
+ */
+const BRITISH = /\b(metres?|litres?|centimetres?|kilometres?|millilitres?|colours?|coloured|theatre|sweets|petrol|maths|practise|favourite|realise|organise|behaviour|neighbour|programme|trapezium)\b/i;
+const PROPER_NOUN = /Defence of Fort McHenry/;
+check('error', 'つづりが英式（米式にそろえる）',
+  WORD_DATA.filter((w) => {
+    const t = `${w.word} ${w.example || ''}`;
+    return BRITISH.test(t) && !PROPER_NOUN.test(t);
+  }),
+  'meters / liters / color / theater / candy などに');
+
 // ---- 出力 ----
 console.log(`単語データ ${WORD_DATA.length} 語を点検\n`);
 const lv = {};

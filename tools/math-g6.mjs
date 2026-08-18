@@ -77,7 +77,7 @@ export function ratios(seed, n) {
       const a = int(r, 2, 7), b = int(r, 2, 7);
       const unitSize = int(r, 3, 12);
       out.push(problem({
-        question: `${(a + b) * unitSize} sweets are shared in the ratio ${a}:${b}. How many does the first person get?`,
+        question: `${(a + b) * unitSize} candies are shared in the ratio ${a}:${b}. How many does the first person get?`,
         answer: a * unitSize, unit: '個',
         explanation: `${a} + ${b} = ${a + b} 等分にする。${(a + b) * unitSize} ÷ ${a + b} = ${unitSize}。1人目は ${unitSize} × ${a} = ${a * unitSize} 個。`,
         grade: G, category: '比'
@@ -359,11 +359,11 @@ export function unitRate(seed, n) {
         grade: G, category: '単位量あたり'
       }));
     } else if (kind === 1) {
-      const kmPerL = int(r, 8, 20), litres = int(r, 3, 12);
+      const kmPerL = int(r, 8, 20), liters = int(r, 3, 12);
       out.push(problem({
-        question: `A car runs ${kmPerL} km on 1 litre of petrol. How far can it go on ${litres} litres?`,
-        answer: kmPerL * litres, unit: 'km',
-        explanation: `1 L で ${kmPerL} km なので ${kmPerL} × ${litres} = ${kmPerL * litres} km。`,
+        question: `A car runs ${kmPerL} km on 1 liter of gas. How far can it go on ${liters} liters?`,
+        answer: kmPerL * liters, unit: 'km',
+        explanation: `1 L で ${kmPerL} km なので ${kmPerL} × ${liters} = ${kmPerL * liters} km。`,
         grade: G, category: '単位量あたり'
       }));
     } else {
