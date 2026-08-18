@@ -183,11 +183,14 @@ export function decimals(seed, n) {
   for (let i = 0; i < n; i++) {
     const kind = i % 3;
     if (kind === 0) {
+      // 「lots of」は英語圏の教室では「〜つ分」の意味で通じるが、
+      // 日本語話者の子には「たくさんの」としか読めない。算数でなく英語でつまずく。
+      // tenths（10分の1）は入試でも出る言い方なので、こちらで覚えてもらう
       const k = int(r, 2, 9);
       out.push(problem({
-        question: `What number is ${k} lots of 0.1?`,
+        question: `Write ${k} tenths as a decimal.`,
         answer: Math.round(k * 0.1 * 10) / 10,
-        explanation: `0.1 が ${k} つ分で ${Math.round(k * 0.1 * 10) / 10}。0.1 が10こ集まると 1 になる。`,
+        explanation: `tenths は「10分の1」のこと。0.1 が ${k} つ分で ${Math.round(k * 0.1 * 10) / 10}。0.1 が10こ集まると 1 になる。`,
         grade: G, category: '小数'
       }));
     } else if (kind === 1) {

@@ -188,3 +188,20 @@ export const CATEGORY_ORDER = [
   // 図形とデータ
   '平面図形', '円', '立体図形', 'データの活用'
 ];
+
+/**
+ * 手作り問題の英語のつづりをそろえる表。
+ *
+ * 生成ぶんは英式（metres / litres / colour）で統一しているのに、
+ * 手作りの4問だけ米式（meters / liters / candy）が混ざっていた。
+ * 同じアプリの中で単位のつづりが揺れると、読む側は別のものかと迷う。
+ *
+ * どちらが正しいという話ではなく、**そろっていること**が大事。
+ * 教材（TOEFL Junior）と長文が英式寄りなので英式に寄せる。
+ */
+export const SPELLING = {
+  m31: 'A map scale is 1:50000. A distance of 3 cm on the map is how many kilometres in real life?',
+  m40: 'Five friends share 2 kg of sweets equally. How many grams does each get?',
+  m41: 'A tank holds 45 litres. It is 2/3 full. How many litres are in it?',
+  m98: 'A car uses 8 litres of fuel for 100 km. How many litres does it use for 250 km?'
+};

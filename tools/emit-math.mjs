@@ -9,7 +9,7 @@
  *   node tools/emit-math.mjs
  */
 import { readFileSync, writeFileSync } from 'node:fs';
-import { RELEVEL, FIXES, FIGURES, CATEGORY_ORDER } from './math-relevel.mjs';
+import { RELEVEL, FIXES, FIGURES, CATEGORY_ORDER, SPELLING } from './math-relevel.mjs';
 
 const url = (p) => new URL(p, import.meta.url);
 
@@ -26,11 +26,12 @@ if (existing.length !== Object.keys(RELEVEL).length) throw new Error('手作り�
 const kept = existing.map((p) => {
   const [level, category] = RELEVEL[p.id];
   const fixed = { ...p, ...(FIXES[p.id] || {}), level, category };
+  if (SPELLING[p.id]) fixed.question = SPELLING[p.id];
   if (FIGURES[p.id]) fixed.figure = FIGURES[p.id];
   return fixed;
 });
 
-const stale = [...Object.keys(FIXES), ...Object.keys(FIGURES)].filter((id) => !RELEVEL[id]);
+const stale = [...Object.keys(FIXES), ...Object.keys(FIGURES), ...Object.keys(SPELLING)].filter((id) => !RELEVEL[id]);
 if (stale.length) throw new Error(`存在しない ID の手直し・図がある: ${stale.join(', ')}`);
 
 const mods = await Promise.all([

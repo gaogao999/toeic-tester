@@ -67,6 +67,9 @@ function recompute(q) {
   m = q.match(/What is (\d+)\/(\d+) of (\d+)\?/);
   if (m) return (+m[3] / +m[2]) * +m[1];
 
+  m = q.match(/Write (\d+) tenths as a decimal/);
+  if (m) return +m[1] / 10;
+
   m = q.match(/Write ([\d.]+) as a fraction with denominator 100/);
   if (m) return Math.round(+m[1] * 100);
 
@@ -301,6 +304,29 @@ function evalExpr(src) {
  * ここに書き出しておく（黙って抜けているのか、決めて外したのかを区別するため）。
  */
 // 図が**必ず要る**分野。図が無ければ落とす
+/**
+ * 英語の言い回しの点検。
+ *
+ * 解くのは日本語話者の子で、**算数でなく英語でつまずかせないこと**が大事。
+ * ここに挙げるのは「英語圏の教室では通じるが、日本の子には別の意味に読める」言い回し。
+ *
+ * つづりの英式・米式は、どちらが正しいという話ではなく **そろっていること**が大事。
+ * 教材（TOEFL Junior）と長文が英式寄りなので英式に統一している。
+ */
+const BAD_WORDING = [
+  { re: /\blots of\b/i, why: '「たくさんの」と読まれる。「◯ tenths」「◯ groups of」にする' },
+  { re: /\bof a number\b/i, why: '何を指すか曖昧。具体的に書く' }
+];
+const US_SPELLING = [
+  { re: /\bmeters?\b/i, use: 'metres' },
+  { re: /\bliters?\b/i, use: 'litres' },
+  { re: /\bkilometers?\b/i, use: 'kilometres' },
+  { re: /\bcentimeters?\b/i, use: 'centimetres' },
+  { re: /\bmilliliters?\b/i, use: 'millilitres' },
+  { re: /\bcolors?\b/i, use: 'colour' },
+  { re: /\bcandies|\bcandy\b/i, use: 'sweets' }
+];
+
 const FIGURE_REQUIRED = ['平面図形', '円', '立体図形', '座標'];
 // 図が**あってもよい**分野。ぼうグラフは「データの活用」だが図がないと読めない
 const FIGURE_ALLOWED = [...FIGURE_REQUIRED, 'データの活用'];
@@ -364,6 +390,10 @@ export function audit(list) {
     // グラフを見せずに「グラフによると」と聞く問題は解きようがない
     if (/bar chart|graph shows/i.test(p.question) && !p.figure) fail(p, 'グラフの問題なのに図が無い');
 
+    // 英語の言い回し
+    for (const b of BAD_WORDING) if (b.re.test(p.question)) fail(p, `読み違えられる言い回し: ${b.why}`);
+    for (const u of US_SPELLING) if (u.re.test(p.question)) fail(p, `つづりが英式でない（${u.use} に）`);
+
     // 検算
     const expected = recompute(p.question);
     if (expected === null) continue;
@@ -373,7 +403,8 @@ export function audit(list) {
     if (!near(expected, numeric)) fail(p, `答えが合わない（検算 ${expected} / データ ${p.answer}）`);
   }
 
-  return { checked, figured, total: list.length };
+  // errors/warns も返す。検査そのものが効いているかを外から確かめられるように
+  return { checked, figured, total: list.length, errors: [...errors], warns: [...warns] };
 }
 
 function report(list, label) {
