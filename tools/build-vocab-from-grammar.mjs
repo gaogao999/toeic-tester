@@ -1,19 +1,30 @@
 /**
- * 文法教材の設問文から、まだ単語データに無い語を拾う。
+ * 文法教材から、まだ単語データに無い語を拾う。
  *
  *   node tools/build-vocab-from-grammar.mjs          … 一覧を出すだけ
  *   node tools/build-vocab-from-grammar.mjs --emit   … js/data.js に**追記**する
  *
- * 元にするのは js/grammar-data.js の question と choices。
- * **OCR そのままの本文は使わない。**教材のページは OCR の傷が多く、そこから語を拾うと
- * つづりの壊れた語が混ざる（`7ih` `l'm` のたぐい）。設問文と選択肢は取り込みのときに
- * 1問ずつ人が読んで書き写したものなので、つづりが確かめてある。
+ * 元にするのは次の2つ。
  *
- * 選択肢は捨てずに使う。**教材が誤答としてわざわざ並べた語**（stationed / illogical /
- * captivating など）は、その教材が「この語を知っているか」を試している語なので、
- * 覚える価値がいちばん高い。
+ *   ① js/grammar-data.js の question と choices
+ *      取り込みのときに1問ずつ人が読んで書き写したもの。つづりが確かめてある。
+ *      選択肢も使う。**教材が誤答としてわざわざ並べた語**（stationed / illogical /
+ *      captivating など）は「この語を知っているか」を試している語なので、
+ *      覚える価値がいちばん高い。
  *
- * 例文は、設問文の空所に正解を入れて組み立てる。**空所のままでは例文にならない**ので。
+ *   ② 教材の本文にある**完全な英文**（materials/*.txt）
+ *      解説ページの例文（`Look at the huge sculptures.`）と長文の地の文。
+ *      設問文だけでは日常語（wallet / haircut / umbrella）がほとんど拾えないので足した。
+ *
+ * ②で **OCR の傷をどう避けているか**が肝。ページの語をそのまま拾うのではなく、
+ *
+ *   - 大文字で始まり文末の記号で終わる、4〜40語の行だけを「文」とみなす
+ *   - **その文に含まれる語がすべて辞書に当たること**を条件にする。
+ *     1語でも壊れていれば文ごと捨てる（`infor` `mation` のような分断はこれで落ちる）
+ *   - 拾った文をそのまま例文として使う。例文が壊れていないことが保証される
+ *
+ * さらに、教材が**英語について語るために使う語**（verb / gerund / participle …）は
+ * METALANGUAGE で落とす。頻度で並べると上位を独占するが、入試で問われる語ではない。
  *
  * ID は既存の最大値の次から振る。**既存の ID には触らない**（学習記録のキーなので）。
  */
@@ -25,13 +36,22 @@ import {
 // 長文から取り込むときと**同じ手直し表**を使う。同じ語が入り口によって
 // 違う見出し・違う意味で2つ入るのを防ぐため
 import { MEANINGS, DROP, REWRITE, POS, SPELLING_FIX } from './passage-vocab-overrides.mjs';
-import { GRAMMAR_DROP, GRAMMAR_MEANINGS, GRAMMAR_POS, KEEP_AS_IS } from './grammar-vocab-overrides.mjs';
+import {
+  GRAMMAR_DROP, GRAMMAR_MEANINGS, GRAMMAR_POS, KEEP_AS_IS, METALANGUAGE
+} from './grammar-vocab-overrides.mjs';
 
 const WORD_DATA = load('js/data.js', 'WORD_DATA');
 const GRAMMAR_DATA = load('js/grammar-data.js', 'GRAMMAR_DATA');
 
 /** 出どころが分かるようにカテゴリを分ける。既存の分類は話題別だが、これは出典別 */
-const CATEGORY = '文法問題の語';
+const CATEGORY = '文法教材の語';
+
+/** 教材3冊。レベルはその冊子の CEFR に合わせる */
+const BOOKS = [
+  ['materials/grammar-basic-a2.txt', 2],
+  ['materials/grammar-inter-b1.txt', 3],
+  ['materials/grammar-adv-b2.txt', 4]
+];
 
 /** 設問文の空所に正解を入れて、ふつうの英文に戻す */
 const filled = (q) => q.question.replace('___', q.choices[q.answer]);
@@ -55,10 +75,43 @@ const dict = loadDictionary();
 const phonetics = loadPhonetics();
 const known = new Set(WORD_DATA.map((w) => w.word.toLowerCase()));
 
-// 設問1つにつき「空所を埋めた文」と「選択肢すべて」を見る
+/**
+ * 教材の本文から「文らしい行」だけを拾う。
+ *
+ * OCR は版面をそのまま流すので、見出し・ページ番号・選択肢・表がすべて行として混ざる。
+ * **文になっている行だけを通す**ことで、そのほとんどを落とせる。
+ */
+function sentencesOf(text) {
+  const out = [];
+  for (const raw of text.split('\n')) {
+    // 教材は例文を2つ、1行に「 / 」でつないで並べることがある。
+    // 分けずに拾うと、無関係な2文がくっついた例文になる
+    //   「I'm packing my backpack. / She is studying linguistics at Durham University.」
+    for (const part of raw.split(/\s+\/\s+/)) {
+      const l = part.trim();
+      if (!/^["'“]?[A-Z]/.test(l)) continue;      // 大文字で始まる
+      if (!/[.!?]["'”]?$/.test(l)) continue;      // 文末の記号で終わる（見出しはここで落ちる）
+      if (/\([A-D]\)/.test(l)) continue;          // 選択肢の記号を含む行
+      if (/www\.|@|http/.test(l)) continue;       // URL・メールアドレス
+      if (/^\d|\d{3,}/.test(l)) continue;         // ページ番号・年号の羅列
+      // 設問の指示文。英文ではあるが、覚える語の例文としては中身が無い
+      if (/^Questions?\s+\d|refer to the following/i.test(l)) continue;
+      const words = l.match(/[A-Za-z]+/g) || [];
+      if (words.length < 4 || words.length > 40) continue;
+      out.push(l.replace(/\s+/g, ' '));
+    }
+  }
+  return out;
+}
+
+const bookText = new Map(BOOKS.map(([path]) => [path, fs.readFileSync(path, 'utf8')]));
+
+// 設問1つにつき「空所を埋めた文」と「選択肢すべて」、それに教材の本文を見る
 const texts = [];
 for (const q of GRAMMAR_DATA) texts.push(filled(q), ...q.choices);
-const proper = properNouns(texts);
+// 固有名詞の判定は**教材の全文**で行う。設問文だけだと、教材に何度も出てくる
+// 人名（Bartholdi など）が設問文では小文字で現れず、判定を誤ることがある
+const proper = properNouns([...texts, ...bookText.values()]);
 
 /**
  * 語形から見出し語を決める。入らないものは null を返す。
@@ -92,6 +145,7 @@ function gate(word) {
   head = SPELLING_FIX[head] || head;   // 英式のつづりは米式へ（アメリカ式の学校を受けるため）
   if (FUNCTION_WORDS.has(head)) return null;
   if (DROP.has(head) || GRAMMAR_DROP.has(head)) return null;
+  if (METALANGUAGE.has(head)) return null;   // 英語について語るための語は覚える対象ではない
   if (known.has(head)) return null;    // すでに単語データにある語は足さない
   return head;
 }
@@ -108,13 +162,51 @@ for (const q of GRAMMAR_DATA) {
       const head = headwordOf(raw);
       if (!head) continue;
 
-      const cur = found.get(head);
-      if (!cur) found.set(head, { count: 1, level: q.level, example, from: q.id });
-      else {
-        cur.count += 1;
-        // より易しいレベルで出てきたら、そちらを初出とする
-        if (q.level < cur.level) Object.assign(cur, { level: q.level, example, from: q.id });
-      }
+      remember(head, q.level, example, q.id);
+    }
+  }
+}
+
+/** 見つけた語を控える。より易しいレベルで出てきたら、そちらを初出とする */
+function remember(head, level, example, from) {
+  const cur = found.get(head);
+  if (!cur) found.set(head, { count: 1, level, example, from });
+  else {
+    cur.count += 1;
+    if (level < cur.level) Object.assign(cur, { level, example, from });
+  }
+}
+
+// ---- ② 教材の本文の、完全な英文から ----
+let seenSentences = 0;
+let usedSentences = 0;
+for (const [path, level] of BOOKS) {
+  for (const sentence of sentencesOf(bookText.get(path))) {
+    seenSentences += 1;
+    const tokens = sentence.toLowerCase().match(/[a-z]+(?:['’][a-z]+)?/g) || [];
+
+    // **文まるごとの健全性を先に見る。**語が1つでも壊れていれば文ごと捨てる。
+    // OCR は語を分断する（infor / mation）ので、拾った語だけを見ていると気づけない。
+    // 例文としてそのまま出すものなので、文が壊れていないことのほうが大事
+    const broken = tokens.some(
+      (t) =>
+        t.length > 2 &&
+        !t.includes("'") &&
+        !t.includes('’') &&
+        !proper.has(t) &&
+        !FUNCTION_WORDS.has(t) &&
+        !known.has(t) &&
+        !candidates(t).some((c) => dict.has(c))
+    );
+    if (broken) continue;
+    usedSentences += 1;
+
+    for (const raw of tokens) {
+      if (raw.length < 3 || raw.includes("'") || raw.includes('’')) continue;
+      if (FUNCTION_WORDS.has(raw) || proper.has(raw)) continue;
+      const head = headwordOf(raw);
+      if (!head) continue;
+      remember(head, level, sentence, path.replace(/^materials\/|\.txt$/g, ''));
     }
   }
 }
@@ -130,8 +222,16 @@ const entries = [...found.entries()]
   .filter((e) => e.meaning)
   .sort((a, b) => a.level - b.level || b.count - a.count || a.word.localeCompare(b.word));
 
+// **同じ回で原形も入る活用形は落とす。**headwordOf が見ているのは「すでに単語データに
+// ある語」だけなので、steal と stealing、jog と jogging のように、原形も活用形も
+// 今回まとめて入ってくる組は素通りしてしまう
+const batch = new Set(entries.map((e) => e.word));
+const deduped = entries.filter(
+  (e) => KEEP_AS_IS.has(e.word) || !candidates(e.word).some((c) => c !== e.word && batch.has(c))
+);
+
 const nextId = Math.max(...WORD_DATA.map((w) => w.id)) + 1;
-const rows = entries.map((e, i) => ({
+const rows = deduped.map((e, i) => ({
   id: nextId + i,
   word: e.word,
   phonetic: phonetics.get(e.word) || '',
@@ -167,9 +267,11 @@ if (process.argv.includes('--emit')) {
 } else {
   const byLevel = {};
   rows.forEach((r) => (byLevel[r.level] = (byLevel[r.level] || 0) + 1));
-  console.log(`設問 ${GRAMMAR_DATA.length} 問から抽出`);
+  console.log(`設問 ${GRAMMAR_DATA.length} 問と、教材の英文 ${usedSentences} / ${seenSentences} 文から抽出`);
   console.log(`  まだ入っていない語（辞書に当たったもの）: ${found.size}`);
   console.log(`  収録できるもの（意味が引けたもの）: ${rows.length}`);
+  const dropped = entries.filter((e) => !deduped.includes(e)).map((e) => e.word);
+  if (dropped.length) console.log(`  同じ回に原形も入るので落とした活用形: ${dropped.join(' ')}`);
   console.log(`  レベル別: ${JSON.stringify(byLevel)}`);
   console.log(`  発音記号あり: ${rows.filter((r) => r.phonetic).length} / 例文あり: ${rows.filter((r) => r.example).length}`);
   console.log('\n先頭40語:');

@@ -15,6 +15,29 @@
  * 覚える意味としては外れているものが必ず混ざる。
  */
 
+/**
+ * **英語について語るための語**。教材が英語そのものではなく英文法を説明するために使う。
+ * 入試で問われるのは英語であって英文法用語ではないので、単語カードにしない。
+ *
+ * 教材の本文から語を拾うと、`verb`(322回) `noun`(181) `gerund`(82) `participle`(121) が
+ * 頻度の上位を独占する。**回数が多い＝重要語、ではない**ことがはっきり出る例。
+ */
+export const METALANGUAGE = new Set([
+  'verb', 'noun', 'adjective', 'adverb', 'adverbial', 'pronoun', 'preposition',
+  'prepositional', 'conjunction', 'clause', 'phrase', 'infinitive', 'gerund',
+  'participle', 'participial', 'modifier', 'complement', 'tense', 'plural',
+  'singular', 'possessive', 'comparative', 'superlative', 'countable',
+  'uncountable', 'auxiliary', 'modal', 'conditional', 'subordinate',
+  'coordinating', 'antecedent', 'grammatical', 'grammar', 'agreement',
+  'preparatory', 'indefinite', 'definite', 'verbal', 'transitive', 'intransitive',
+  'predicate', 'syntax', 'apostrophe', 'quantifier',
+  // 教材の体裁・奥付
+  'chapter', 'unit', 'section', 'page', 'index', 'edition', 'license',
+  'publishing', 'publication', 'reproduce', 'retrieval', 'transmit',
+  'photocopy', 'diagnostic', 'comprehension', 'proficiency', 'tester',
+  'exposition', 'paraphrase'
+]);
+
 /** -ing / -ed だが、活用形ではなく独立した語として覚えるもの */
 export const KEEP_AS_IS = new Set([
   'wedding', 'meeting', 'building', 'feeling', 'ending', 'saving', 'setting',
@@ -39,7 +62,13 @@ export const GRAMMAR_DROP = new Set([
   // 機能語に近く、単語カードにしても意味がないもの
   'regarding', 'whenever',
   // 話し言葉のくずれ
-  'nother', 'gonna', 'wanna', 'ain'
+  'nother', 'gonna', 'wanna', 'ain',
+  // ここから、本文から拾うようにして出てきたもの
+  'nuts', 'bananas',        // 俗語（「頭がおかしい」）。覚える語ではない
+  'tun',                    // turn の読み違いか、まず使わない語
+  'bowls', 'coaster',       // 複数形／熟語の一部（roller coaster）
+  'master',                 // 教材の題名（Master TOEFL Junior）から紛れ込む
+  'albino', 'beaten', 'admitted', 'whatever', 'anytime'
 ]);
 
 /** 英和辞書の語義が教材の使われ方と合わないもの */
@@ -109,7 +138,63 @@ export const GRAMMAR_MEANINGS = {
   enable: '可能にする',
   popularize: '広める',
   boycott: 'ボイコットする',
-  tempting: '心をそそる'
+  tempting: '心をそそる',
+
+  // ここから、教材の本文から拾うようにして出てきたもの。
+  // **英和辞書は古い語義や専門語義を先頭に置く**ので、いまの使われ方に直す
+  kite: '凧',                       // 辞書は鳥の「トビ」
+  vaccine: 'ワクチン',              // 辞書は「牛痘種、痘苗」
+  racism: '人種差別',               // 辞書は「民族主義」
+  diet: '食事',                     // 辞書は「議会」（日本の国会の語義）
+  community: '地域社会',            // 辞書は「共同会社」
+  generation: '世代',
+  medicine: '薬',
+  gymnast: '体操選手',              // 辞書は「体操教師」
+  lifeguard: '監視員',
+  mall: 'ショッピングモール',       // 辞書は「木陰の散歩道」
+  hamburger: 'ハンバーガー',        // 辞書は「牛のひき肉」
+  fantastic: 'すばらしい',          // 辞書は「異様な」
+  fitness: '体力、健康',
+  confidence: '自信',
+  restroom: 'トイレ',
+  toilet: 'トイレ',
+  bakery: 'パン屋',
+  balloon: '風船',
+  pony: 'ポニー',
+  porch: '玄関',
+  cabinet: '戸棚',
+  elementary: '小学校の、初歩の',
+  password: 'パスワード',
+  address: '住所',
+  glue: 'のり、接着剤',
+  jog: 'ジョギングをする',
+  logging: '伐採',
+  stamp: '切手',
+  scout: '偵察する',
+  chip: 'かけら、チップ',
+  mural: '壁画',
+  lace: 'レース、ひも',
+  sole: '唯一の',
+  link: 'つながり',
+  sight: '光景、視力',
+  boost: '後押しする',
+  cart: '荷車、カート',
+  pace: '速さ、ペース',
+  trash: 'ごみ',
+  rubbish: 'ごみ',
+  yoga: 'ヨガ',
+  subscribe: '定期購読する',
+  tease: 'からかう',
+  optimistic: '楽観的な',
+  enhance: '高める',
+  awake: '目が覚めて',
+  shop: '店',
+  favor: '親切な行い',
+  temple: '寺',
+  tip: '先端、こつ',
+  backpack: 'リュックサック',
+  grill: '焼き網、グリル',
+  board: '板、委員会'
 };
 
 /** 語義の語尾からは当てられない品詞 */
@@ -123,5 +208,11 @@ export const GRAMMAR_POS = {
   worrisome: 'adj.', magnitude: 'n.', ease: 'n.', dumping: 'n.',
   disobey: 'v.', satisfying: 'adj.', mobile: 'adj.', belong: 'v.',
   trustworthy: 'adj.', tempting: 'adj.', perish: 'v.', upstairs: 'adv.',
-  welcome: 'v.', graduate: 'v.', teens: 'n.'
+  welcome: 'v.', graduate: 'v.', teens: 'n.',
+  // ここから、教材の本文から拾うようにして出てきたもの
+  noisily: 'adv.', respectfully: 'adv.', otherwise: 'adv.', outdoors: 'adv.',
+  chair: 'n.', sofa: 'n.', shame: 'n.', backpack: 'n.', mural: 'n.',
+  trash: 'n.', sole: 'adj.', ill: 'adj.', choosy: 'adj.', afford: 'v.',
+  dying: 'adj.', embarrassing: 'adj.', outstanding: 'adj.', nutritious: 'adj.',
+  boost: 'v.', awake: 'adj.', accustomed: 'adj.', diet: 'n.'
 };
