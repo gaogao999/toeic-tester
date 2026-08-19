@@ -291,6 +291,130 @@ export const B1_ITEMS = [
   { k: 'p100-2', s: 'Today, if you ___ an international leader, you will have to speak English.', a: 'A', j: 'if 節の中は未来のことでも現在形。grow up to be 〜 で「成長して〜になる」' },
   { k: 'p100-3', s: 'Speaking English will allow you ___ with many world leaders.', a: 'B', j: 'allow + 人 + to 不定詞' },
   { k: 'p100-4', s: "___ English can benefit people in today's world.", a: 'D', j: '主語の位置に置く to 不定詞。動詞のままでは主語にならない' },
-  { k: 'p100-5', s: '___ is very important.', a: 'C', j: '「聞いてもらい、分かってもらうこと」なので to 不定詞の受け身' }
+  { k: 'p100-5', s: '___ is very important.', a: 'C', j: '「聞いてもらい、分かってもらうこと」なので to 不定詞の受け身' },
+
+  // ===== Chapter 3 / Unit 2 Gerunds =====
+  // p102 ニューヨーク旅行の日記
+  { k: 'p102-1', s: 'It was a great trip and I feel that ___ about it is important.', a: 'B', j: '主語の位置に来るので動名詞。about が続くので受け身にしない' },
+  // OCR が「(B) saw」の左かっこを落としたため機械では拾えなかった。選択肢は紙面から書き写した
+  { k: 'p102-2', o: ['see', 'saw', 'seeing', 'to seeing'], s: 'I loved ___ the Statue of Liberty.', a: 'C', j: 'love は動名詞も取れる。to seeing の形は無い' },
+  { k: 'p102-3', s: 'My favorite thing is ___ a student on a school trip.', a: 'B', j: 'be の後ろで「〜であること」を表すので動名詞' },
+  { k: 'p102-4', s: 'The best thing about ___ was that I got to see New York City.', a: 'C', j: 'about は前置詞なので後ろは動名詞。旅するのは自分なので受け身にしない' },
+  // p104 水族館の遠足についてのメール
+  { k: 'p104-1', s: "I never imagined ___ about a field trip, but I'm really interested in sea animals.", a: 'A', j: 'imagine の後ろは動名詞。わくわくさせられる側なので being excited' },
+  { k: 'p104-2', s: "I have a question about ___ us what we're supposed to bring for the picnic lunch afterwards.", a: 'C', j: '動名詞の意味上の主語は所有格で表す。your telling で「あなたが言ったこと」' },
+  { k: 'p104-3', s: "I'm sorry for ___ in class, but I didn't think of it until now.", a: 'B', j: '動名詞を打ち消す not は前に置く。前置詞 for の後ろなので動名詞' },
+  { k: 'p104-4', s: "I hope you don't mind ___.", a: 'C', j: 'mind の後ろは動名詞。意味上の主語は所有格で my e-mailing' },
+  // p106 携帯電話についての作文
+  { k: 'p106-1', s: 'How often do you like ___ your cell phone at school?', a: 'B', j: 'like は動名詞も取れる。to using の形は無い' },
+  { k: 'p106-2', s: "I enjoy ___ my cell phone just like every other student, but I think they're very distracting.", a: 'C', j: 'enjoy の後ろは動名詞。play on 〜 をひとまとまりで動名詞にする' },
+  { k: 'p106-3', s: 'The teachers have decided ___ a program that will reward the students who never have their cell phones in class.', a: 'C', j: 'decide の後ろは to 不定詞。動名詞は取れない' },
+  { k: 'p106-4', s: 'To the students who already shut off their phones, you should keep ___!', a: 'C', j: 'keep + 動名詞 で「〜し続ける」' },
+  // p108 吹奏楽部のお知らせ
+  { k: 'p108-1', s: 'Although the band is used ___, they have never made it to the state competition.', a: 'C', j: 'be used to の to は前置詞。後ろは動名詞' },
+  { k: 'p108-2', s: 'They have spent a lot of time ___ for the big day.', a: 'C', j: 'spend + 時間 + 動名詞 で「〜して時間を過ごす」' },
+  { k: 'p108-3', s: 'They cannot help ___ that this sort of support will help them win!', a: 'B', j: "can't help + 動名詞 で「〜せずにいられない」" },
+  { k: 'p108-4', s: 'They look forward ___ you there.', a: 'C', j: 'look forward to の to は前置詞。後ろは動名詞' },
+  // p109-110 Unit Test（お泊まり会）
+  { k: 'p109-1', s: 'Megan and Lisa were looking forward ___ a big party.', a: 'C', j: 'look forward to + 動名詞。for とは組にならない' },
+  { k: 'p109-2', s: 'Despite ___ about buying enough candy for the event, they were excited to show the girls how fun a sleepover party could be.', a: 'C', j: 'despite は前置詞なので後ろは動名詞' },
+  { k: 'p109-3', s: 'The twins were ___ the girls to their house.', a: 'A', j: 'わくわくしているのは双子なので excited。後ろは to 不定詞' },
+  { k: 'p109-4', s: 'Lisa started ___ that Megan looked unhappy.', a: 'B', j: 'start は動名詞も取れる。to noticing の形は無い' },
+  { k: 'p110-1', s: 'After they had finished ___ stuff for the party, Megan and Lisa helped their mom bake a birthday cake.', a: 'D', j: 'finish の後ろは動名詞。to 不定詞は取れない' },
+  { k: 'p110-2', s: 'Megan and Lisa both regretted ___ better.', a: 'B', j: 'regret + 動名詞 で「〜したことを悔やむ」。打ち消しの not は前' },
+  { k: 'p110-3', s: "Megan, Lisa, and their friends couldn't remember ___ to a better party!", a: 'B', j: 'remember + 動名詞 で「〜したことを覚えている」。to 不定詞だと「これから〜するのを忘れずに」' },
+  { k: 'p110-4', s: 'The girls spent all night ___ about things and were sad to go home in the morning.', a: 'C', j: 'spend + 時間 + 動名詞' },
+
+  // ===== Chapter 3 / Unit 3 Participles =====
+  // p112 合唱団のオーディション
+  { k: 'p112-1', s: 'The Chamber Chorus is ___ in finding sopranos and altos.', a: 'B', j: '興味を持つ側なので interested。be interested in 〜' },
+  { k: 'p112-2', s: 'There is a lot of room in the chorus for students ___ a spot.', a: 'C', j: 'students を後ろから説明する現在分詞。students は複数なので who wants は合わない' },
+  { k: 'p112-3', s: "Singing with others is an ___ experience, so don't miss this opportunity to try it.", a: 'C', j: 'わくわくさせる側なので exciting。名詞 experience を前から説明する' },
+  { k: 'p112-4', s: "If you've seen the Chamber Chorus ___ on stage, then you'll want to try out.", a: 'B', j: 'see + O + 現在分詞 で「〜しているのを見る」' },
+  // p114 ソフトボール大会の日記
+  { k: 'p114-1', s: "___ May now, we're preparing for the Founder's Softball Tournament.", a: 'B', j: '分詞構文に自前の主語 it を付けた形。It being 〜 で「今は〜なので」' },
+  { k: 'p114-2', s: "___ yesterday, Chloe told me that she's really nervous about the tournament.", a: 'C', j: '接続詞を残した分詞構文。while + 現在分詞' },
+  { k: 'p114-3', s: '___ in the tournament before, I know we have a shot at winning this year!', a: 'D', j: '主節より前のことなので having + 過去分詞' },
+  { k: 'p114-4', s: '___ that Chloe is so good, I don’t think she should be so nervous.', a: 'D', j: 'considering that 〜 で「〜を考えると」。決まった言い方' },
+  // p116 校庭閉鎖のお知らせ
+  { k: 'p116-1', s: '___ the bad condition of the fields, the school decided to re-plant them with new grass.', a: 'C', j: '理由を表す分詞構文。「〜を見て」なので現在分詞' },
+  { k: 'p116-2', s: 'We realize it will be difficult for the sports teams ___ this week, but Jetson School has opened their fields to us.', a: 'B', j: 'teams を後ろから説明する現在分詞。練習するのはチームの側' },
+  { k: 'p116-3', s: "___, it won't be a problem to practice there after school.", a: 'C', j: '主節と主語が違うので、分詞構文に自前の主語を残す' },
+  // p118 期末試験が不安な生徒からのメール
+  { k: 'p118-1', s: '___ the mid-term exam, I am really nervous about the final.', a: 'D', j: '主節より前のことなので having + 過去分詞' },
+  { k: 'p118-2', s: "___ a good test taker, I've always had problems with exams.", a: 'D', j: '「思われたことがない」ので受け身。主節より前なので having been + 過去分詞' },
+  { k: 'p118-3', s: '___, I thought the best idea was to e-mail you.', a: 'B', j: 'frankly speaking で「率直に言うと」。決まった言い方' },
+  { k: 'p118-4', s: 'Not ___ many middle school exams, I think I need some help.', a: 'D', j: '主節より前のことなので having + 過去分詞。打ち消しの not は前' },
+  // p119-120 Unit Test（牛乳と骨の健康）
+  { k: 'p119-1', s: "Many of today's middle school and high school students are not drinking enough milk, ___ adults to wonder about the health of their bones.", a: 'B', j: '結果を表す分詞構文。「その結果〜させている」' },
+  { k: 'p119-2', s: '___ good to have healthy bones, it is important that all teens get enough calcium.', a: 'B', j: '分詞構文に自前の主語 it を残した形' },
+  { k: 'p119-3', s: '___, experts believe that it is incredibly important that they get enough calcium.', a: 'C', j: '主節の主語 experts と違うので、分詞構文に自前の主語 teenagers を残す' },
+  { k: 'p119-4', s: 'It is important that teenagers get enough calcium because their bones are still ___.', a: 'C', j: '骨は「育っている」最中なので現在分詞' },
+  { k: 'p120-1', s: '___ milk as children, many seniors say they are happier now.', a: 'D', j: '子どものころという主節より前のことなので having + 過去分詞' },
+  { k: 'p120-2', s: "___ seniors, experts found that those who didn't drink milk were more likely to suffer from bone disease.", a: 'D', j: '調べたのは主節より前なので having + 過去分詞' },
+  { k: 'p120-3', s: '___ on their health, students will try to get calcium in any way they can.', a: 'C', j: '接続詞を残した分詞構文。「目を向けているなら」なので if + 過去分詞' },
+  { k: 'p120-4', s: '___ to be healthy, these teenagers will be happy later in life.', a: 'B', j: '「決意している」状態なので being + 過去分詞' },
+
+  // ===== Chapter 3 Chapter Test（ポカホンタス）=====
+  { k: 'p121-1', s: 'The real story of Pocahontas needs ___ in all American history classes.', a: 'C', j: '物語は「教えられる」側なので to 不定詞の受け身' },
+  { k: 'p121-2', s: 'The story of Pocahontas has been used in many books and movies, ___ the story from what actually occurred.', a: 'A', j: '結果を表す分詞構文。「その結果、話を変えてしまった」' },
+  { k: 'p121-3', s: 'At that time, it was difficult ___ in their colony.', a: 'D', j: 'difficult は for + 人 + to 不定詞 で「誰にとって」を表す' },
+  { k: 'p122-1', s: 'Pocahontas brought food and goods because the settlement seemed ___ trouble.', a: 'D', j: 'seem to be + 動名詞 で「〜しているように見える」' },
+  { k: 'p122-2', s: 'Besides ___ supplies, Pocahontas is often believed to have had a romantic relationship with Captain John Smith.', a: 'B', j: 'besides は前置詞なので後ろは動名詞' },
+  { k: 'p122-3', s: 'The people ___ movies simply thought this would be a good story.', a: 'B', j: 'people を後ろから説明する現在分詞。作る側なので受け身にしない' },
+  { k: 'p122-4', s: 'They were not ___ with the truth.', a: 'B', j: 'be satisfied with 〜 で「〜に満足する」' },
+  { k: 'p122-5', s: '___ friends with the colonists, Pocahontas was later captured by them.', a: 'D', j: '捕らえられるより前のことなので having + 過去分詞' },
+
+  // ===== Actual Test =====
+  // p126 は Directions の例題で、紙面に答えが刷ってある。設問として使わない
+  // p127 家庭教師の募集
+  { k: 'p127-1', s: 'To get better grades, many 7th graders ___ for tutors.', a: 'B', j: '今そうしている最中なので現在進行形。graders は複数' },
+  { k: 'p127-2', s: 'They want tutors in all subjects and want ___ by 8th grade students.', a: 'C', j: '7年生は「教えてもらう」側なので to 不定詞の受け身' },
+  { k: 'p127-3', s: 'If you are an 8th grade student who is interested in ___ a tutor, then visit Mrs. Devins in Room 22.', a: 'B', j: 'be interested in の in は前置詞なので後ろは動名詞' },
+  { k: 'p127-4', o: ['8th grade tutor', '8th grade tutor every', 'every 8th grade tutor', 'every 8th grade tutors'], s: 'She will find a 7th grade student for ___.', a: 'C', j: 'every の後ろは単数名詞。every 8th grade tutor の語順' },
+  // p128 遠足のもちもの
+  { k: 'p128-1', s: '___ on the school picnic, you will need a few things.', a: 'B', j: '「〜するには」と目的を表す to 不定詞' },
+  { k: 'p128-2', s: 'Remember that you will be sharing ___.', a: 'B', j: '「持ってきたもの」をまとめる名詞節。先行詞なしで使えるのは what' },
+  { k: 'p128-3', s: "It's always best to bring some sunscreen in case the sun is too bright. You don't want to get ___.", a: 'D', j: '日焼け止めの話なので「日に焼ける」。get burned' },
+  { k: 'p128-4', s: 'Also, you might bring a Frisbee or a ball ___ you can play games with your friends.', a: 'C', j: 'so that 〜 で「〜できるように」と目的を表す' },
+  // p129-130 先生への謝罪メール
+  { k: 'p129-1', s: "When you asked me ___, I didn't.", a: 'C', j: 'ask + 人 + to 不定詞' },
+  { k: 'p129-2', s: 'I was ___.', a: 'B', j: 'そのときだけの態度を言うので be being + 形容詞' },
+  { k: 'p130-1', s: 'I am sorry for making ___.', a: 'C', j: 'make it + 形容詞 + for 人 + to 不定詞。it が to 以下の代わりに立つ' },
+  { k: 'p130-2', s: 'I hope you will accept my ___. It is from my heart.', a: 'C', j: '謝る手紙なので apology（おわび）' },
+  // p131-132 橋についての作文
+  { k: 'p131-1', s: 'A bridge is a ___ that is built across an area that is difficult for people to cross.', a: 'C', j: '橋は建造物なので structure。device は道具、masterpiece は傑作' },
+  { k: 'p131-2', s: 'Suspension bridges are ___ of the most beautiful structures in the world.', a: 'A', j: 'one of the + 最上級 + 複数名詞 で「もっとも〜なものの一つ」' },
+  { k: 'p131-3', s: 'They look very ___ from any other bridges.', a: 'B', j: 'look の後ろは形容詞。be different from 〜' },
+  { k: 'p132-1', s: 'These columns support the bridge ___ cables.', a: 'B', j: '「ケーブルを使って」と手段を表す分詞構文' },
+  { k: 'p132-2', s: 'It looks as though the cables ___ beautiful, but they are actually supporting the bridge.', a: 'C', j: 'be meant to be 〜 で「〜であるはずだ」。cables は複数なので are' },
+  { k: 'p132-3', s: 'If ___ a bridge over it, a river must be crossed by a boat.', a: 'A', j: '接続詞を残した分詞構文。打ち消しの not は分詞の前' },
+  // p133-134 フィルムカメラの記事
+  { k: 'p133-1', s: 'Today when a photographer takes a picture, he or she can see what it looks like ___ afterward.', a: 'D', j: 'デジタルなのですぐ見られる。immediately' },
+  { k: 'p133-2', s: 'Before the use of digital cameras, people used ___ that had no photo viewers.', a: 'C', j: '形容詞 + 名詞 の語順。cameras は複数なので a は付けない' },
+  { k: 'p133-3', s: 'Photographers had to guess ___ or not their pictures were good without seeing the photos they took.', a: 'D', j: 'whether or not 〜 で「〜かどうか」' },
+  { k: 'p133-4', s: '___, they had to carefully adjust their cameras to make sure they were getting a good picture.', a: 'A', j: '前の文の「見られなかった」の代わりにしたことなので Instead' },
+  { k: 'p134-1', s: 'They considered the light, the subject, and the background ___ taking a shot.', a: 'B', j: '撮る前に考えるので before' },
+  { k: 'p134-2', s: 'The photographers had to learn ___ these cameras.', a: 'C', j: '疑問詞 + to 不定詞。how to work 〜 で「〜の扱い方」' },
+  { k: 'p134-3', s: 'Some of these older photographs are more beautiful than photographs ___ with new fancy cameras.', a: 'B', j: '写真は「撮られる」側なので過去分詞が後ろから説明する' },
+  { k: 'p134-4', s: 'It is only recently that digital cameras ___ so popular.', a: 'C', j: '最近から今に続いていることなので現在完了' },
+  // p135-136 アメリカの地名の記事
+  { k: 'p135-1', s: 'When the English came they brought their own language and their own names, ___ to make America an English land.', a: 'C', j: '結果を表す分詞構文。language と names の2つなので both' },
+  { k: 'p135-2', s: 'These English settlers and explorers named the places they found depending on ___ the new place reminded them of.', a: 'A', j: 'of の目的語をまとめる名詞節。先行詞なしで使えるのは what' },
+  { k: 'p135-3', s: 'They named new places with thoughts of places they ___ before.', a: 'B', j: '名づけたときより前のことなので過去完了' },
+  { k: 'p136-1', s: 'The places that held native names ___ new names.', a: 'D', j: '地名は「与えられる」側。places は複数なので were given' },
+  { k: 'p136-2', s: '___ spreading the English language was not the only way the English were able to triumph.', a: 'B', j: 'It should be noted that 〜 で「〜という点に注意したい」' },
+  { k: 'p136-3', s: 'It should be noted that spreading the English language ___ not the only way the English were able to triumph.', a: 'B', j: '主語は動名詞なので単数扱い。昔の話なので was' },
+  { k: 'p136-4', s: 'It was not the only way ___ the English were able to triumph.', a: 'B', j: 'the way を後ろから説明する関係詞。ここでは that を使う' },
+  { k: 'p136-5', s: 'They also had good weapons and ___ diseases which killed the natives.', a: 'A', j: '先住民が亡くなったのだから「命にかかわる」病気。deadly' },
+  // p137-138 ピザの歴史
+  { k: 'p137-1', s: 'A pizza is a flat bread covered with tomatoes, cheese, and a variety of ___.', a: 'C', j: 'a variety of の後ろは複数名詞。other toppings で「そのほかの具」' },
+  { k: 'p137-2', s: 'Today, pizza is one of the most popular foods in America, but this ___ the case.', a: 'C', j: 'not always 〜 で「いつも〜とはかぎらない」。not は always の前' },
+  { k: 'p137-3', s: 'People sold it on the street like they ___ do in Italy.', a: 'D', j: 'used to + 原形 で「昔は〜していた」' },
+  { k: 'p137-4', o: ['so', 'far', 'that', 'only'], s: 'A few pizzerias opened in New York City in the early 20th century, but these were ___ popular with Italian immigrants.', a: 'D', j: '「イタリア系移民にだけ人気だった」なので only' },
+  { k: 'p137-5', s: '___ World War II that pizza became truly popular.', a: 'B', j: 'It was not until 〜 that … で「〜になってはじめて…した」' },
+  { k: 'p138-1', s: 'American men that had been ___ in Europe, particularly in Italy, had found out about pizza.', a: 'D', j: 'be stationed で「（軍務で）駐留する」。ヨーロッパにいた理由になる' },
+  { k: 'p138-2', s: 'Pizza, ___ originally made in Italy, is now one of the most important foods in America.', a: 'B', j: 'コンマで補足する関係代名詞は which。pizza は単数なので was' },
+  { k: 'p138-3', s: 'Americans feel lucky ___ eating pizza!', a: 'C', j: '食べ始めたのは feel より前のことなので to have + 過去分詞' }
   // ここまで
 ];
