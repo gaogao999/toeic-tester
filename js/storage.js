@@ -31,6 +31,8 @@ const Storage = (() => {
       mathLevel: 'all',
       mathCategory: 'all',
       mathScope: 'all',
+      // 本番（MAP Growth）が4択なので既定も4択。自由入力のほうが難しいので選べる
+      mathFormat: 'choice',
       mathLength: 10
     }
   };

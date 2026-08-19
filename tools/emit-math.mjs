@@ -68,6 +68,7 @@ const line = (p) =>
   `  { id: '${p.id}', question: '${esc(p.question)}', answer: '${esc(p.answer)}', unit: '${esc(p.unit || '')}', ` +
   `explanation: '${esc(p.explanation)}', level: ${p.level}, category: '${esc(p.category)}'` +
   (p.figure ? `, figure: ${figureLiteral(p.figure)}` : '') +
+  (p.wrong ? `, wrong: [${p.wrong.map((w) => `'${esc(w)}'`).join(', ')}]` : '') +
   ' }';
 
 const byLevel = {};

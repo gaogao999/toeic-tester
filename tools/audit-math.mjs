@@ -339,6 +339,12 @@ const NO_FIGURE_OK = {
   m117: '一般の四角形の話。図を出すと「この四角形の」と読めてしまう'
 };
 
+/** js/math-choices.js を読み込む（4択が作れるかを点検するため） */
+function loadChoices() {
+  const src = readFileSync(new URL('../js/math-choices.js', import.meta.url), 'utf8');
+  return new Function(`${src}; return MathChoices;`)();
+}
+
 /** js/math-figure.js が実際に描ける形の一覧を読み出す */
 function figureKinds() {
   const src = readFileSync(new URL('../js/math-figure.js', import.meta.url), 'utf8');
@@ -351,6 +357,8 @@ export function audit(list) {
   const seenQ = new Map();
   const seenId = new Set();
   const kinds = figureKinds();
+  const MC = loadChoices();
+  let choiceless = 0;
   let checked = 0;
   let figured = 0;
 
@@ -394,6 +402,19 @@ export function audit(list) {
     // グラフを見せずに「グラフによると」と聞く問題は解きようがない
     if (/bar chart|graph shows/i.test(p.question) && !p.figure) fail(p, 'グラフの問題なのに図が無い');
 
+    // 4択。本番（MAP Growth）が4択なので、選択肢が作れることを確かめる
+    const c = MC.build(p);
+    if (!c) {
+      choiceless++;
+      warn(p, '4択が作れない（誤答が3つそろわない）。自由入力で出る');
+    } else {
+      if (new Set(c.choices).size !== 4) fail(p, '選択肢に重複がある');
+      if (c.choices[c.answer] !== String(p.answer).trim()) fail(p, '正解の位置がずれている');
+      // 誤答が正解と数として同じだと、2つ正解がある問題になってしまう
+      const dup = c.choices.filter((x, i) => i !== c.answer && MC.toNumber(x) === MC.toNumber(String(p.answer).trim()));
+      if (dup.length) fail(p, `誤答が正解と同じ値: ${dup.join(', ')}`);
+    }
+
     // 英語の言い回し
     for (const b of BAD_WORDING) if (b.re.test(p.question)) fail(p, `読み違えられる言い回し: ${b.why}`);
     for (const u of BR_SPELLING) if (u.re.test(p.question)) fail(p, `つづりが米式でない（${u.use} に）`);
@@ -408,13 +429,13 @@ export function audit(list) {
   }
 
   // errors/warns も返す。検査そのものが効いているかを外から確かめられるように
-  return { checked, figured, total: list.length, errors: [...errors], warns: [...warns] };
+  return { checked, figured, choiceless, total: list.length, errors: [...errors], warns: [...warns] };
 }
 
 function report(list, label) {
-  const { checked, figured, total } = audit(list);
+  const { checked, figured, choiceless, total } = audit(list);
   console.log(`\n== ${label} ==`);
-  console.log(`件数 ${total}／検算できた ${checked} 問（${Math.round((checked / total) * 100)}%）／図あり ${figured} 問`);
+  console.log(`件数 ${total}／検算できた ${checked} 問（${Math.round((checked / total) * 100)}%）／図あり ${figured} 問／4択が作れない ${choiceless} 問`);
   const byLevel = {};
   const byCat = {};
   list.forEach((p) => { byLevel[p.level] = (byLevel[p.level] || 0) + 1; byCat[p.category] = (byCat[p.category] || 0) + 1; });

@@ -24,6 +24,8 @@ export function integers(seed, n) {
       out.push(problem({
         question: `Calculate: (−${a}) + ${b}`,
         answer: b - a,
+        // 引かずに足した／符号を取り違えた、が本命の間違い
+        wrong: [a + b, a - b, -(b - a)],
         explanation: `符号のちがう数の足し算は、絶対値の大きいほうから小さいほうを引き、大きいほうの符号をつける。答えは ${b - a}。`,
         grade: G, category: '正負の数'
       }));
@@ -32,6 +34,7 @@ export function integers(seed, n) {
       out.push(problem({
         question: `Calculate: ${a} − (−${b})`,
         answer: a + b,
+        wrong: [a - b, b - a, -(a + b)],
         explanation: `負の数を引くのは足すのと同じ。${a} + ${b} = ${a + b}。`,
         grade: G, category: '正負の数'
       }));
@@ -40,6 +43,7 @@ export function integers(seed, n) {
       out.push(problem({
         question: `Calculate: (−${a}) × (−${b})`,
         answer: a * b,
+        wrong: [-(a * b), a + b, -(a + b)],
         explanation: `負 × 負 は正。${a} × ${b} = ${a * b}。`,
         grade: G, category: '正負の数'
       }));
@@ -48,6 +52,7 @@ export function integers(seed, n) {
       out.push(problem({
         question: `Calculate: (−${b * q}) ÷ ${b}`,
         answer: -q,
+        wrong: [q, -(b * q), b * q],
         explanation: `負 ÷ 正 は負。${b * q} ÷ ${b} = ${q} なので、答えは −${q}。`,
         grade: G, category: '正負の数'
       }));
@@ -56,6 +61,8 @@ export function integers(seed, n) {
       out.push(problem({
         question: `Calculate: (−${a})²`,
         answer: a * a,
+        // −a² と取り違えるのがいちばん多い
+        wrong: [-(a * a), -a * 2, a * 2],
         explanation: `(−${a})² は (−${a}) × (−${a})。負 × 負 は正なので ${a * a}。−${a}² との違いに注意。`,
         grade: G, category: '正負の数'
       }));
@@ -118,6 +125,8 @@ export function equations(seed, n) {
       out.push(problem({
         question: `Solve for x: ${a}x + ${b} = ${a * x + b}`,
         answer: x,
+        // ${b} を足してしまった／${a} で割り忘れた
+        wrong: [x + (2 * b) / a, a * x + b, a * x],
         explanation: `両辺から ${b} を引いて ${a}x = ${a * x}。${a} で割って x = ${x}。`,
         grade: G, category: '方程式'
       }));
@@ -126,6 +135,7 @@ export function equations(seed, n) {
       out.push(problem({
         question: `Solve for x: ${a}x − ${b} = ${a * x - b}`,
         answer: x,
+        wrong: [x - (2 * b) / a, a * x - b, a * x],
         explanation: `両辺に ${b} を足して ${a}x = ${a * x}。${a} で割って x = ${x}。`,
         grade: G, category: '方程式'
       }));

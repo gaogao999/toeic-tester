@@ -60,10 +60,13 @@ export const fmt = (v) => String(v);
  * 問題を作るヘルパ。
  * category と grade は呼び出し側で決め、ここでは形だけ整える。
  */
-export function problem({ question, answer, unit = '', explanation, grade, category, figure = null }) {
+export function problem({ question, answer, unit = '', explanation, grade, category, figure = null, wrong = null }) {
   const p = { question, answer: String(answer), unit, explanation, level: grade, category };
   // 図は形の指定だけを持つ。SVG を組み立てるのは js/math-figure.js の仕事
   if (figure) p.figure = figure;
+  // 4択の誤答。**この単元ならこう間違える**という候補を生成器が知っているとき。
+  // 無ければ js/math-choices.js が答えの形から作る
+  if (wrong && wrong.length) p.wrong = wrong.map(String);
   return p;
 }
 

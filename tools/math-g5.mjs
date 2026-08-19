@@ -22,6 +22,8 @@ export function orderOfOperations(seed, n) {
       out.push(problem({
         question: `Calculate: ${a} × ${b} + ${c} × ${d}`,
         answer: a * b + c * d,
+        // 左から順に計算した／かけ算をひとつにまとめた
+        wrong: [(a * b + c) * d, a * (b + c) * d, a + b + c + d],
         explanation: `かけ算を先に。${a} × ${b} = ${a * b}、${c} × ${d} = ${c * d}。足して ${a * b + c * d}。`,
         grade: G, category: '計算の順序'
       }));
@@ -30,6 +32,8 @@ export function orderOfOperations(seed, n) {
       out.push(problem({
         question: `Calculate: ${c} − ${b * q} ÷ ${b}`,
         answer: c - q,
+        // 左から順に引いてから割った
+        wrong: [(c - b * q) / b, c - b * q, c + q],
         explanation: `わり算を先に。${b * q} ÷ ${b} = ${q}。そのあと ${c} − ${q} = ${c - q}。`,
         grade: G, category: '計算の順序'
       }));
@@ -38,6 +42,8 @@ export function orderOfOperations(seed, n) {
       out.push(problem({
         question: `Calculate: ${a} × (${b} + ${c})`,
         answer: a * (b + c),
+        // かっこを無視して a×b + c としてしまう
+        wrong: [a * b + c, a + b * c, a + b + c],
         explanation: `かっこが先。${b} + ${c} = ${b + c}。${a} × ${b + c} = ${a * (b + c)}。`,
         grade: G, category: '計算の順序'
       }));
@@ -46,6 +52,8 @@ export function orderOfOperations(seed, n) {
       out.push(problem({
         question: `Calculate: ${a}³`,
         answer: a ** 3,
+        // 3をかけただけ／2乗にした
+        wrong: [a * 3, a ** 2, a + 3],
         explanation: `${a}³ は ${a} を3回かける。${a} × ${a} × ${a} = ${a ** 3}。`,
         grade: G, category: '計算の順序'
       }));

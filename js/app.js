@@ -1513,6 +1513,7 @@
     $('#math-category').value = s.mathCategory;
     $('#math-level').value = s.mathLevel;
     $('#math-scope').value = s.mathScope;
+    $('#math-format').value = s.mathFormat;
 
     updateMathCount();
     $('#math-body').hidden = true;
@@ -1540,9 +1541,19 @@
     renderMathQuestion();
   }
 
+  /**
+   * 4択を出すかどうか。設定が4択で、その問題の選択肢が作れるときだけ。
+   * 選択肢が作れない問題（誤答が3つそろわない）は自由入力に落とす
+   */
+  function choicesFor(p) {
+    if (Storage.getSettings().mathFormat !== 'choice') return null;
+    return MathChoices.build(p);
+  }
+
   function renderMathQuestion() {
     const p = mathQuiz.questions[mathQuiz.index];
     mathQuiz.answered = false;
+    mathQuiz.choice = choicesFor(p);
 
     $('#math-counter').textContent = `${mathQuiz.index + 1} / ${mathQuiz.questions.length}`;
     $('#math-progress').style.width = `${(mathQuiz.index / mathQuiz.questions.length) * 100}%`;
@@ -1553,13 +1564,31 @@
     $('#math-unit').textContent = p.unit;
     $('#math-unit').hidden = !p.unit;
 
+    const box = $('#math-choices');
     const input = $('#math-input');
     input.value = '';
     input.disabled = false;
     input.classList.remove('is-correct', 'is-wrong');
-    $('#math-form').hidden = false;
     $('#math-feedback').hidden = true;
-    input.focus();
+
+    if (mathQuiz.choice) {
+      box.innerHTML = '';
+      mathQuiz.choice.choices.forEach((text, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice';
+        btn.textContent = `${'ABCD'[i]}. ${text}${p.unit ? ' ' + p.unit : ''}`;
+        btn.addEventListener('click', () => {
+          if (!mathQuiz.answered) gradeMath(mathQuiz.choice.choices[i]);
+        });
+        box.appendChild(btn);
+      });
+      box.hidden = false;
+      $('#math-form').hidden = true;
+    } else {
+      box.hidden = true;
+      $('#math-form').hidden = false;
+      input.focus();
+    }
   }
 
   function gradeMath(typed) {
@@ -1574,9 +1603,18 @@
     }
     mathQuiz.results.push({ problem: p, isCorrect, typed: typed.trim() });
 
-    const input = $('#math-input');
-    input.disabled = true;
-    input.classList.add(isCorrect ? 'is-correct' : 'is-wrong');
+    if (mathQuiz.choice) {
+      // 押したものと正解の両方に印を付ける。どれが正解だったかが分からないと復習にならない
+      [...$('#math-choices').children].forEach((btn, i) => {
+        btn.disabled = true;
+        if (i === mathQuiz.choice.answer) btn.classList.add('is-correct');
+        else if (mathQuiz.choice.choices[i] === typed.trim()) btn.classList.add('is-wrong');
+      });
+    } else {
+      const input = $('#math-input');
+      input.disabled = true;
+      input.classList.add(isCorrect ? 'is-correct' : 'is-wrong');
+    }
 
     $('#math-score').textContent = `正解 ${mathQuiz.correct}`;
     $('#math-feedback-title').textContent = isCorrect ? '⭕️ 正解' : '❌ 不正解';
@@ -1635,6 +1673,7 @@
     $('#math-category').value = s.mathCategory;
     $('#math-level').value = s.mathLevel;
     $('#math-scope').value = s.mathScope;
+    $('#math-format').value = s.mathFormat;
     $('#math-length').value = String(s.mathLength);
 
     const bind = (sel, key, cast) => {
@@ -1646,6 +1685,7 @@
     bind('#math-category', 'mathCategory');
     bind('#math-level', 'mathLevel');
     bind('#math-scope', 'mathScope');
+    bind('#math-format', 'mathFormat');
     bind('#math-length', 'mathLength', Number);
 
     $('#math-start').addEventListener('click', () => startMath());
@@ -1749,6 +1789,9 @@
       unit: p.unit,
       answer: p.answer,
       figure: p.figure,
+      // 本番（MAP Growth）は4択。模擬試験では設定に関係なく4択にそろえる。
+      // 選択肢が作れない問題だけ自由入力のまま
+      choice: MathChoices.build(p),
       explanation: p.explanation
     };
   }
@@ -1908,9 +1951,11 @@
   }
 
   function isAnswerCorrect(q, given) {
-    return q.kind === 'math'
-      ? given !== null && given !== '' && isMathCorrect(given, q.answer)
-      : given === q.answer;
+    // 算数でも4択なら、ほかの科目と同じく「選んだ番号」で比べる
+    if (q.kind === 'math' && !q.choice) {
+      return given !== null && given !== '' && isMathCorrect(given, q.answer);
+    }
+    return given === (q.kind === 'math' ? q.choice.answer : q.answer);
   }
 
   function updateMockPlan() {
@@ -2027,7 +2072,7 @@
 
   function saveCurrentMockAnswer() {
     const q = mock.questions[mock.index];
-    if (q.kind === 'math') mock.answers[mock.index] = $('#mock-input').value.trim() || null;
+    if (q.kind === 'math' && !q.choice) mock.answers[mock.index] = $('#mock-input').value.trim() || null;
   }
 
   function renderMockQuestion() {
@@ -2054,7 +2099,7 @@
     $('#mock-question').textContent = q.question;
     showFigure($('#mock-figure'), q.figure);
 
-    if (q.kind === 'math') {
+    if (q.kind === 'math' && !q.choice) {
       $('#mock-choices').innerHTML = '';
       $('#mock-form').hidden = false;
       $('#mock-input').value = mock.answers[mock.index] || '';
@@ -2065,10 +2110,11 @@
       $('#mock-form').hidden = true;
       const box = $('#mock-choices');
       box.innerHTML = '';
-      q.choices.forEach((choice, i) => {
+      const list = q.kind === 'math' ? q.choice.choices : q.choices;
+      list.forEach((choice, i) => {
         const btn = document.createElement('button');
         btn.className = 'choice' + (mock.answers[mock.index] === i ? ' is-picked' : '');
-        btn.textContent = `${'ABCD'[i]}. ${choice}`;
+        btn.textContent = `${'ABCD'[i]}. ${choice}${q.kind === 'math' && q.unit ? ' ' + q.unit : ''}`;
         btn.addEventListener('click', () => {
           mock.answers[mock.index] = i;
           renderMockQuestion();
@@ -2177,13 +2223,15 @@
 
     $('#mock-review').innerHTML = results
       .map((r, i) => {
-        const yourAnswer =
-          r.q.kind === 'math'
-            ? r.given || '（無回答）'
-            : r.given === null
-              ? '（無回答）'
-              : `${'ABCD'[r.given]}`;
-        const rightAnswer = r.q.kind === 'math' ? r.q.answer : `${'ABCD'[r.q.answer]}`;
+        const freeInput = r.q.kind === 'math' && !r.q.choice;
+        const yourAnswer = freeInput
+          ? r.given || '（無回答）'
+          : r.given === null || r.given === undefined
+            ? '（無回答）'
+            : `${'ABCD'[r.given]}`;
+        const rightAnswer = freeInput
+          ? r.q.answer
+          : `${'ABCD'[r.q.kind === 'math' ? r.q.choice.answer : r.q.answer]}. ${r.q.kind === 'math' ? r.q.answer : ''}`.trim();
         return `<div class="result-item ${r.isCorrect ? 'ok' : 'ng'}">
             <span>${r.isCorrect ? '⭕️' : '❌'}</span>
             <b>${i + 1}. ${escapeHtml(r.q.tag.split(' ／ ')[0])}</b>

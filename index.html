@@ -436,6 +436,13 @@
             </select>
           </label>
           <label class="field">
+            <span>解答形式</span>
+            <select id="math-format">
+              <option value="choice">4択（本番と同じ）</option>
+              <option value="input">自由入力（より難しい）</option>
+            </select>
+          </label>
+          <label class="field">
             <span>出題数</span>
             <select id="math-length">
               <option value="5">5問</option>
@@ -470,6 +477,8 @@
         <p class="math-tag" id="math-tag"></p>
         <p class="math-question" id="math-question"></p>
         <div class="math-figure" id="math-figure" hidden></div>
+
+        <div class="choices" id="math-choices" hidden></div>
 
         <form class="answer-form" id="math-form" autocomplete="off">
           <div class="math-input-row">
@@ -811,6 +820,7 @@
 <script src="js/math-data.js"></script>
 <script src="js/reading-data.js"></script>
 <script src="js/math-figure.js"></script>
+<script src="js/math-choices.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/ai.js"></script>
 <script src="js/app.js"></script>

@@ -881,6 +881,8 @@ body {
 
 /* 4択（長文読解で使用） */
 .choices { display: grid; gap: 8px; }
+/* display を指定した要素は hidden が効かないので明示する（過去に踏んだ罠） */
+.choices[hidden] { display: none; }
 .choice {
   padding: 12px 14px;
   border: 1px solid var(--border);

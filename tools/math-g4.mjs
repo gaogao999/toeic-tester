@@ -42,6 +42,8 @@ export function arithmetic(seed, n) {
       out.push(problem({
         question: `Calculate: ${c} + ${a} × ${b}`,
         answer: c + a * b,
+        // **左から順に計算する**のがこの単元の本命の間違い。それを誤答に置く
+        wrong: [(c + a) * b, c * a + b, c + a + b],
         explanation: `かけ算が先。${a} × ${b} = ${a * b}。そのあと ${c} + ${a * b} = ${c + a * b}。`,
         grade: G, category: '四則計算'
       }));
@@ -52,6 +54,8 @@ export function arithmetic(seed, n) {
       out.push(problem({
         question: `Calculate: (${a} + ${b}) × ${c}`,
         answer: (a + b) * c,
+        // かっこを無視して a + b×c としてしまう
+        wrong: [a + b * c, a * b + c, a + b + c],
         explanation: `かっこが先。${a} + ${b} = ${a + b}。そのあと ${a + b} × ${c} = ${(a + b) * c}。`,
         grade: G, category: '四則計算'
       }));
