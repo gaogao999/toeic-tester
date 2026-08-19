@@ -132,6 +132,7 @@
     quiz: 'quiz',
     flashcard: 'quiz',
     reading: 'quiz',
+    grammar: 'quiz',
     math: 'quiz',
     list: 'quiz',
     mock: 'mock',
@@ -151,6 +152,7 @@
     if (name === 'quiz') resetQuizToSetup();
     if (name === 'math') resetMathToSetup();
     if (name === 'reading') showReadingList();
+    if (name === 'grammar') resetGrammarToSetup();
     if (name === 'mock') resetMockToSetup();
     if (name === 'list') renderListFromTop();
     if (name === 'stats') renderStats();
@@ -299,7 +301,10 @@
     return [
       ...accuracyByCategory(WORD_DATA).map((r) => ({ ...r, subject: '単語', view: 'quiz' })),
       ...accuracyByCategory(readingItems).map((r) => ({ ...r, subject: '長文読解', view: 'reading' })),
-      ...accuracyByCategory(MATH_DATA).map((r) => ({ ...r, subject: '算数', view: 'math' }))
+      ...accuracyByCategory(MATH_DATA).map((r) => ({ ...r, subject: '算数', view: 'math' })),
+      // 文法は分野の欄に単元名（unit）を入れて、同じ集計に乗せる
+      ...accuracyByCategory(GRAMMAR_DATA.map((q) => ({ ...q, category: q.unit })))
+        .map((r) => ({ ...r, subject: '文法', view: 'grammar' }))
     ]
       .filter((r) => r.answered >= minAnswered && r.rate < WEAK_LINE)
       .sort((a, b) => a.rate - b.rate);
@@ -341,8 +346,8 @@
 
   // 1日のノルマ。曜日で決め打ちにしてある（残り日数からは計算しない）
   const DAILY_GOALS = {
-    weekday: { word: 20, math: 15 },
-    weekend: { word: 25, math: 20 }
+    weekday: { word: 20, math: 15, grammar: 10 },
+    weekend: { word: 25, math: 20, grammar: 15 }
   };
 
   function isWeekend(date = new Date()) {
@@ -358,6 +363,7 @@
     const readingLeft = READING_DATA.filter(
       (r) => r.questions.some((q, i) => !Storage.isLearned(`${r.id}-${i + 1}`))
     ).length;
+    const grammarLeft = GRAMMAR_DATA.filter((q) => !Storage.isLearned(q.id)).length;
 
     // データが無い科目は献立に出さない。達成できないノルマを残すと
     // 「今日の分は達成」に一生ならず、続ける気を削ぐため
@@ -381,6 +387,16 @@
         left: mathLeft,
         view: 'math',
         available: MATH_DATA.length > 0
+      },
+      {
+        key: 'grammar',
+        icon: '✏️',
+        name: '文法',
+        goal: quota.grammar,
+        unit: '問',
+        left: grammarLeft,
+        view: 'grammar',
+        available: GRAMMAR_DATA.length > 0
       },
       {
         key: 'passages',
@@ -494,7 +510,7 @@
    * tools/stamp-version.mjs で書き換える。
    * スマホで開いたときに、手元のものが最新かを確かめるためのもの。
    */
-  const APP_VERSION = '2026-08-19 (bda980a)';
+  const APP_VERSION = '2026-08-19 (282fa11)';
 
   const EXAM_DATE = '2027-01-07';
 
@@ -1704,6 +1720,196 @@
   }
 
   // ============================================================
+  // 文法（Language Usage）
+  // ============================================================
+  //
+  // 本番（MAP Growth）の Language Usage にあたる科目。
+  // データは js/grammar-data.js（TOEFL Junior 対策教材3冊から取り込んだ706問）。
+  //
+  // 算数と違って**自由入力は無い**。文法は「正しい形を選べるか」を問うもので、
+  // 綴りを打たせても測るものが変わるだけなので、常に選択式にしてある。
+
+  const grammarQuiz = { questions: [], index: 0, correct: 0, results: [], answered: false, order: [] };
+
+  function getFilteredGrammar() {
+    const s = Storage.getSettings();
+    return GRAMMAR_DATA.filter((q) => {
+      if (s.grammarLevel !== 'all' && String(q.level) !== String(s.grammarLevel)) return false;
+      if (s.grammarUnit !== 'all' && q.unit !== s.grammarUnit) return false;
+      if (s.grammarScope === 'unlearned') return !Storage.isLearned(q.id);
+      if (s.grammarScope === 'weak') return Storage.getRecord(q.id).wrong > 0;
+      return true;
+    });
+  }
+
+  function updateGrammarCount() {
+    $('#grammar-count').textContent = `対象: ${getFilteredGrammar().length} 問`;
+  }
+
+  function resetGrammarToSetup() {
+    const s = Storage.getSettings();
+    $('#grammar-unit').value = s.grammarUnit;
+    $('#grammar-level').value = s.grammarLevel;
+    $('#grammar-scope').value = s.grammarScope;
+
+    updateGrammarCount();
+    $('#grammar-body').hidden = true;
+    $('#grammar-result').hidden = true;
+    $('#grammar-setup').hidden = false;
+  }
+
+  function startGrammar(override) {
+    const settings = Storage.getSettings();
+    const source = override || shuffle(getFilteredGrammar());
+    grammarQuiz.questions = source.slice(0, override ? source.length : settings.grammarLength);
+    grammarQuiz.index = 0;
+    grammarQuiz.correct = 0;
+    grammarQuiz.results = [];
+
+    if (grammarQuiz.questions.length === 0) {
+      toast('出題できる問題がありません');
+      return;
+    }
+
+    Storage.incrementSessions();
+    $('#grammar-setup').hidden = true;
+    $('#grammar-result').hidden = true;
+    $('#grammar-body').hidden = false;
+    renderGrammarQuestion();
+  }
+
+  function renderGrammarQuestion() {
+    const q = grammarQuiz.questions[grammarQuiz.index];
+    grammarQuiz.answered = false;
+    // 選択肢の並びは毎回混ぜる。データの並び順を覚えても正解できないようにするため
+    grammarQuiz.order = shuffle(q.choices.map((_, i) => i));
+
+    $('#grammar-counter').textContent = `${grammarQuiz.index + 1} / ${grammarQuiz.questions.length}`;
+    $('#grammar-progress').style.width =
+      `${(grammarQuiz.index / grammarQuiz.questions.length) * 100}%`;
+    $('#grammar-score').textContent = `正解 ${grammarQuiz.correct}`;
+    $('#grammar-tag').textContent = `${q.unit} ／ ${levelLabel(q.level)}`;
+    $('#grammar-question').textContent = q.question;
+
+    const box = $('#grammar-choices');
+    box.innerHTML = '';
+    grammarQuiz.order.forEach((originalIndex, displayIndex) => {
+      const btn = document.createElement('button');
+      btn.className = 'choice';
+      btn.textContent = `${'ABCD'[displayIndex]}. ${q.choices[originalIndex]}`;
+      btn.addEventListener('click', () => {
+        if (!grammarQuiz.answered) gradeGrammar(originalIndex);
+      });
+      box.appendChild(btn);
+    });
+    $('#grammar-feedback').hidden = true;
+  }
+
+  function gradeGrammar(pickedIndex) {
+    const q = grammarQuiz.questions[grammarQuiz.index];
+    const isCorrect = pickedIndex === q.answer;
+
+    grammarQuiz.answered = true;
+    Storage.recordAnswer(q.id, isCorrect);
+    if (isCorrect) {
+      Storage.setLearned(q.id, true);
+      grammarQuiz.correct += 1;
+    }
+    grammarQuiz.results.push({ q, isCorrect });
+
+    // 押したものと正解の両方に印を付ける。どれが正解だったかが分からないと復習にならない
+    const correctDisplayIndex = grammarQuiz.order.indexOf(q.answer);
+    [...$('#grammar-choices').children].forEach((btn, i) => {
+      btn.disabled = true;
+      if (i === correctDisplayIndex) btn.classList.add('is-correct');
+      else if (grammarQuiz.order[i] === pickedIndex) btn.classList.add('is-wrong');
+    });
+
+    $('#grammar-score').textContent = `正解 ${grammarQuiz.correct}`;
+    $('#grammar-feedback-title').textContent = isCorrect ? '⭕️ 正解' : '❌ 不正解';
+    // **空にするだけでは消えない。**この2つは背景色を持つので、
+    // 中身が無いと灰色の帯だけが残る（正解したときにそれが出ていた）
+    const answerLine = $('#grammar-feedback-answer');
+    answerLine.textContent = isCorrect ? '' : `正解: ${q.choices[q.answer]}`;
+    answerLine.hidden = isCorrect;
+    const explLine = $('#grammar-explanation');
+    explLine.textContent = q.explanation;
+    explLine.hidden = !q.explanation;
+    $('#grammar-next').textContent =
+      grammarQuiz.index === grammarQuiz.questions.length - 1 ? '結果を見る →' : '次の問題 →';
+    $('#grammar-feedback').hidden = false;
+    $('#grammar-next').focus();
+  }
+
+  function nextGrammarQuestion() {
+    if (grammarQuiz.index === grammarQuiz.questions.length - 1) {
+      showGrammarResult();
+      return;
+    }
+    grammarQuiz.index += 1;
+    renderGrammarQuestion();
+  }
+
+  function showGrammarResult() {
+    const total = grammarQuiz.questions.length;
+    const rate = Math.round((grammarQuiz.correct / total) * 100);
+
+    $('#grammar-body').hidden = true;
+    $('#grammar-result').hidden = false;
+    $('#grammar-result-correct').textContent = grammarQuiz.correct;
+    $('#grammar-result-total').textContent = total;
+    $('#grammar-result-rate').textContent = `正答率 ${rate}%`;
+    $('#grammar-result-emoji').textContent =
+      rate === 100 ? '🏆' : rate >= 80 ? '🎉' : rate >= 50 ? '💪' : '📖';
+
+    $('#grammar-result-list').innerHTML = grammarQuiz.results
+      .map(
+        (r) => `<div class="result-item ${r.isCorrect ? 'ok' : 'ng'}">
+          <span>${r.isCorrect ? '⭕️' : '❌'}</span>
+          <b>${escapeHtml(r.q.unit)}</b>
+          <span>${escapeHtml(r.isCorrect ? r.q.question : `正解 ${r.q.choices[r.q.answer]}`)}</span>
+        </div>`
+      )
+      .join('');
+
+    const wrong = grammarQuiz.results.filter((r) => !r.isCorrect).map((r) => r.q);
+    $('#grammar-wrong-only').hidden = wrong.length === 0;
+    $('#grammar-wrong-only').onclick = () => startGrammar(wrong);
+  }
+
+  function initGrammar() {
+    // 単元の一覧はデータ側の並び（習う順）をそのまま使う。
+    // 問題が1問も無い単元は出さない（選んでも0問になるだけなので）
+    const used = new Set(GRAMMAR_DATA.map((q) => q.unit));
+    $('#grammar-unit').innerHTML =
+      '<option value="all">すべて</option>' +
+      GRAMMAR_UNITS.filter((u) => used.has(u))
+        .map((u) => `<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`)
+        .join('');
+
+    const s = Storage.getSettings();
+    $('#grammar-unit').value = s.grammarUnit;
+    $('#grammar-level').value = s.grammarLevel;
+    $('#grammar-scope').value = s.grammarScope;
+    $('#grammar-length').value = String(s.grammarLength);
+
+    const bind = (sel, key, cast) => {
+      $(sel).addEventListener('change', (e) => {
+        Storage.updateSettings({ [key]: cast ? cast(e.target.value) : e.target.value });
+        updateGrammarCount();
+      });
+    };
+    bind('#grammar-unit', 'grammarUnit');
+    bind('#grammar-level', 'grammarLevel');
+    bind('#grammar-scope', 'grammarScope');
+    bind('#grammar-length', 'grammarLength', Number);
+
+    $('#grammar-start').addEventListener('click', () => startGrammar());
+    $('#grammar-retry').addEventListener('click', () => startGrammar());
+    $('#grammar-next').addEventListener('click', nextGrammarQuestion);
+  }
+
+  // ============================================================
   // 模擬試験
   // ============================================================
 
@@ -1722,7 +1928,9 @@
   };
 
   // 単語と長文は4段階（CEFR B2 まで）、算数は3段階しかないので上限で頭打ちにする
-  const MAX_LEVEL = { word: 4, math: 5, reading: 4 };
+  // 文法だけ**レベル1の問題が無い**（教材が A2 から始まるため）。
+  // poolFor が空を返しても nextAdaptiveQuestion が別の科目へ回すので、階段は止まらない
+  const MAX_LEVEL = { word: 4, math: 5, reading: 4, grammar: 4 };
 
   // 上下の向きが変わった回数がこれだけ溜まれば、レベルは十分に絞れたとみなす
   const ENOUGH_REVERSALS = 6;
@@ -1796,7 +2004,22 @@
     };
   }
 
-  /** 出題内容を組み立てる。英語は単語と長文を混ぜ、長文は1本ぶんまとめて出す */
+  function buildGrammarMockQuestion(q) {
+    // 選択肢の並びは毎回混ぜる。データの並び順を覚えても意味が無いようにするため
+    const order = shuffle(q.choices.map((_, k) => k));
+    return {
+      kind: 'grammar',
+      id: q.id,
+      level: q.level,
+      tag: `文法 ／ ${q.unit}`,
+      question: q.question,
+      choices: order.map((k) => q.choices[k]),
+      answer: order.indexOf(q.answer),
+      explanation: q.explanation
+    };
+  }
+
+  /** 出題内容を組み立てる。英語は単語・長文・文法を混ぜ、長文は1本ぶんまとめて出す */
   function buildMockQuestions(subject, total) {
     const questions = [];
 
@@ -1807,9 +2030,15 @@
     if (subject === 'english') {
       const passage = shuffle(READING_DATA)[0];
       passage.questions.forEach((q, i) => questions.push(buildReadingQuestion(passage, q, i)));
-      const words = shuffle(WORD_DATA).slice(0, Math.max(total - questions.length, 0));
-      words.forEach((w) => questions.push(buildWordChoice(w)));
-      return questions.slice(0, total);
+      // 本番（MAP Growth）は Reading と Language Usage が別のセクションなので、
+      // 英語のうちおよそ3分の1を文法にあてる
+      shuffle(GRAMMAR_DATA)
+        .slice(0, Math.max(Math.round(total / 3), 0))
+        .forEach((g) => questions.push(buildGrammarMockQuestion(g)));
+      shuffle(WORD_DATA)
+        .slice(0, Math.max(total - questions.length, 0))
+        .forEach((w) => questions.push(buildWordChoice(w)));
+      return shuffle(questions).slice(0, total);
     }
 
     // 英語＋算数。おおよそ英語6割・算数4割
@@ -1818,6 +2047,9 @@
 
     const passage = shuffle(READING_DATA)[0];
     passage.questions.forEach((q, i) => questions.push(buildReadingQuestion(passage, q, i)));
+    shuffle(GRAMMAR_DATA)
+      .slice(0, Math.max(Math.round(englishCount / 3), 0))
+      .forEach((g) => questions.push(buildGrammarMockQuestion(g)));
     shuffle(WORD_DATA)
       .slice(0, Math.max(englishCount - questions.length, 0))
       .forEach((w) => questions.push(buildWordChoice(w)));
@@ -1838,6 +2070,7 @@
     const lv = Math.min(level, MAX_LEVEL[kind]);
     if (kind === 'word') return WORD_DATA.filter((w) => w.level === lv);
     if (kind === 'math') return MATH_DATA.filter((p) => p.level === lv);
+    if (kind === 'grammar') return GRAMMAR_DATA.filter((q) => q.level === lv);
     const out = [];
     READING_DATA.filter((r) => r.level === lv).forEach((r) =>
       r.questions.forEach((q, i) => out.push({ passage: r, q, i }))
@@ -1847,8 +2080,8 @@
 
   /** 出題の混ぜ具合。単語ばかりにならないよう重みで散らす */
   const ADAPTIVE_KINDS = {
-    both: ['word', 'word', 'word', 'reading', 'math', 'math'],
-    english: ['word', 'word', 'word', 'reading', 'reading'],
+    both: ['word', 'word', 'reading', 'grammar', 'math', 'math'],
+    english: ['word', 'word', 'reading', 'reading', 'grammar', 'grammar'],
     math: ['math']
   };
 
@@ -1897,7 +2130,9 @@
             ? buildWordChoice(item)
             : kind === 'math'
               ? buildMathQuestion(item)
-              : buildReadingQuestion(item.passage, item.q, item.i);
+              : kind === 'grammar'
+                ? buildGrammarMockQuestion(item)
+                : buildReadingQuestion(item.passage, item.q, item.i);
         // 語そのものの級ではなく、階段のどの高さで出したかを残す
         q.askedAt = mock.level;
         return q;
@@ -2177,7 +2412,9 @@
     saveCurrentMockAnswer();
     stopMockTimer();
 
-    const byKind = { word: { c: 0, n: 0 }, reading: { c: 0, n: 0 }, math: { c: 0, n: 0 } };
+    const byKind = {
+      word: { c: 0, n: 0 }, reading: { c: 0, n: 0 }, grammar: { c: 0, n: 0 }, math: { c: 0, n: 0 }
+    };
     const results = mock.questions.map((q, i) => {
       const given = mock.answers[i];
       const isCorrect = isAnswerCorrect(q, given);
@@ -2208,7 +2445,7 @@
     $('#mock-rate').textContent = `正答率 ${rate}%　／　所要 ${minutes} 分`;
     $('#mock-emoji').textContent = rate >= 90 ? '🏆' : rate >= 70 ? '🎉' : rate >= 50 ? '💪' : '📖';
 
-    const names = { word: '単語', reading: '長文読解', math: '算数' };
+    const names = { word: '単語', reading: '長文読解', grammar: '文法', math: '算数' };
     $('#mock-breakdown').innerHTML = Object.entries(byKind)
       .filter(([, v]) => v.n > 0)
       .map(([k, v]) => {
@@ -2976,6 +3213,7 @@
     initCountdown();
     initMath();
     initReading();
+    initGrammar();
     initMock();
     initVersion();
     initApiKey();

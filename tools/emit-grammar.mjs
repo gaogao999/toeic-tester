@@ -20,6 +20,7 @@ import { parseLfm } from './parse-grammar-lfm.mjs';
 import { unitFor } from './grammar-units.mjs';
 import { B1_ITEMS } from './grammar-b1.mjs';
 import { B2_ITEMS } from './grammar-b2.mjs';
+import { A2_NOTES, A2_FIXES } from './grammar-a2.mjs';
 
 /**
  * OCR の読み違い。選択肢の**中身の違い**（文法）には関わらない、字面だけの傷を直す。
@@ -77,21 +78,32 @@ function buildA2(idBase) {
     return [];
   }
   const items = JSON.parse(readFileSync(path, 'utf8'));
-  return items
+  const missing = [];
+  const out = items
     .filter((it) => it.answer)
     .map((it, i) => {
       const choices = it.options.map(clean);
+      // OCR の読み違いを直してから解説を引く（キーは直したあとの問題文）
+      const question = A2_FIXES[it.sentence] || it.sentence;
+      const explanation = A2_NOTES[question] || '';
+      if (!explanation) missing.push(question);
       return {
         id: `g${idBase + i + 1}`,
-        question: it.sentence,
+        question,
         choices,
         answer: choices.indexOf(clean(it.answer)),
-        explanation: '',   // 教材に解説が無い。あとから足す
+        explanation,
         level: 2,
         unit: it.unit
       };
     })
     .filter((q) => q.answer >= 0);
+  // 解説はキーを問題文で持っているので、問題文が変わると静かに外れる。必ず知らせる
+  if (missing.length) {
+    console.warn(`※ 解説の付かない A2 の設問が ${missing.length} 件（grammar-a2.mjs に足す）:`);
+    missing.forEach((q) => console.warn(`   ${q}`));
+  }
+  return out;
 }
 
 const all = [
@@ -126,13 +138,14 @@ const header = `/**
  *   question    … 空所を ___ で表した1文
  *   choices     … 選択肢。A2 は2つ、B1・B2 は4つ
  *   answer      … 正解の番号（0 から数える）
- *   explanation … 日本語の解説。A2 は教材に解説が無いので空
+ *   explanation … 日本語の解説。**全問にある**（A2 は教材に解説が無いので書き足した）
  *   level       … 2=A2 / 3=B1 / 4=B2。**レベル1は今のところ無い**
  *   unit        … 単元。GRAMMAR_UNITS の並びが「習う順」
  *
  * 出典は TOEFL Junior 対策教材3冊（Basic / Intermediate / Advanced）。
  * **B1・B2 の正解は教材の解答欄が OCR で復元できなかったため、こちらで判定したもの。**
  * 判定の根拠は explanation に1問ずつ残してある。
+ * A2 の解説も教材には無く、こちらで書いた（tools/grammar-a2.mjs）。
  */
 `;
 

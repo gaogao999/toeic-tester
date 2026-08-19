@@ -141,6 +141,7 @@
       <nav class="study-chips">
         <button class="study-chip is-active" type="button">単語</button>
         <button class="study-chip" data-view="reading">長文読解</button>
+        <button class="study-chip" data-view="grammar">文法</button>
         <button class="study-chip" data-view="math">算数</button>
       </nav>
 
@@ -334,6 +335,7 @@
       <nav class="study-chips">
         <button class="study-chip" data-view="quiz">単語</button>
         <button class="study-chip is-active" type="button">長文読解</button>
+        <button class="study-chip" data-view="grammar">文法</button>
         <button class="study-chip" data-view="math">算数</button>
       </nav>
       <div class="panel">
@@ -409,12 +411,98 @@
     </div>
   </section>
 
+  <!-- ============ 文法（Language Usage） ============ -->
+  <section class="view" id="view-grammar">
+    <div id="grammar-setup">
+      <nav class="study-chips">
+        <button class="study-chip" data-view="quiz">単語</button>
+        <button class="study-chip" data-view="reading">長文読解</button>
+        <button class="study-chip is-active" type="button">文法</button>
+        <button class="study-chip" data-view="math">算数</button>
+      </nav>
+      <div class="panel">
+        <h2 class="panel-title">文法の出題範囲</h2>
+        <div class="filters">
+          <label class="field">
+            <span>単元</span>
+            <select id="grammar-unit"></select>
+          </label>
+          <label class="field">
+            <span>レベル</span>
+            <select id="grammar-level">
+              <option value="all">すべて</option>
+              <option value="2">A2（基礎）</option>
+              <option value="3">B1（標準）</option>
+              <option value="4">B2（応用）</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>出題数</span>
+            <select id="grammar-length">
+              <option value="5">5問</option>
+              <option value="10" selected>10問</option>
+              <option value="20">20問</option>
+              <option value="9999">すべて</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>対象</span>
+            <select id="grammar-scope">
+              <option value="all">すべての問題</option>
+              <option value="unlearned">まだ正解していない問題</option>
+              <option value="weak">間違えた問題</option>
+            </select>
+          </label>
+        </div>
+        <p class="hint" id="grammar-count">対象: 0 問</p>
+      </div>
+      <button class="btn btn-primary btn-lg" id="grammar-start">文法を解く</button>
+      <p class="hint center">空所に入るものを選びます。本番（MAP Growth）の Language Usage と同じ形式です。</p>
+    </div>
+
+    <div id="grammar-body" hidden>
+      <div class="session-bar">
+        <span id="grammar-counter">0 / 0</span>
+        <div class="progress-bar slim"><div class="progress-fill" id="grammar-progress"></div></div>
+        <span class="score" id="grammar-score">正解 0</span>
+      </div>
+
+      <div class="panel">
+        <p class="math-tag" id="grammar-tag"></p>
+        <p class="grammar-question" id="grammar-question"></p>
+        <div class="choices" id="grammar-choices"></div>
+
+        <div class="quiz-feedback" id="grammar-feedback" hidden>
+          <p class="feedback-title" id="grammar-feedback-title"></p>
+          <p class="feedback-typed" id="grammar-feedback-answer"></p>
+          <p class="math-explanation" id="grammar-explanation"></p>
+          <button class="btn btn-primary" id="grammar-next">次の問題 →</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="grammar-result" hidden>
+      <div class="panel result-panel">
+        <p class="result-emoji" id="grammar-result-emoji">🎉</p>
+        <h2 class="result-score"><span id="grammar-result-correct">0</span> / <span id="grammar-result-total">0</span> 正解</h2>
+        <p class="result-rate" id="grammar-result-rate">正答率 0%</p>
+        <div class="result-list" id="grammar-result-list"></div>
+        <div class="result-actions">
+          <button class="btn btn-primary" id="grammar-retry">もう一度</button>
+          <button class="btn btn-secondary" id="grammar-wrong-only" hidden>間違えた問題だけ</button>
+          <button class="btn btn-ghost" data-view="home">ホームへ</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ 算数 ============ -->
   <section class="view" id="view-math">
     <div id="math-setup">
       <nav class="study-chips">
         <button class="study-chip" data-view="quiz">単語</button>
         <button class="study-chip" data-view="reading">長文読解</button>
+        <button class="study-chip" data-view="grammar">文法</button>
         <button class="study-chip is-active" type="button">算数</button>
       </nav>
       <div class="panel">
@@ -819,6 +907,7 @@
 <script src="js/data.js"></script>
 <script src="js/math-data.js"></script>
 <script src="js/reading-data.js"></script>
+<script src="js/grammar-data.js"></script>
 <script src="js/math-figure.js"></script>
 <script src="js/math-choices.js"></script>
 <script src="js/storage.js"></script>

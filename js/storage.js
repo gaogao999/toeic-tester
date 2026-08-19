@@ -17,7 +17,7 @@ const Storage = (() => {
   const DEFAULT_STATE = {
     records: {}, // { [wordId]: { box, correct, wrong, lastStudied, nextDue, starred, learned } }
     stats: { totalAnswers: 0, totalCorrect: 0, sessions: 0 },
-    // [{ date, answered, correct, word, math, reading }] — 後ろ3つは科目別の解答数
+    // [{ date, answered, correct, word, math, reading, grammar }] — 後ろ4つは科目別の解答数
     history: [],
     settings: {
       level: 'all',
@@ -33,7 +33,11 @@ const Storage = (() => {
       mathScope: 'all',
       // 本番（MAP Growth）が4択なので既定も4択。自由入力のほうが難しいので選べる
       mathFormat: 'choice',
-      mathLength: 10
+      mathLength: 10,
+      grammarLevel: 'all',
+      grammarUnit: 'all',
+      grammarScope: 'all',
+      grammarLength: 10
     }
   };
 
@@ -114,11 +118,13 @@ const Storage = (() => {
    *   単語 … 1, 2, 3 …（数値）
    *   算数 … m1, m2 …
    *   長文 … r1-1, r1-2 …
+   *   文法 … g2001, g3001 …
    */
   function kindOf(id) {
     const s = String(id);
     if (s.startsWith('m')) return 'math';
     if (s.startsWith('r')) return 'reading';
+    if (s.startsWith('g')) return 'grammar';
     return 'word';
   }
 
@@ -161,7 +167,7 @@ const Storage = (() => {
     const key = todayKey();
     let day = state.history.find((h) => h.date === key);
     if (!day) {
-      day = { date: key, answered: 0, correct: 0, word: 0, math: 0, reading: 0 };
+      day = { date: key, answered: 0, correct: 0, word: 0, math: 0, reading: 0, grammar: 0 };
       state.history.push(day);
     }
     day.answered += 1;
@@ -268,6 +274,7 @@ const Storage = (() => {
       word: (day && day.word) || 0,
       math: (day && day.math) || 0,
       reading: (day && day.reading) || 0,
+      grammar: (day && day.grammar) || 0,
       // 読み終えた長文の本数。献立はこちらで数える
       passages: (day && day.passages) || 0,
       answered: (day && day.answered) || 0
@@ -286,7 +293,7 @@ const Storage = (() => {
     const key = todayKey();
     let day = state.history.find((h) => h.date === key);
     if (!day) {
-      day = { date: key, answered: 0, correct: 0, word: 0, math: 0, reading: 0 };
+      day = { date: key, answered: 0, correct: 0, word: 0, math: 0, reading: 0, grammar: 0 };
       state.history.push(day);
     }
     day.passages = (day.passages || 0) + 1;
@@ -372,7 +379,9 @@ const Storage = (() => {
         correct: num(h.correct),
         word: num(h.word),
         math: num(h.math),
-        reading: num(h.reading)
+        reading: num(h.reading),
+        grammar: num(h.grammar),
+        passages: num(h.passages)
       }));
 
     // settings は既知の項目だけ受け取り、型が合わないものは初期値のままにする

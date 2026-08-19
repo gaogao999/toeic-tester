@@ -53,28 +53,51 @@ const BY_FRAGMENT = [
 ];
 
 /**
- * 章と単元。教材の目次から取った並び。
- * 設問がどの単元のものかは、本文中の見出しからは機械的に取れないので、
+ * 章と単元。設問がどの単元のものかは本文からは機械的に取れないので、
  * ページ番号の範囲で振り分ける。
+ *
+ * **範囲は目次からではなく、本文中の見出しから取ること。**
+ * 最初は目次の並びから等間隔に割り振ったが、目次にはページ番号が
+ * 載っておらず、**単元が丸ごと1つぶんずれた**（助動詞の設問が「受動態」、
+ * 分詞の設問が「不定詞」になっていた）。
+ * 見出しの実際のページは、本文から次のように拾える:
+ *
+ *   Unit 1 / 01 Basic Subject-Verb Agreement   ← p31
+ *   01 Forming the Passive                     ← p47
+ *   01 Form and Use（助動詞）                   ← p51
+ *   01 To-infinitives: Functions               ← p59
+ *   01 Participles as Adjectives               ← p69
+ *   01 Nouns and Noun Phrases                  ← p77
+ *   01 Personal Pronouns                       ← p82
+ *   01 Positions of Adjectives and Adverbs     ← p88
+ *   01 Making a Comparison                     ← p92
+ *   01 Positions of Prepositions               ← p96
+ *   01 Coordinating Conjunctions               ← p104
+ *   01 Noun Clauses: Functions and Patterns    ← p108
+ *   01 Adverb Clauses: Time and Condition      ← p112
+ *   01 Relative Clauses                        ← p116
+ *
+ * 振り分けたあとは、**設問を何問か読んで単元と合っているか確かめる**こと。
+ * ずれていても機械は気づかない。
  */
 const UNITS = [
-  { unit: '文の要素', from: 13, to: 29 },
-  { unit: '主語と動詞の一致', from: 30, to: 39 },
-  { unit: '時制', from: 40, to: 49 },
-  { unit: '受動態', from: 50, to: 57 },
-  { unit: '助動詞', from: 58, to: 67 },
-  { unit: '不定詞', from: 68, to: 75 },
-  { unit: '動名詞', from: 76, to: 81 },
-  { unit: '分詞', from: 82, to: 87 },
-  { unit: '名詞と冠詞', from: 88, to: 95 },
-  { unit: '代名詞と数量詞', from: 96, to: 103 },
-  { unit: '形容詞と副詞', from: 104, to: 109 },
-  { unit: '比較', from: 110, to: 115 },
-  { unit: '前置詞', from: 116, to: 121 },
-  { unit: '接続詞', from: 122, to: 127 },
-  { unit: '名詞節', from: 128, to: 131 },
-  { unit: '副詞節', from: 132, to: 135 },
-  { unit: '形容詞節', from: 136, to: 140 }
+  { unit: '文の要素', from: 13, to: 30 },
+  { unit: '主語と動詞の一致', from: 31, to: 40 },
+  { unit: '時制', from: 41, to: 46 },
+  { unit: '受動態', from: 47, to: 50 },
+  { unit: '助動詞', from: 51, to: 58 },
+  { unit: '不定詞', from: 59, to: 64 },
+  { unit: '動名詞', from: 65, to: 68 },
+  { unit: '分詞', from: 69, to: 76 },
+  { unit: '名詞と冠詞', from: 77, to: 81 },
+  { unit: '代名詞と数量詞', from: 82, to: 87 },
+  { unit: '形容詞と副詞', from: 88, to: 91 },
+  { unit: '比較', from: 92, to: 95 },
+  { unit: '前置詞', from: 96, to: 103 },
+  { unit: '接続詞', from: 104, to: 107 },
+  { unit: '名詞節', from: 108, to: 111 },
+  { unit: '副詞節', from: 112, to: 115 },
+  { unit: '形容詞節', from: 116, to: 122 }
 ];
 
 const unitFor = (page) => (UNITS.find((u) => page >= u.from && page <= u.to) || { unit: 'その他' }).unit;

@@ -48,9 +48,9 @@ for (const q of items) {
   if (!units.includes(q.unit)) errors.push(`${at}: 知らない単元 ${q.unit}`);
   if (![2, 3, 4].includes(q.level)) errors.push(`${at}: レベルが不正 ${q.level}`);
 
-  // 解説は日本語で書く決まり。A2 は教材に解説が無いので空を許す
-  if (q.explanation && !/[ぁ-んァ-ヶ一-龠]/.test(q.explanation)) errors.push(`${at}: 解説に日本語が無い`);
-  if (!q.explanation && q.level !== 2) errors.push(`${at}: 解説が無い`);
+  // 解説は全問に、日本語で。「なぜそれが正解か」が無いと、間違えても次に生きない
+  if (!q.explanation) errors.push(`${at}: 解説が無い`);
+  else if (!/[ぁ-んァ-ヶ一-龠]/.test(q.explanation)) errors.push(`${at}: 解説に日本語が無い`);
 
   for (const c of q.choices) {
     for (const s of OCR_SMELL) if (s.re.test(c)) warns.push(`${at}: ${s.why} → 「${c}」`);

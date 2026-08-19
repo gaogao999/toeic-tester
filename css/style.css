@@ -752,6 +752,16 @@ body {
   line-height: 1.7;
 }
 
+/* 文法の問題文。空所（___）が本文に埋もれないよう、行間を広めに取る */
+.grammar-question {
+  margin: 0 0 18px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.9;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+
 /* ---- 算数の図 ----
    SVG の中の色は必ずここの変数を通す。SVG に色を直書きすると明暗の切り替えで
    線が背景に埋もれる（黒い線をダークの背景に置いてしまう）。 */
