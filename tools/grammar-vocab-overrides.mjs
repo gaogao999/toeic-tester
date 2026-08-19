@@ -31,6 +31,9 @@ export const METALANGUAGE = new Set([
   'coordinating', 'antecedent', 'grammatical', 'grammar', 'agreement',
   'preparatory', 'indefinite', 'definite', 'verbal', 'transitive', 'intransitive',
   'predicate', 'syntax', 'apostrophe', 'quantifier',
+  'interrogative', 'demonstrative', 'reflexive', 'inversion', 'usage',
+  'subjective', 'generalization', 'comma', 'consonant', 'vowel', 'prefix',
+  'unreal', 'habitual', 'continuation', 'successive', 'demotic',
   // 教材の体裁・奥付
   'chapter', 'unit', 'section', 'page', 'index', 'edition', 'license',
   'publishing', 'publication', 'reproduce', 'retrieval', 'transmit',
@@ -68,7 +71,12 @@ export const GRAMMAR_DROP = new Set([
   'tun',                    // turn の読み違いか、まず使わない語
   'bowls', 'coaster',       // 複数形／熟語の一部（roller coaster）
   'master',                 // 教材の題名（Master TOEFL Junior）から紛れ込む
-  'albino', 'beaten', 'admitted', 'whatever', 'anytime'
+  'albino', 'beaten', 'admitted', 'whatever', 'anytime',
+  // 短縮形がアポストロフィで割れて残ったもの（don't → don。辞書には「ドン川」がある）
+  'don',
+  // 地の文から拾うようにして出てきたもの
+  'pop',        // popcorn / pop music の一部。単独では「ポンという音」になってしまう
+  'grasping'    // grasp の派生。辞書の語義が「欲深い」で教材の使われ方と合わない
 ]);
 
 /** 英和辞書の語義が教材の使われ方と合わないもの */
@@ -194,7 +202,60 @@ export const GRAMMAR_MEANINGS = {
   tip: '先端、こつ',
   backpack: 'リュックサック',
   grill: '焼き網、グリル',
-  board: '板、委員会'
+  board: '板、委員会',
+
+  // **英和辞書が「〜の短縮形」「〜の略」としか書いていない語。**
+  // 語義にラテン文字が残るものは「答えが問題文に漏れる」ので採らない規則にしてあり、
+  // その規則に基本語がまとめて引っかかっていた（bike / math / mom が単語帳に無かった）
+  bike: '自転車',
+  math: '数学',
+  mom: 'お母さん',
+  cab: 'タクシー',
+  teen: '10代の若者',
+  donut: 'ドーナツ',
+  motel: 'モーテル',
+  sports: 'スポーツ',
+  cat: 'ネコ',
+  pen: 'ペン',
+  salt: '塩',
+  aid: '援助、助け',
+  spicy: '香辛料のきいた、辛い',
+  scientist: '科学者',
+  hallway: '廊下',
+  hairdresser: '美容師',
+  firefighter: '消防士',
+  speciality: '得意料理、専門',
+  geese: 'ガチョウ（複数形）',
+  oxen: '雄牛（複数形）',
+  possum: 'フクロネズミ',
+  acquaint: '知らせる、慣れさせる',
+
+  // 地の文から拾うようにして出てきたぶんの手直し
+  appropriate: '適切な',
+  direct: '直接の',
+  indirect: '間接的な',
+  mate: '仲間',
+  capital: '首都、資本',
+  drill: '訓練、ドリル',
+  frequency: '頻度',
+  gender: '性別',
+  option: '選択肢',
+  prediction: '予測',
+  readiness: '用意ができていること',
+  secure: '安全な',
+  total: '合計の',
+  scoop: 'すくう',
+  deaf: '耳が聞こえない',
+  studio: 'スタジオ、仕事場',
+  smell: 'においがする、かぐ',
+  perception: '知覚、認識',
+  arrangement: '手配、配置',
+  correspondence: '文通、やりとり',
+  identification: '身元確認',
+  placement: '配置',
+  bunny: 'ウサギ',
+  boldness: '大胆さ',
+  domestically: '国内で、家庭で'
 };
 
 /** 語義の語尾からは当てられない品詞 */
@@ -214,5 +275,8 @@ export const GRAMMAR_POS = {
   chair: 'n.', sofa: 'n.', shame: 'n.', backpack: 'n.', mural: 'n.',
   trash: 'n.', sole: 'adj.', ill: 'adj.', choosy: 'adj.', afford: 'v.',
   dying: 'adj.', embarrassing: 'adj.', outstanding: 'adj.', nutritious: 'adj.',
-  boost: 'v.', awake: 'adj.', accustomed: 'adj.', diet: 'n.'
+  boost: 'v.', awake: 'adj.', accustomed: 'adj.', diet: 'n.',
+  // 地の文から拾うようにして出てきたぶん
+  appropriate: 'adj.', capital: 'n.', boldness: 'n.', domestically: 'adv.',
+  scoop: 'v.', seldom: 'adv.'
 };

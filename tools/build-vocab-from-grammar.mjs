@@ -178,6 +178,7 @@ function remember(head, level, example, from) {
 }
 
 // ---- ② 教材の本文の、完全な英文から ----
+// ここで拾えた語は、その文をそのまま例文として持てる
 let seenSentences = 0;
 let usedSentences = 0;
 for (const [path, level] of BOOKS) {
@@ -209,6 +210,54 @@ for (const [path, level] of BOOKS) {
       remember(head, level, sentence, path.replace(/^materials\/|\.txt$/g, ''));
     }
   }
+}
+
+// ---- ③ 寸断された地の文から（例文は付けない） ----
+//
+// B1・B2 の長文は、紙面で選択肢の枠に割られている。OCR はそれを行ごとに吐くので、
+// 本文は「大文字で始まり句点で終わる行」にならず、②ではほとんど拾えない。
+//   「A marsupial is a mammal that carries its babies in a small」  ← 句点が無い
+// 実際、knee / onion / soup / towel / truck のような基本語が落ちていた。
+//
+// そこで、地の文らしい行からも語を拾う。ただし文として復元はしないので、
+// **例文は付けない。**つなぎ直すと、段をまたいだ無関係な2文がくっついた例文になる。
+//
+// OCR が壊した語が本物の英単語に化ける危険（modern → modem）に備えて、
+// **2回以上出てくる語だけ**を採る。1回きりの化けは繰り返さない。
+const LOOSE_MIN_COUNT = 2;
+
+/** 行が「地の文らしい」か。見出し・表・選択肢・柱を落とす */
+const NOISE_LINE = [
+  /^www\.nhantriviet/i, /^Answer Key/i, /^\[?GO ON/i, /^STOP$/i, /^PART\s+\d+$/i,
+  /^Master TOEFL Junior/i, /^Questions?\s+\d/i, /^\(?[A-D]\)/, /^\d+\.?$/,
+  /^Chapter|^Unit\s*\d|^Check-?up/i
+];
+
+const loose = new Map();   // 見出し語 → { 回数, 初出レベル }
+for (const [path, level] of BOOKS) {
+  for (const raw of bookText.get(path).split('\n')) {
+    const l = raw.trim();
+    if (!l || NOISE_LINE.some((r) => r.test(l))) continue;
+    const words = l.match(/[A-Za-z]+/g) || [];
+    if (words.length < 3) continue;
+    // 記号だらけの行は表や図。地の文ではない
+    if ((l.match(/[^A-Za-z\s.,;:!?'’"()\-–—%$]/g) || []).length > 2) continue;
+
+    for (const t of l.toLowerCase().match(/[a-z]+/g) || []) {
+      if (t.length < 3 || FUNCTION_WORDS.has(t) || proper.has(t)) continue;
+      const head = headwordOf(t);
+      if (!head) continue;
+      const cur = loose.get(head);
+      if (!cur) loose.set(head, { count: 1, level });
+      else { cur.count += 1; if (level < cur.level) cur.level = level; }
+    }
+  }
+}
+let looseAdded = 0;
+for (const [head, v] of loose) {
+  if (found.has(head) || v.count < LOOSE_MIN_COUNT) continue;
+  found.set(head, { count: v.count, level: v.level, example: '', from: '本文' });
+  looseAdded += 1;
 }
 
 // 意味が引けないものは入れない。意味の無い単語カードは出しても覚えられない
@@ -268,6 +317,7 @@ if (process.argv.includes('--emit')) {
   const byLevel = {};
   rows.forEach((r) => (byLevel[r.level] = (byLevel[r.level] || 0) + 1));
   console.log(`設問 ${GRAMMAR_DATA.length} 問と、教材の英文 ${usedSentences} / ${seenSentences} 文から抽出`);
+  console.log(`  寸断された地の文から追加（${LOOSE_MIN_COUNT}回以上・例文なし）: ${looseAdded}`);
   console.log(`  まだ入っていない語（辞書に当たったもの）: ${found.size}`);
   console.log(`  収録できるもの（意味が引けたもの）: ${rows.length}`);
   const dropped = entries.filter((e) => !deduped.includes(e)).map((e) => e.word);
