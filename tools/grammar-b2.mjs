@@ -216,6 +216,193 @@ export const B2_ITEMS = [
   { k: 'p80-2', s: 'Avignon was where the pope lived during the 14th century. You ___ there if you are interested in the history of Catholicism.', a: 'C', j: 'ought to は「〜するとよい」という勧め' },
   { k: 'p80-3', s: 'If you visit Avignon, you ___ visit the rest of the Provencal region.', a: 'D', j: 'may as well + 原形 で「ついでに〜するとよい」' },
   { k: 'p80-4', s: 'It is a beautiful region in the South of France that ___ around the world for its beauty.', a: 'D', j: '地域は「知られる」側なので受け身' },
-  { k: 'p80-5', s: 'France is a wonderful country. You ___ visit!', a: 'B', j: '「ぜひ行くべきだ」と強くすすめているので must' }
+  { k: 'p80-5', s: 'France is a wonderful country. You ___ visit!', a: 'B', j: '「ぜひ行くべきだ」と強くすすめているので must' },
+
+  // ===== Chapter 2 / Unit 5 Conditionals =====
+  // p82 友だちへの置き手紙
+  { k: 'p82-1', s: "I ___ more, but I don't have enough time before class.", a: 'C', j: '「もっと探したいけれど（時間がない）」という控えめな言い方' },
+  { k: 'p82-2', s: "Well, if I ___ class, I'd be in big trouble with my teacher!", a: 'D', j: 'were to 〜 で「もし仮に〜したら」。主節の I’d と対になる' },
+  { k: 'p82-3', s: 'Anyway, if I had found you, ___ this note!', a: 'D', j: '過去の事実と違う話なので、主節は would have been + -ing' },
+  { k: 'p82-4', s: 'I ___ you in math class, but I forgot!', a: 'D', j: 'would have + 過去分詞 で「〜したはずだったのに（しなかった）」' },
+  // p84 シカゴからの手紙
+  { k: 'p84-1', s: 'Greetings from Chicago! I wish you ___ here with me.', a: 'C', j: 'wish の後ろは今そうでないことなので過去形の could' },
+  { k: 'p84-2', s: "The past month here has been great, but it's time I ___ you to tell you about how things are going!", a: 'A', j: "It's time + 主語 + 過去形 で「もう〜してもいいころだ」" },
+  { k: 'p84-3', s: 'It feels I fit right in ___ I had lived here forever.', a: 'D', j: 'as though 〜 で「まるで〜であるかのように」' },
+  { k: 'p84-4', s: "___ the time you took me to the Yankees game, I wouldn't have been interested in baseball.", a: 'C', j: 'If it had not been for 〜 の if を省いて Had を前に出した形' },
+  // p85-86 Unit Test（模様が消える乳牛）
+  { k: 'p85-1', s: 'If the loss of cow spots ___ less milk, people would know about this strange phenomenon.', a: 'D', j: 'were to 〜 で「もし仮に〜だとしたら」。主節の would と対になる' },
+  { k: 'p85-2', s: '___ of a new study released by the Wisconsin School of Agriculture, people would not be aware of this occurrence.', a: 'B', j: 'If it were not for 〜 の if を省いて Were を前に出した形' },
+  { k: 'p85-3', s: 'Were it not for the results of a new study, people ___ aware of this occurrence.', a: 'C', j: '今の事実と違う話なので主節は would + 原形' },
+  { k: 'p85-4', s: "Scientists aren't sure why this is happening, but it is ___ the cows have lost the ability to produce spotted offspring.", a: 'B', j: 'it is because 〜 で理由を言う' },
+  { k: 'p86-1', s: 'Farmers and scientists wish they ___ the problem.', a: 'B', j: 'wish の後ろは今そうでないことなので過去形の could' },
+  { k: 'p86-2', s: 'After all, if people ___ their skin colors, it would be disturbing.', a: 'B', j: '今の事実と違う話なので if 節は過去形、主節は would' },
+  { k: 'p86-3', s: '___ people knew about this issue.', a: 'B', j: 'If only + 過去形 で「〜であればいいのに」' },
+  { k: 'p86-4', s: 'I would rather scientists ___ a solution.', a: 'B', j: 'would rather + 主語 + 過去形 で「〜してほしい」。今のことでも過去形' },
+
+  // ===== Chapter 2 Chapter Test（ショートメッセージの歴史）=====
+  { k: 'p87-1', s: 'If you had been a teenager in the 60s, you ___ The Beatles.', a: 'C', j: '過去の事実と違う話なので、主節は would have + 過去分詞' },
+  { k: 'p87-2', s: 'Neil Papworth did not think that the first text message he ___ in 1992 would cause such a transformation in communication.', a: 'C', j: 'think より前に送っているので過去完了' },
+  { k: 'p87-3', s: "After text messaging ___ in Papworth's company, it could have failed.", a: 'D', j: 'サービスは「作られる」側なので過去の受け身' },
+  { k: 'p87-4', o: ['been for had it not', 'had it not been for', "if it haven't been for", 'it had not been for'], s: 'In fact, ___ mobile phone companies deciding to create phone billing plans that included text messaging, the service might not have been so popular today.', a: 'B', j: 'If it had not been for 〜 の if を省いて Had を前に出した形' },
+  { k: 'p87-5', s: 'Had it not been for mobile phone companies creating billing plans that included text messaging, the service ___ so popular today.', a: 'D', j: '過去の事実と違う話なので might not have been' },
+  { k: 'p88-1', s: 'Next year, text messaging ___ for 20 years.', a: 'D', j: '来年という未来の時点までの積み重ねなので未来完了' },
+  { k: 'p88-2', s: 'The amount of growth in this short time ___ mobile phone companies to carefully think about gaining money from text messaging.', a: 'B', j: '今に続く結果なので現在完了。主語は amount（単数）' },
+  { k: 'p88-3', s: 'Next time you send a text message, imagine a world without them. It ___ so long ago!', a: 'B', j: '「そんなに昔のことではなかった」と過去をふり返るので過去形' },
+
+  // ===== Chapter 3 Verbals / Unit 1 Infinitives =====
+  // p92 宿題をたずねるメール
+  { k: 'p92-1', s: "I'm writing ___ out about the English homework for tomorrow.", a: 'B', j: '「〜するために」と目的を表す to 不定詞' },
+  { k: 'p92-2', s: 'Was the homework ___ our essays, or did the teacher assign something new?', a: 'C', j: 'be + to 不定詞 で「〜することになっている」。書くのは自分たちなので受け身にしない' },
+  { k: 'p92-3', s: 'Mrs. Morse reminded us last week about ___ our homework.', a: 'C', j: 'the need to 〜 で「〜する必要」。名詞を後ろから説明する to 不定詞' },
+  { k: 'p92-4', s: '___ seemed like a good way to find out about the assignment.', a: 'B', j: '主語の位置に置く to 不定詞。To write to you で「あなたに書くこと」' },
+  // p94 野球部の留守番電話
+  { k: 'p94-1', s: "The school is being used ___ an important meeting and the principal doesn't want us to be loud on the field.", a: 'B', j: '「〜するために」と目的を表す to 不定詞。開くのは学校の側' },
+  { k: 'p94-2', s: 'I know you really wanted ___ in the practice tonight.', a: 'D', j: '君は「入れてもらう」側なので to 不定詞の受け身' },
+  { k: 'p94-3', s: 'I am sorry ___ you.', a: 'D', j: 'sorry より前のことなので to have + 過去分詞' },
+  { k: 'p94-4', s: 'Our hope is ___ this weekend, so we really need to practice!', a: 'A', j: 'to 不定詞の意味上の主語は for + 名詞 で表す' },
+  // p96 ユースオーケストラのオーディション
+  { k: 'p96-1', s: 'We aim ___ the best musicians in the Midwest.', a: 'C', j: 'aim to 〜 で「〜することを目指す」' },
+  { k: 'p96-2', s: "We'd like to enable ___ with a dedicated and talented group of young musicians.", a: 'D', j: 'enable + 人 + to 不定詞' },
+  { k: 'p96-3', s: 'Our current students tell us ___ our hope of finding new members.', a: 'C', j: 'tell + 人 + to 不定詞。打ち消しの not は to の前' },
+  { k: 'p96-4', s: 'We hope to find new members who take the opportunity ___ music very seriously.', a: 'B', j: 'opportunity to 〜 で「〜する機会」' },
+  // p98 大雪による休校の放送
+  { k: 'p98-1', s: 'After studying the weather reports and seeing snow, we have made the decision ___ school tomorrow.', a: 'B', j: 'the decision to 〜 で「〜するという決定」' },
+  { k: 'p98-2', s: 'The teachers and I hope to have the roads ___ by tomorrow night so that school can open on Thursday.', a: 'B', j: 'have + O + 過去分詞。道路は「除雪される」側' },
+  { k: 'p98-3', s: "There aren't enough snow plows ___ the snow tonight.", a: 'B', j: 'enough … to 〜 で「〜するのにじゅうぶんな…」' },
+  { k: 'p98-4', s: 'Be careful tomorrow. Please persuade ___ from driving.', a: 'A', j: 'persuade + 人 + to 不定詞' },
+  // p99-100 Unit Test（言語と帰属意識）
+  { k: 'p99-1', s: 'The language that people use helps ___ their sense of identity, especially if their nation is associated with that language.', a: 'D', j: 'help の後ろは to の付かない原形も取れる' },
+  { k: 'p99-2', s: '___ a different language from someone else may seem trivial, but sharing a language can unite groups of people.', a: 'B', j: '主語の位置に置く to 不定詞' },
+  { k: 'p99-3', s: 'A study ___ how people felt about meeting someone speaking their language when they were traveling abroad.', a: 'D', j: '研究は「行われる」側なので受け身。目的を表す to 不定詞が続く' },
+  { k: 'p100-1', o: ['to be with their happy language', 'to be happy with their language', 'happy to be with their language', 'happy with their language to be'], s: 'Without a doubt, these people were ___.', a: 'C', j: 'be 動詞の後ろは形容詞 happy。その後ろに理由を表す to 不定詞が続く' },
+  { k: 'p100-2', s: 'Social linguists would like ___ how much the sounds of a language have to do with the cultural similarity of those that speak it.', a: 'D', j: 'would like の後ろは to 不定詞' },
+  { k: 'p100-3', s: 'These linguists need ___ them further in order to find answers.', a: 'D', j: 'need の後ろは to 不定詞。動詞を説明するので副詞 systematically' },
+  { k: 'p100-4', s: 'If you ___ a linguist, you will have a chance to focus on these questions.', a: 'A', j: 'if 節の中は未来のことでも現在形。grow up to be 〜 で「成長して〜になる」' },
+  { k: 'p100-5', s: 'If you grow up to be a linguist, you will have a chance ___ on these questions.', a: 'C', j: 'a chance to 〜 で「〜する機会」' },
+
+  // ===== Chapter 3 / Unit 2 Gerunds =====
+  // p102 送迎をお願いする留守番電話
+  { k: 'p102-1', s: 'My mom is sick with a really bad flu and feels that ___ is a bad idea.', a: 'C', j: '主語の位置に来るので動名詞' },
+  { k: 'p102-2', s: 'I love ___ to school because it gives me good exercise.', a: 'C', j: 'love は動名詞も取れる。習慣として言うので進行形にはしない' },
+  { k: 'p102-3', s: 'I am worried about ___ cold, so I thought I would see if you could help me out.', a: 'D', j: 'about は前置詞なので後ろは動名詞' },
+  { k: 'p102-4', o: ['carpool', 'carpooling', 'to carpooling', 'being carpools'], s: 'I think an efficient way to get to school is ___.', a: 'B', j: 'be の後ろで「〜すること」を表すので動名詞' },
+  // p104 レポートの延長をお願いするメール
+  { k: 'p104-1', s: 'To be honest, I never imagined ___ in writing a paper, but this subject is fascinating.', a: 'A', j: 'imagine の後ろは動名詞。興味を持たされる側なので being interested' },
+  { k: 'p104-2', s: 'Now I understand ___ of the time you got excited about writing your paper on World War II.', a: 'C', j: '動名詞の意味上の主語は所有格。your telling で「あなたが話してくれたこと」' },
+  { k: 'p104-3', o: ['having finished not', 'not having finished', 'not to have finished', 'to not have finished'], s: "I'm sorry for ___, but do you think you could give me an extension?", a: 'B', j: '前置詞 for の後ろは動名詞。打ち消しの not は前に置く' },
+  { k: 'p104-4', o: ['to ask', 'my ask', 'my asking', 'for me asking'], s: "I hope you don't mind ___. I'd just like an extra day!", a: 'C', j: 'mind の後ろは動名詞。意味上の主語は所有格で my asking' },
+  // p106 数学の本の紹介
+  { k: 'p106-1', s: 'He likes ___ math every day because it helps him stay organized.', a: 'B', j: 'like は動名詞も取れる。to using の形は無い' },
+  { k: 'p106-2', s: "When asked, most people said they don't mind ___ basic math when buying things in stores or paying bills.", a: 'C', j: 'mind の後ろは動名詞' },
+  { k: 'p106-3', s: 'Allen has been studying math his whole life, but he decided ___ his opinions with others by writing them all down.', a: 'C', j: 'decide の後ろは to 不定詞' },
+  // OCR が「(D) thinking」の左かっこを落としたため機械では拾えなかった。選択肢は紙面から書き写した
+  { k: 'p106-4', o: ['think', 'thought', 'to think', 'thinking'], s: "Now I regret ___ math was boring because Timothy Allen's book taught me so much.", a: 'D', j: 'regret + 動名詞 で「〜したことを悔やむ」' },
+  // p108 相乗り制度のお知らせ
+  { k: 'p108-1', s: 'Although we are used ___ so much traffic in the parking lot, it does not mean that the traffic is okay.', a: 'C', j: 'be used to の to は前置詞。後ろは動名詞' },
+  { k: 'p108-2', s: 'So, we have spent a lot of time ___ this problem.', a: 'C', j: 'spend + 時間 + 動名詞 で「〜して時間を使う」' },
+  { k: 'p108-3', s: 'We cannot help ___ that carpooling will solve the problem.', a: 'B', j: "can't help + 動名詞 で「〜せずにいられない」" },
+  { k: 'p108-4', s: '___ the website, visit HaywoodSchoolCP.com.', a: 'B', j: '「〜するには」と目的を表す to 不定詞' },
+  // p109-110 Unit Test（三つの頭を持つ赤ん坊の話）
+  { k: 'p109-1', s: 'Once upon a time, there was a poor woman who was looking forward ___ a beautiful baby.', a: 'C', j: 'look forward to の to は前置詞。後ろは動名詞' },
+  { k: 'p109-2', s: 'Despite ___ about caring for the baby, the woman was excited to bring a new life into the world.', a: 'C', j: 'despite は前置詞なので後ろは動名詞' },
+  { k: 'p109-3', s: 'The woman was ___ a new life into the world.', a: 'A', j: 'わくわくしているのは女性なので excited。後ろは to 不定詞' },
+  { k: 'p109-4', s: 'As the baby grew older, she began ___ that each head had a different personality and different skills.', a: 'B', j: 'begin の後ろは to 不定詞も動名詞も取れるが、to noticing の形は無い' },
+  { k: 'p109-5', s: 'One day, after she had finished ___ the baby, she took a nap and dreamed a very strange dream.', a: 'D', j: 'finish の後ろは動名詞' },
+  { k: 'p110-1', s: 'She told the man that she regretted ___ the baby better, but the man said not to worry.', a: 'D', j: 'regret + 動名詞。打ち消しの not は動名詞の前' },
+  { k: 'p110-2', s: 'When the woman woke up, she remembered ___ of similar things when she was a young girl.', a: 'B', j: 'remember + 動名詞 で「〜したことを覚えている」' },
+  { k: 'p110-3', s: 'After the baby became a child, he liked ___ with all of his heads.', a: 'B', j: 'like は動名詞も取れる。話すのは本人なので受け身にしない' },
+
+  // ===== Chapter 3 / Unit 3 Participles =====
+  // p112 ミュージカルのオーディション
+  { k: 'p112-1', s: 'If you plan to try out, you should become ___ with the songs before the audition.', a: 'A', j: 'become の後ろは形容詞。become acquainted with 〜 で「〜になじむ」' },
+  { k: 'p112-2', s: 'There are many roles for actors ___ a part.', a: 'B', j: 'actors を後ろから説明する現在分詞。actors は複数なので who wants は合わない' },
+  { k: 'p112-3', s: 'The musical is always ___ and fun to watch.', a: 'C', j: '楽しませる側なので -ing。fun と並ぶので形容詞にそろえる' },
+  { k: 'p112-4', o: ['worries', 'worried', 'worrying', 'to worry'], s: 'I know the audition can make you ___.', a: 'B', j: 'make + O + 過去分詞。不安にさせられる側なので worried' },
+  // p114 交換留学生の日記
+  { k: 'p114-1', s: "___ April now, I'm happy to see spring here in Ohio.", a: 'B', j: '分詞構文に自前の主語 it を付けた形' },
+  { k: 'p114-2', s: 'She says every dinner is better with bread ___ on the table.', a: 'D', j: 'with + 名詞 + 現在分詞 で「〜が…している状態で」' },
+  { k: 'p114-3', s: '___ to school yesterday, Mathilde told me that she used to take the city bus every morning.', a: 'C', j: '接続詞を残した分詞構文。while + 現在分詞' },
+  { k: 'p114-4', s: '___ I live in a small town, there is no way I could take a bus like that!', a: 'D', j: 'considering 〜 で「〜を考えると」。決まった言い方' },
+  // p116 ダンス教室からの留守番電話
+  { k: 'p116-1', s: "___ you with your bag before, I'm sure that it's yours.", a: 'D', j: '主節より前に見ているので having + 過去分詞' },
+  { k: 'p116-2', s: "I know you'll want your ballet slippers ___ this week!", a: 'D', j: '接続詞を残した分詞構文。when + 現在分詞' },
+  { k: 'p116-3', s: "___ I know you'll be looking for that bag so you can practice!", a: 'C', j: '主節の主語 I と違うので、分詞構文に自前の主語 you を残す' },
+  { k: 'p116-4', s: '___ late, the other dancers found it.', a: 'B', j: '主節の主語（ほかの生徒）と同じなので、主語を省いた現在分詞' },
+  // p118 『カンタベリー物語』についてのメール
+  { k: 'p118-1', s: '___ to your lecture about writing good essays, I think that I need to write a perfect one!', a: 'D', j: '主節より前に聞いているので having + 過去分詞' },
+  { k: 'p118-2', s: '___ in old English, the tales must have undergone some translation.', a: 'B', j: '物語は「書かれた」側なので過去分詞' },
+  { k: 'p118-3', s: '___ any others, our translation is not trustworthy as it only has one editor.', a: 'C', j: '主節より前のことなので having + 過去分詞。打ち消しの not は前' },
+  { k: 'p118-4', o: ['Frankly spoken', 'Frankly speaking', 'Having frankly spoken', 'With speaking frankly'], s: '___, I’m not sure how true our translation is to the original version.', a: 'B', j: 'frankly speaking で「率直に言うと」。決まった言い方' },
+  // p119-120 Unit Test（学校外のスポーツ）
+  { k: 'p119-1', s: "Many of today's middle and high school students are playing sports outside of school, ___ adults to wonder if this is a positive or negative addition to young people's lives.", a: 'B', j: '結果を表す分詞構文。「その結果〜させている」' },
+  { k: 'p119-2', s: '___ good to be physically healthy, it is tempting to say that playing sports is good for students.', a: 'D', j: '分詞構文に自前の主語 it を残した形' },
+  { k: 'p119-3', s: '___ people think that they need to develop skills outside of the classroom.', a: 'D', j: '主節の主語 people と違うので、分詞構文に自前の主語 students を残す' },
+  { k: 'p120-1', s: '___ sports, students might not have time for homework.', a: 'C', j: '理由を表す分詞構文。する側なので現在分詞' },
+  { k: 'p120-2', s: '___ on sports, students will neglect their other responsibilities.', a: 'B', j: '接続詞を残した分詞構文。「目を向けているなら」なので if + 過去分詞' },
+  { k: 'p120-3', s: '___ students, teachers can see that those who play sports are less likely to do their homework.', a: 'C', j: '主節の主語 teachers が見る側なので現在分詞' },
+  { k: 'p120-4', s: 'However, ___ employers, experts have reported that corporations are more satisfied with employees who have played sports before.', a: 'D', j: '報告より前に調べているので having + 過去分詞' },
+  { k: 'p120-5', s: '___ in competition, sportsmanship, and teamwork, these employees are good to have in the office.', a: 'C', j: '経験を積まされた側なので being + 過去分詞' },
+
+  // ===== Chapter 3 Chapter Test（ゴールドラッシュ）=====
+  { k: 'p121-1', s: 'The California Gold Rush occurred in 1849, ___ loads of people west in search of wealth through gold.', a: 'C', j: '結果を表す分詞構文。「その結果、人々を連れてきた」' },
+  { k: 'p121-2', s: 'This important event needs ___ in all American history books.', a: 'C', j: '出来事は「教えられる」側なので to 不定詞の受け身' },
+  { k: 'p121-3', s: 'At that time, it was difficult ___ wealth.', a: 'D', j: 'difficult は for + 人 + to 不定詞 で「誰にとって」を表す' },
+  { k: 'p121-4', s: 'Free gold in California seemed ___ a lot of potential.', a: 'B', j: 'seem to 〜 で「〜のように見える」。持つ側なので受け身にしない' },
+  { k: 'p122-1', s: 'Besides ___ to get rich, many came to set up businesses and new lives in California.', a: 'B', j: 'besides は前置詞なので後ろは動名詞' },
+  { k: 'p122-2', s: 'Unfortunately, most of the people ___ in the east who traveled west were not satisfied.', a: 'C', j: 'people を後ろから説明する現在分詞。住む側なので -ing' },
+  { k: 'p122-3', o: ['satisfied', 'satisfying', 'to satisfy', 'have satisfied'], s: 'Most of the people living in the east who traveled west were not ___.', a: 'A', j: 'be satisfied で「満足させられる」。人が感じる側なので過去分詞' },
+  { k: 'p122-4', s: '___ their money for the journey, they were often penniless upon arrival.', a: 'D', j: '到着より前に使っているので having + 過去分詞' },
+
+  // ===== Actual Test =====
+  // p126 は Directions の例題で、紙面に答えが刷ってある。設問として使わない
+  // p127 くじ引きのお知らせ
+  { k: 'p127-1', s: "To raise money for this year's Soccer Championship in Florida, the Ridgewood School soccer team ___ raffle tickets every Monday, Wednesday, and Friday morning of the next month.", a: 'D', j: '来月ずっと続く予定なので未来進行形' },
+  { k: 'p127-2', s: 'The tickets will be sold by the players ___ in their homeroom classes.', a: 'D', j: 'players は複数なので themselves。「選手たち自身が」と強める' },
+  { k: 'p127-3', o: ['success', 'profession', 'contribution', 'application'], s: 'The team would greatly appreciate your ___.', a: 'C', j: '募金を集める話なので「協力・寄付」。contribution' },
+  { k: 'p127-4', s: 'The members will be sending thank you notes to ___ a ticket.', a: 'D', j: 'to の後ろは名詞。everyone を who buys が後ろから説明する' },
+  // p128 年表の作り方
+  { k: 'p128-1', o: ['To finish your history timelines', 'Your history timelines are finished', 'Your history timelines have been finished', 'Having been finished your history timelines'], s: "___, you will need to list the key dates we've studied this semester.", a: 'A', j: '「〜するには」と目的を表す to 不定詞' },
+  { k: 'p128-2', s: 'First, review the key dates from modern European and early American history that ___ in class.', a: 'C', j: '出来事は授業で「取り上げられた」側なので過去の受け身' },
+  { k: 'p128-3', s: '___ the key dates by the country that they took place in — this will make it easier for you to complete the timeline for each country.', a: 'B', j: '国ごとにまとめる作業なので group（分類する）' },
+  { k: 'p128-4', o: ['your answers correct', 'that you correct answers', 'that your answers are correct', 'what your answers are correct'], s: 'Finally, use your textbooks to check ___.', a: 'C', j: 'check の目的語に文を置くので that で始める名詞節' },
+  // p129-130 音楽教室の手伝いを申し出るメール
+  { k: 'p129-1', s: 'You said in class last week that you were looking ___ students to help you with a preschool music class.', a: 'B', j: 'look for 〜 で「〜をさがす」' },
+  { k: 'p129-2', s: 'Well, I thought about it and I have ___ relevant experience, such as babysitting for my sister and working at my cousin’s summer camp.', a: 'D', j: 'experience は数えられない名詞。many や various は付けられない' },
+  { k: 'p130-1', s: 'I know these experiences are just with family, but I hope they are ___ for the position.', a: 'B', j: 'enough to 〜 で「〜するのにじゅうぶん」' },
+  { k: 'p130-2', s: 'I am looking to have a work experience with children that ___ my perspective.', a: 'A', j: 'that が指すのは experience（単数）。広げる側なので受け身にしない' },
+  // p131-132 携帯電話の記事
+  { k: 'p131-1', s: 'Today, cell phones come in many different sizes and shapes, and very ___ they have impressive features such as cameras, reminders, and Internet capability.', a: 'B', j: 'very often で「とてもよく」。頻度を表す' },
+  { k: 'p131-2', s: 'Cell phones today, however, are ___ what they were in the past.', a: 'C', j: 'be different from 〜 で「〜と違う」' },
+  { k: 'p131-3', s: 'The first cell phones were big, bulky car phones with no special features ___ into them.', a: 'D', j: '機能は「組み込まれる」側なので過去分詞。program into 〜' },
+  { k: 'p132-1', o: ['Not using in the car', 'If not used in the car', 'If they did not use cars', 'If not to use in the car'], s: '___ while driving, these cell phones were useless.', a: 'B', j: '接続詞を残した分詞構文。携帯は「使われる」側なので過去分詞' },
+  { k: 'p132-2', s: 'Cell phones soon became as they are today ___ our technologically advanced society.', a: 'D', j: 'because of + 名詞 で理由を表す。because だけなら後ろは文' },
+  { k: 'p132-3', s: '___ a cell phone can also be a lifesaver in an emergency.', a: 'A', j: '主語の位置に来るので動名詞' },
+  // p133-134 ホログラムの記事
+  { k: 'p133-1', s: 'Holography is a technique where an image is recorded and then ___ with a laser beam.', a: 'B', j: 'is recorded and (is) reconstructed。and の前後で形をそろえる' },
+  { k: 'p133-2', o: ['three-dimensionally appeared', 'appear to be three-dimensional', 'appear to be three-dimensionally', 'being appeared three-dimensional'], s: 'These recorded images, called holograms, ___.', a: 'B', j: 'appear to be の後ろは形容詞。images は複数なので appear' },
+  { k: 'p133-3', s: 'This technology ___ since 1947, when it was invented by Dennis Gabor.', a: 'B', j: 'since 1947 は今まで続く期間なので現在完了' },
+  { k: 'p133-4', s: 'Only with the appearance of lasers ___ for its practical use in various fields.', a: 'D', j: 'only で始まる語句が文頭に出ると疑問文の語順にひっくり返る' },
+  { k: 'p134-1', s: 'This hologram, named Yuki, is projected on a ___ and appears to be singing.', a: 'A', j: '歌っているので舞台の上。stage' },
+  { k: 'p134-2', s: "Yuki's holographic mouth moves no ___ the music.", a: 'C', j: 'no later than 〜 で「〜より遅れずに」。比較なので than が要る' },
+  { k: 'p134-3', s: 'Although it is very obvious that Yuki is not human, she is still a ___ performer.', a: 'B', j: '人を引きつける側なので -ing。名詞 performer を前から説明する' },
+  { k: 'p134-4', s: "___ Yuki gains more popularity outside of Japan, she's sure to do international concerts.", a: 'A', j: 'once 〜 で「いったん〜すれば」' },
+  // p135-136 ロゼッタ・ストーン
+  { k: 'p135-1', s: 'The writing on this stone made ___ the meaning of hieroglyphics.', a: 'D', j: 'make it + 形容詞 + to 不定詞。it が to 以下の代わりに立つ' },
+  { k: 'p135-2', s: 'King Ptolemy V of Egypt ___ the Rosetta Stone as a way of recording an important speech that he gave in 196 BC.', a: 'B', j: '紀元前196年のことなので過去形' },
+  { k: 'p135-3', s: 'The stone ___ the decree written in three different languages.', a: 'A', j: '今も変わらない事実なので現在形。contain は状態を表すので進行形にしない' },
+  { k: 'p135-4', s: 'The stone contains the decree written in three different languages, ___ archeologists to finally understand the Egyptian system of writing.', a: 'A', j: '結果を表す分詞構文。「その結果〜できるようにした」' },
+  { k: 'p136-1', s: 'They needed to have some sort of translator as a key, ___ is why the Rosetta Stone is so important.', a: 'B', j: '前の文全体を受けて説明を足すので which' },
+  { k: 'p136-2', s: 'It took a long time ___ hieroglyphics, even with the Rosetta Stone.', a: 'C', j: 'It takes + 時間 + for 人 + to 不定詞' },
+  { k: 'p136-3', o: ['the language worked', 'how the language worked', 'how worked the language', 'how did the language work'], s: 'It took them until 1822 to officially announce that they understood ___.', a: 'B', j: '疑問詞が文の中に入ると、疑問文ではなくふつうの語順になる' },
+  { k: 'p136-4', s: 'Today, Egyptian hieroglyphics can be read with ease, ___ the Rosetta Stone.', a: 'A', j: 'thanks to 〜 で「〜のおかげで」' },
+  // p137-138 コロッセウム
+  { k: 'p137-1', s: 'The Colosseum is ___ in the center of the city of Rome.', a: 'B', j: '冠詞 + 形容詞 + 名詞 の語順' },
+  { k: 'p137-2', s: 'It is the largest amphitheater ___ during the Roman Empire.', a: 'A', j: '闘技場は「建てられた」側なので過去分詞が後ろから説明する' },
+  { k: 'p137-3', s: 'The Colosseum was built ___ it could fit more than 50,000 spectators.', a: 'A', j: 'so that 〜 で「〜できるように」と目的を表す' },
+  { k: 'p137-4', o: ['attacks', 'contests', 'defenses', 'attempts'], s: 'The Colosseum was used for many different types of spectacles, but was most often used for gladiator ___.', a: 'B', j: '剣闘士どうしの「試合」なので contest' },
+  { k: 'p138-1', s: 'The reason why ___ the "Colosseum" is because of a "colossal" statue of Nero that was built nearby.', a: 'D', j: 'why の後ろは文。建物は「名づけられる」側なので受け身' },
+  { k: 'p138-2', s: 'It is ___ possible that the Colosseum was called many different things in the past before it got its current name.', a: 'D', j: 'quite は形容詞 possible を強める副詞' },
+  { k: 'p138-3', s: 'Tourists notice that ___ the stage from any location in the amphitheater.', a: 'C', j: 'notice that の後ろは主語と動詞のある文' },
+  { k: 'p138-4', s: 'Tourists notice that one can see the stage from any location, proving that the Colosseum is one of ___ ever achieved by the Ancient Romans.', a: 'D', j: 'one of the + 最上級 + 複数名詞' }
   // ここまで
 ];
