@@ -216,6 +216,24 @@ Playwright で形ごとに1問ずつ並べて撮り、明暗の両方で確か�
 
 ---
 
+## PDF の取り込み
+
+`tools/pdf-to-text.py`（Python。ほかの道具は Node だがここだけ Python）。
+
+```bash
+pip install pymupdf pillow
+python3 tools/pdf-to-text.py 教材.pdf --check     # 判別が先。ここを飛ばさない
+```
+
+- **文字入りの PDF に OCR をかけない。** 誤字ゼロのものをわざわざ誤字ありにすることになる
+- OCR（tesseract）は **数字を壊す**。「何千キロ」→「何干キロ」を実際に踏んだ。
+  取り込んだあとは必ず目で確かめる
+- 精度が要るなら `--mode images` で画像にして **Claude に読ませる**。
+  `js/reading-data.js` の r23〜r134 はこの方法
+- 出力はページごとに分ける。**あとで誤字を見つけたとき元のページに戻れる**ようにするため
+- **教材そのものをリポジトリに置かない。**公開リポジトリなので。
+  `materials/` と `out/` は `.gitignore` にある
+
 ## Git
 
 - 開発は `claude/toeic-vocabulary-app-7v6o1v` ブランチ

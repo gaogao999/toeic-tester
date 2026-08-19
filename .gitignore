@@ -1,6 +1,7 @@
 # 教材（著作物）と作業ファイルはコミットしない
 materials/
 data/raw/
+out/          # tools/pdf-to-text.py の書き出し先
 
 # Playwright 確認用
 node_modules/

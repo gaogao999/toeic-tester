@@ -537,6 +537,54 @@ node tools/audit-math.mjs    # 点検。エラー0件になるまで直す
 }
 ```
 
+## PDF を文字にする（教材の取り込み）
+
+`tools/pdf-to-text.py`。**スキャン画像の PDF と、文字が入っている PDF はやることが全く違う**ので、
+まず判別してから進みます。
+
+```bash
+pip install pymupdf pillow
+apt-get install tesseract-ocr tesseract-ocr-jpn   # OCR を使うときだけ
+
+python3 tools/pdf-to-text.py 教材.pdf --check      # ← まずこれ
+```
+
+判別の結果で分かれます。
+
+| PDF の種類 | やること | 精度 | 速さ |
+| --- | --- | --- | --- |
+| 文字が入っている | 取り出すだけ | 誤字ゼロ | 一瞬 |
+| スキャン画像 | OCR が要る | 誤字が出る | 遅い |
+
+```bash
+python3 tools/pdf-to-text.py 教材.pdf                  # 自動判別して書き出す
+python3 tools/pdf-to-text.py 教材.pdf --mode images --dpi 150 --format jpg
+python3 tools/pdf-to-text.py 教材.pdf --mode ocr --lang eng+jpn --pages 1-20
+```
+
+出力は `out/<PDFの名前>/` に**ページごと**（`p0001.txt`）と、まとめ（`all.txt`）。
+1ファイルにまとめないのは、**取り込んだあとに誤字を見つけたとき元のページに戻れる**ようにするためです。
+
+### OCR の結果は必ず目で見ること
+
+きれいなスキャンでこの精度でした（実際の教材はもっと落ちます）。
+
+| | 一致率 |
+| --- | --- |
+| 英語 | 100% |
+| 日本語 | 97.2% |
+
+日本語で外した1文字が **「何千キロ」→「何干キロ」** でした。**数字が壊れます。**
+算数の問題や設問番号でこれが起きると、気づかないまま間違ったデータが入ります。
+
+精度が要るなら OCR に頼らず、`--mode images` でページを画像にして
+**Claude に読ませる**ほうが確実です（`js/reading-data.js` の r23〜r134 はこの方法で作りました）。
+
+### 教材を扱うときの注意
+
+**このリポジトリは公開されています。**教材のスキャンや、そこから起こした本文を
+リポジトリに置かないでください。`materials/` と `out/` は `.gitignore` に入れてあります。
+
 ## 単語データについて
 
 **2,919 語**。全語に品詞・日本語の意味・レベル・カテゴリが付いています。
