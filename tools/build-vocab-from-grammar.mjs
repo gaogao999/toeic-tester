@@ -55,18 +55,24 @@ const CATEGORY = '文法教材の語';
  * 巻末は解答と索引で、こちらも英文ではない。
  */
 const BOOKS = [
-  ['materials/grammar-basic-a2.txt', 2, 13, 136],
-  ['materials/grammar-inter-b1.txt', 3, 15, 139],
-  ['materials/grammar-adv-b2.txt', 4, 15, 139]
+  ['materials/grammar-basic-a2.txt', 2, 13, 136, [14, 125]],
+  ['materials/grammar-inter-b1.txt', 3, 15, 138, [16, 126]],
+  ['materials/grammar-adv-b2.txt', 4, 15, 138, [16, 126]]
 ];
 
-/** 冊子の本編だけを取り出す */
-function bodyOf(file, from, to) {
+/**
+ * 冊子の本編だけを取り出す。**Directions のページも外す。**
+ * 試験の受け方の説明で、3冊とも同じ文が載っている。ここを含めると、共通のサンプル問題から
+ * concept / theory / relatively / Newton が「A2 の語」として入ってしまう。
+ * レベル判定（relevel-vocab.mjs）と**同じ範囲**にしておくこと。片方だけ違うと、
+ * 収録はされるがレベルが決まらない語ができる
+ */
+function bodyOf(file, from, to, skip) {
   const pages = fs.readFileSync(file, 'utf8').split(/^===== PAGE (\d+) =====$/m);
   const keep = [];
   for (let i = 1; i < pages.length; i += 2) {
     const n = Number(pages[i]);
-    if (n >= from && n <= to) keep.push(pages[i + 1]);
+    if (n >= from && n <= to && !skip.includes(n)) keep.push(pages[i + 1]);
   }
   return keep.join('\n');
 }
@@ -122,7 +128,7 @@ function sentencesOf(text) {
   return out;
 }
 
-const bookText = new Map(BOOKS.map(([path, , from, to]) => [path, bodyOf(path, from, to)]));
+const bookText = new Map(BOOKS.map(([path, , from, to, skip]) => [path, bodyOf(path, from, to, skip)]));
 
 // 設問1つにつき「空所を埋めた文」と「選択肢すべて」、それに教材の本文を見る
 const texts = [];
