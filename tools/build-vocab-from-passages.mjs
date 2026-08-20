@@ -224,7 +224,9 @@ if (process.argv.includes('--emit')) {
  */
 const WORD_DATA = [\n`;
   const body = entries.map(serialize).join(',\n');
-  const footer = `\n];\n\nconst LEVELS = [1, 2, 3];\n// カテゴリの一覧は単語データから作る\nconst CATEGORIES = [...new Set(WORD_DATA.map((w) => w.category))];\n`;
+  // LEVELS はどこからも参照されておらず、値も実態（2〜4）と食い違っていたので書き出さない。
+  // 難易度の呼び名は js/app.js の LEVEL_LABELS、出す段は MIN_LEVEL / MAX_LEVEL が持つ
+  const footer = `\n];\n\n// カテゴリの一覧は単語データから作る\nconst CATEGORIES = [...new Set(WORD_DATA.map((w) => w.category))];\n`;
   fs.writeFileSync(path.join(ROOT, 'js/data.js'), header + body + footer);
   console.log(`js/data.js に ${entries.length} 語を書き出しました`);
 } else {

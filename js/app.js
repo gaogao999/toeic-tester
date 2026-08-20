@@ -548,7 +548,7 @@
    * tools/stamp-version.mjs で書き換える。
    * スマホで開いたときに、手元のものが最新かを確かめるためのもの。
    */
-  const APP_VERSION = '2026-08-20 (8d8eda5)';
+  const APP_VERSION = '2026-08-20 (e008ba1)';
 
   const EXAM_DATE = '2027-01-07';
 
@@ -764,9 +764,12 @@
     if (!text) return;
     if (fc.deck[fc.index] !== w) return; // 待っている間に次のカードへ移っていたら書き換えない
 
-    el.innerHTML = text.replace(
+    // **先に全体を escape してから ruby に組む。**拾った漢字と読みだけを escape していたら、
+    // それ以外の部分が生の HTML として入っていた（AI の返答とキャッシュがそのまま画面に入る経路）。
+    // escapeHtml は日本語と丸かっこを触らないので、この順でも読みの抽出はできる
+    el.innerHTML = escapeHtml(text).replace(
       /([一-龯々]+)\(([ぁ-ん]+)\)/g,
-      (m, kanji, yomi) => `<ruby>${escapeHtml(kanji)}<rt>${escapeHtml(yomi)}</rt></ruby>`
+      (m, kanji, yomi) => `<ruby>${kanji}<rt>${yomi}</rt></ruby>`
     );
   }
 
@@ -3088,12 +3091,12 @@
     // マスごとに MATH_DATA を filter すると 884 問 × 125 マスを走ることになる
     const bucket = new Map();
     for (const p of MATH_DATA) {
-      const key = `${p.category} ${p.level}`;
+      const key = `${p.category}\u0000${p.level}`;
       const arr = bucket.get(key);
       if (arr) arr.push(p);
       else bucket.set(key, [p]);
     }
-    const cellAt = (cat, lv) => mathMapCell(bucket.get(`${cat} ${lv}`) || []);
+    const cellAt = (cat, lv) => mathMapCell(bucket.get(`${cat}\u0000${lv}`) || []);
 
     const head =
       '<div class="mm-row mm-head"><span class="mm-name"></span>' +

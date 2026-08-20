@@ -3065,6 +3065,5 @@ const WORD_DATA = [
   { id: 3732, word: 'weak', phonetic: '/ˈwik/', pos: 'adj.', meaning: '弱い', note: '', example: 'It was disappointing to see the team beaten by a weaker opponent.', exampleJa: '', level: 4, category: '文法教材の語', toefl: true }
 ];
 
-const LEVELS = [1, 2, 3];
 // カテゴリの一覧は単語データから作る
 const CATEGORIES = [...new Set(WORD_DATA.map((w) => w.category))];
