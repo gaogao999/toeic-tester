@@ -46,12 +46,30 @@ const GRAMMAR_DATA = load('js/grammar-data.js', 'GRAMMAR_DATA');
 /** 出どころが分かるようにカテゴリを分ける。既存の分類は話題別だが、これは出典別 */
 const CATEGORY = '文法教材の語';
 
-/** 教材3冊。レベルはその冊子の CEFR に合わせる */
+/**
+ * 教材3冊と、その**本編**のページ範囲。レベルはその冊子の CEFR に合わせる。
+ *
+ * **巻頭と巻末を入れないこと。**巻頭は「TOEFL Junior とはどんな試験か」を大人向けに
+ * 説明した文章で、その冊子のレベルで書かれた英文ではない。ここを含めていたために
+ * communication / relationship / research が「A2 の語」として入っていた（あとで直した）。
+ * 巻末は解答と索引で、こちらも英文ではない。
+ */
 const BOOKS = [
-  ['materials/grammar-basic-a2.txt', 2],
-  ['materials/grammar-inter-b1.txt', 3],
-  ['materials/grammar-adv-b2.txt', 4]
+  ['materials/grammar-basic-a2.txt', 2, 13, 136],
+  ['materials/grammar-inter-b1.txt', 3, 15, 139],
+  ['materials/grammar-adv-b2.txt', 4, 15, 139]
 ];
+
+/** 冊子の本編だけを取り出す */
+function bodyOf(file, from, to) {
+  const pages = fs.readFileSync(file, 'utf8').split(/^===== PAGE (\d+) =====$/m);
+  const keep = [];
+  for (let i = 1; i < pages.length; i += 2) {
+    const n = Number(pages[i]);
+    if (n >= from && n <= to) keep.push(pages[i + 1]);
+  }
+  return keep.join('\n');
+}
 
 /** 設問文の空所に正解を入れて、ふつうの英文に戻す */
 const filled = (q) => q.question.replace('___', q.choices[q.answer]);
@@ -104,7 +122,7 @@ function sentencesOf(text) {
   return out;
 }
 
-const bookText = new Map(BOOKS.map(([path]) => [path, fs.readFileSync(path, 'utf8')]));
+const bookText = new Map(BOOKS.map(([path, , from, to]) => [path, bodyOf(path, from, to)]));
 
 // 設問1つにつき「空所を埋めた文」と「選択肢すべて」、それに教材の本文を見る
 const texts = [];
