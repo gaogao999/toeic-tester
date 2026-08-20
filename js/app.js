@@ -510,7 +510,7 @@
    * tools/stamp-version.mjs で書き換える。
    * スマホで開いたときに、手元のものが最新かを確かめるためのもの。
    */
-  const APP_VERSION = '2026-08-20 (abf79d0)';
+  const APP_VERSION = '2026-08-20 (83d5544)';
 
   const EXAM_DATE = '2027-01-07';
 
