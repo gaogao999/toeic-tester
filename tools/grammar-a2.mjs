@@ -16,7 +16,8 @@
 export const A2_FIXES = {
   'They help us ___ the street sately.': 'They help us ___ the street safely.',
   'He was cleaning his room ___ himself': 'He was cleaning his room ___ himself.',
-  'The lessons are always ___': 'The lessons are always ___.'
+  'The lessons are always ___': 'The lessons are always ___.',
+  'Paul ___ there for ten years when his father died': 'Paul ___ there for ten years when his father died.'
 };
 
 /** 問題文 → 日本語の解説 */
@@ -54,7 +55,7 @@ export const A2_NOTES = {
   'James ___ studying English at that time.': 'at that time は過去のある時点',
   'My neighbor ___ her dog every morning since I was young.': 'since 〜 は今まで続く期間なので現在完了',
   'By next September, my cousin ___ her baby.': 'by + 未来の時 は「〜までに」。未来完了',
-  'Paul ___ there for ten years when his father died': '父が亡くなった時点より前から続いていたので過去完了',
+  'Paul ___ there for ten years when his father died.': '父が亡くなった時点より前から続いていたので過去完了',
   // --- 受動態
   'Nathan ___ Mount Everest.': '登ったのは Nathan の側なので受け身にしない',
   'The organization ___ by Mr. Guggenheim.': '団体は「設立される」側。found（設立する）の過去分詞は founded',

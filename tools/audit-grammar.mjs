@@ -11,6 +11,7 @@
  *   - OCR の傷が残っている（`7ih` `l'm` `SO` のような字面）
  *   - 問題文が重複している
  *   - 解説が日本語でない
+ *   - **1文で完結していない**（文頭が Mine / 文末の記号が無い）
  *
  * emit のあとに必ず走らせること。
  */
@@ -44,6 +45,14 @@ for (const q of items) {
 
   const lower = q.choices.map((c) => c.toLowerCase().trim());
   if (new Set(lower).size !== lower.length) errors.push(`${at}: 選択肢が重複している → ${q.choices.join(' / ')}`);
+
+  // **1文で完結していること。**教材の B1・B2 は「1つの本文に空所が4つ」という形式で、
+  // そこから1問ずつ切り出すと、指す先が本文にしか無い設問ができる。
+  // 実際「Mine has my name, Angela, ___ it.」（Mine = 落とした筆箱）が出ていた
+  if (/^(Mine|Yours|Ours|Theirs|Hers)\b/.test(q.question)) {
+    errors.push(`${at}: 文頭が所有代名詞。何を指すか文の中に無い → ${q.question}`);
+  }
+  if (!/[.!?]["')]?$/.test(q.question)) errors.push(`${at}: 文末の記号が無い → ${q.question}`);
 
   if (!units.includes(q.unit)) errors.push(`${at}: 知らない単元 ${q.unit}`);
   if (![2, 3, 4].includes(q.level)) errors.push(`${at}: レベルが不正 ${q.level}`);

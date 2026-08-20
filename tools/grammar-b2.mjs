@@ -69,16 +69,16 @@ export const B2_ITEMS = [
   { k: 'p34-3', s: 'At this point, your objects should leave you feeling ___ to paint them.', a: 'A', j: 'feel の後ろは形容詞。副詞 quite が形容詞 eager を強める' },
   { k: 'p34-4', s: 'After, what you should do is ___ your canvas, find some brushes, choose your colors, and go!', a: 'A', j: 'What you should do is + 原形。後ろの find・choose と形がそろう' },
   // p36 学芸会のスタッフ募集
-  { k: 'p36-1', s: 'The performers are not the only ones who make ___', a: 'B', j: 'make + O + 名詞 で「O を〜にする」。語順は目的語が先' },
+  { k: 'p36-1', s: 'The performers are not the only ones who make ___.', a: 'B', j: 'make + O + 名詞 で「O を〜にする」。語順は目的語が先' },
   { k: 'p36-2', s: 'Student volunteers allow parents, teachers, and students ___ the show.', a: 'C', j: 'allow + 人 + to 不定詞' },
   { k: 'p36-3', s: 'Also, last year, we made some students ___ the set.', a: 'A', j: 'make + O + 原形。to は付けない' },
   { k: 'p36-4', s: "We'll have volunteers ___ in the talent show's program.", a: 'B', j: 'have + O + 過去分詞。名前は「載せられる」側' },
   // p37-38 Unit Test（キング牧師）
   { k: 'p37-1', s: 'Martin Luther King, Jr. was ___ pastor, and civil rights leader who fought for the freedoms of African-Americans.', a: 'A', j: 'activist・pastor・leader が and で並ぶので、動詞を含まない名詞のまとまりにする' },
-  { k: 'p37-2', s: 'Equality and peace around the world was ___', a: 'A', j: 'be の後ろに置く名詞節。疑問文ではないので語順は he really wanted' },
+  { k: 'p37-2', s: 'Equality and peace around the world was ___.', a: 'A', j: 'be の後ろに置く名詞節。疑問文ではないので語順は he really wanted' },
   { k: 'p37-3', s: 'King is ___ using nonviolent methods to promote change.', a: 'B', j: 'be famous for 〜 で「〜で有名だ」。for の後ろは動名詞' },
   { k: 'p37-4', s: 'African-American bus riders were required ___ for white passengers.', a: 'C', j: 'be required to 〜 で「〜するよう求められる」' },
-  { k: 'p38-1', s: 'King successfully organized a bus boycott to make ___', a: 'A', j: 'make + O + 過去分詞。声は「聞かれる」側' },
+  { k: 'p38-1', s: 'King successfully organized a bus boycott to make ___.', a: 'A', j: 'make + O + 過去分詞。声は「聞かれる」側' },
   { k: 'p38-2', s: 'He gave his "I Have a Dream" speech, which is considered ___ in history.', a: 'D', j: 'one of the + 最上級 + 複数名詞' },
   { k: 'p38-3', s: 'King became ___ the Nobel Peace prize in 1964.', a: 'C', j: 'the youngest person を to 不定詞が後ろから説明する' },
   { k: 'p38-4', o: ['died youngly', 'died a young', 'dead a young man', 'died a young man'], s: 'Unfortunately, King ___. He was assassinated in Memphis, Tennessee in 1968.', a: 'D', j: 'die a young man で「若くして死ぬ」。die は動詞なので dead は使えない' },
@@ -138,7 +138,7 @@ export const B2_ITEMS = [
   { k: 'p56-1', s: 'Darwin wrote: "The preservation of favorable variations and the destruction of those which are injurious, I ___ Natural Selection."', a: 'A', j: 'ダーウィンが書いた当時のことなので過去形' },
   { k: 'p56-2', s: 'By "fittest," Darwin ___ the largest, smartest, or strongest members of a group.', a: 'A', j: '当時ダーウィンが何を指したかの話なので過去形' },
   { k: 'p56-3', s: 'Instead, he ___ the term to refer to those members of a species that produce the largest number of surviving offspring.', a: 'B', j: '前の文の did not mean と時をそろえて過去形' },
-  { k: 'p56-4', s: 'If a species cannot leave offspring that can adapt to an environment, that species ___', a: 'D', j: 'if 節は現在形でも、**主節は未来形**にする' },
+  { k: 'p56-4', s: 'If a species cannot leave offspring that can adapt to an environment, that species ___.', a: 'D', j: 'if 節は現在形でも、**主節は未来形**にする' },
 
   // ===== Chapter 2 / Unit 2 Continuous & Perfect Tenses =====
   // p58 発表のしかた
@@ -163,14 +163,14 @@ export const B2_ITEMS = [
 
   // ===== Chapter 2 / Unit 3 Passive Voice =====
   // p64 プール休業のお知らせ
-  { k: 'p64-1', s: 'It was open for the past month, but ___ the club while it gets remodeled.', a: 'B', j: 'プールは「閉められる」側なので受け身。行為者はクラブなので by' },
+  { k: 'p64-1', s: 'The pool was open for the past month, but ___ the club while it gets remodeled.', a: 'B', j: 'プールは「閉められる」側なので受け身。行為者はクラブなので by' },
   { k: 'p64-2', s: 'The pool will be closed by the club while it ___.', a: 'C', j: 'while の中は未来のことでも現在形。get + 過去分詞 も受け身を表す' },
   { k: 'p64-3', s: 'We are sorry for the inconvenience, but the pool has needed ___ for a long time.', a: 'D', j: 'プールは「直される」側なので to 不定詞の受け身' },
   { k: 'p64-4', s: 'If you ___ the club, you can use the pool at Essex Country Club down the street for no charge.', a: 'A', j: 'belong は状態を表すので進行形にしない。受け身にもしない' },
   // p66 落とし物のお知らせ
   { k: 'p66-1', s: 'I ___ to take it off during gym class by my teacher.', a: 'D', j: '先生に「言われた」側なので過去の受け身' },
   { k: 'p66-2', s: 'I was asked to take it off during gym class and accidentally ___ it on the soccer field.', a: 'A', j: '置き忘れたのは自分なので受け身にしない。過去形' },
-  { k: 'p66-3', s: 'Mine has a special patch ___ the sleeve with my name, Kevin, on it.', a: 'C', j: 'ワッペンは「縫い付けられている」側なので過去分詞。sew onto 〜' },
+  { k: 'p66-3', s: 'My sweatshirt has a special patch ___ the sleeve with my name, Kevin, on it.', a: 'C', j: 'ワッペンは「縫い付けられている」側なので過去分詞。sew onto 〜' },
   { k: 'p66-4', s: 'I hope the sweatshirt ___ the cleaning staff.', a: 'D', j: 'do away with を1つの動詞として受け身にし、そのうえで行為者に by を付ける' },
   // p68 ホームステイについてのメール
   { k: 'p68-1', s: 'I was ___ with a new family before I did it, too!', a: 'D', j: 'be concerned about 〜 で「〜が気がかりだ」。about の後ろは動名詞' },
@@ -211,7 +211,7 @@ export const B2_ITEMS = [
   // p79-80 Unit Test（フランス旅行）
   { k: 'p79-1', s: 'Having visited many countries, I would rather ___ in France than anywhere else.', a: 'A', j: 'would rather の後ろは to の付かない原形' },
   { k: 'p79-2', s: 'If you travel in France, you ___ Le Mont Saint-Michel.', a: 'D', j: 'should は「ぜひ〜するとよい」という勧め' },
-  { k: 'p79-3', s: 'It ___ connected to the mainland by a tidal bridge, but this no longer remains.', a: 'A', j: 'used to be 〜 で「昔は〜だった（今は違う）」。be used to とは別物' },
+  { k: 'p79-3', s: 'Le Mont Saint-Michel ___ connected to the mainland by a tidal bridge, but this no longer remains.', a: 'A', j: 'used to be 〜 で「昔は〜だった（今は違う）」。be used to とは別物' },
   { k: 'p80-1', s: 'If you visit Le Mont Saint-Michel, you ___ wear athletic shoes because there are a lot of stairs!', a: 'B', j: 'might want to 〜 で「〜したほうがいいかも」という控えめな勧め' },
   { k: 'p80-2', s: 'Avignon was where the pope lived during the 14th century. You ___ there if you are interested in the history of Catholicism.', a: 'C', j: 'ought to は「〜するとよい」という勧め' },
   { k: 'p80-3', s: 'If you visit Avignon, you ___ visit the rest of the Provencal region.', a: 'D', j: 'may as well + 原形 で「ついでに〜するとよい」' },

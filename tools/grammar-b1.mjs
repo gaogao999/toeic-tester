@@ -24,7 +24,7 @@ export const B1_ITEMS = [
   // p17 学校のお知らせ（パレード）
   { k: 'p17-1', s: 'To celebrate the coming of summer, the 6th grade class ___ a parade on Tuesday.', a: 'D', j: '来週の火曜という決まった予定なので未来。will be having で「〜することになっている」' },
   { k: 'p17-2', s: 'The entire parade was planned ___ the 6th grade students and their parents.', a: 'C', j: '受け身の文で「誰によって」を言うのは by' },
-  { k: 'p17-3', s: 'It should be ___!', a: 'C', j: 'quite a(n) + 形容詞 + 名詞 の語順。わくわくさせる側なので exciting（excited は人が感じる側）' },
+  { k: 'p17-3', s: 'The parade should be ___!', a: 'C', j: 'quite a(n) + 形容詞 + 名詞 の語順。わくわくさせる側なので exciting（excited は人が感じる側）' },
   { k: 'p17-4', s: 'The 6th graders will be throwing candy to ___.', a: 'D', j: 'to の後ろは名詞。everyone を who comes が後ろから説明する' },
   // p18 道順の説明
   { k: 'p18-1', s: '___ to Hyde Park from our school, you should first take a left.', a: 'C', j: '「〜するには」と目的を表す to 不定詞。文頭に置ける' },
@@ -85,7 +85,7 @@ export const B1_ITEMS = [
   // p36 家庭教師をさがす広告
   { k: 'p36-1', s: 'I really want to learn Chinese — some might call ___!', a: 'C', j: 'call + 人 + 呼び名 の語順' },
   { k: 'p36-2', s: 'I find Chinese very ___.', a: 'C', j: '興味を起こさせる側なので interesting。interested は人が感じる側' },
-  { k: 'p36-3', s: 'This has caused me ___ a tutor.', a: 'C', j: 'cause + 人 + to 不定詞' },
+  { k: 'p36-3', s: 'Studying Chinese alone has caused me ___ a tutor.', a: 'C', j: 'cause + 人 + to 不定詞' },
   { k: 'p36-4', s: "I've heard many students ___ Chinese in the school cafeteria.", a: 'A', j: 'hear などの知覚動詞は to の付かない原形を取る' },
   // p37-38 Unit Test（エルヴィス・プレスリー）
   { k: 'p37-1', s: 'Elvis Presley was ___ who was born in 1935.', a: 'D', j: '冠詞 + 形容詞のまとまり + 名詞 の語順。singer が中心の名詞' },
@@ -93,7 +93,7 @@ export const B1_ITEMS = [
   { k: 'p37-3', s: 'Producers decided to change the name when Elvis\'s song "Love Me Tender" became ___.', a: 'A', j: 'become の後ろは形容詞' },
   { k: 'p37-4', s: 'At this time, African-Americans were ___ against and not allowed on the radio.', a: 'C', j: '差別される側なので過去分詞。動詞を説明するので副詞 largely' },
   { k: 'p38-1', s: 'Elvis helped make ___.', a: 'C', j: 'make + O + 過去分詞。音楽は「聞かれる」側' },
-  { k: 'p38-2', s: 'This made him ___.', a: 'B', j: 'a + 副詞 + 形容詞 + 単数名詞 の語順。him ひとりなので figures は不可' },
+  { k: 'p38-2', s: 'Singing African-American music made Elvis ___.', a: 'B', j: 'a + 副詞 + 形容詞 + 単数名詞 の語順。him ひとりなので figures は不可' },
   { k: 'p38-3', s: 'Singing their own music was ___.', a: 'C', j: '「〜すること」をまとめる名詞節。先行詞なしで使えるのは what' },
   { k: 'p38-4', s: 'They were forced to allow Elvis ___ their music.', a: 'B', j: 'allow + 人 + to 不定詞' },
 
@@ -184,7 +184,7 @@ export const B1_ITEMS = [
   // p66 落とし物のお知らせ
   { k: 'p66-1', s: 'I ___ to lend pencils to another student and handed him my pencil case.', a: 'D', j: '先週のことで「そうさせられた」側なので過去の受け身' },
   { k: 'p66-2', s: 'He gave it back to me, but I accidentally ___ the pencil case after that.', a: 'B', j: '置き忘れたのは自分なので受け身にしない。過去のことなので過去形' },
-  { k: 'p66-3', s: 'Mine has my name, Angela, ___ it.', a: 'C', j: '「書かれている」側なので過去分詞。write on 〜 で「〜に書く」' },
+  { k: 'p66-3', s: 'My pencil case has my name, Angela, ___ it.', a: 'C', j: '「書かれている」側なので過去分詞。write on 〜 で「〜に書く」' },
   { k: 'p66-4', s: 'I hope the pencil case ___ one of the teachers.', a: 'D', j: 'do away with を1つの動詞として受け身にし、そのうえで行為者に by を付ける' },
   // p68 先生から生徒へのメール（ボランティア）
   { k: 'p68-1', s: 'I was ___ in the kitchen before I started doing it, too.', a: 'D', j: 'be worried about 〜 で「〜が心配だ」。about の後ろは動名詞' },
@@ -258,10 +258,10 @@ export const B1_ITEMS = [
   { k: 'p87-2', s: 'Slaves on Southern plantations ___ spiritual songs and work music.', a: 'C', j: 'would は「昔よく〜したものだ」という過去の習慣' },
   { k: 'p87-3', s: 'After the slaves ___, their descendants used ideas from their music to form the blues.', a: 'B', j: '奴隷は「解放される」側なので過去の受け身' },
   { k: 'p87-4', s: 'Blues was first ___ at the end of the 19th century.', a: 'B', j: '音楽は「演奏される」側。was + 過去分詞' },
-  { k: 'p88-1', s: 'It ___ exactly the same as the music sung by slaves.', a: 'B', j: '19世紀末という過去の話が続いているので過去形' },
+  { k: 'p88-1', s: 'Blues music ___ exactly the same as the music sung by slaves.', a: 'B', j: '19世紀末という過去の話が続いているので過去形' },
   { k: 'p88-2', s: 'It ___ so difficult if more records had been kept.', a: 'B', j: '過去に記録が残っていれば「今」楽だった、という話。主節は現在の話なので might not be' },
   { k: 'p88-3', s: 'Blues music ___ many people to feel strongly.', a: 'A', j: '今も変わらない事実なので現在形' },
-  { k: 'p88-4', s: 'It has already influenced many and ___ more in the coming years.', a: 'D', j: 'in the coming years は未来のことなので will' },
+  { k: 'p88-4', s: 'Blues music has already influenced many and ___ more in the coming years.', a: 'D', j: 'in the coming years は未来のことなので will' },
 
   // ===== Chapter 3 Verbals / Unit 1 Infinitives =====
   // p92 イギリスに住む友人へのメール
