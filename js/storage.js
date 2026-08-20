@@ -28,6 +28,12 @@ const Storage = (() => {
       tempoTime: 5, // サクサク4択の1問あたりの制限時間（秒）。0 なら無制限
       autoSpeak: false,
       furigana: false,
+      // 長文のレベルも保存する。ほかの科目と同じく、次に開いたときも同じ範囲で始めたい
+      readingLevel: 'all',
+      // **レベル判定で出た段。**「今日の学習」から開くとき、この段に絞る。
+      // { word: 3, reading: 4, grammar: 3, math: 5, at: '2026-08-20' }。
+      // まだ受けていなければ null
+      judged: null,
       mathLevel: 'all',
       mathCategory: 'all',
       mathScope: 'all',
@@ -390,6 +396,18 @@ const Storage = (() => {
     for (const key of Object.keys(DEFAULT_STATE.settings)) {
       if (typeof s[key] === typeof DEFAULT_STATE.settings[key]) settings[key] = s[key];
     }
+    // judged（レベル判定の結果）は出題範囲の絞り込みに使うので、
+    // 知っている科目の整数だけを受け取る。typeof は null も 'object' なので上の輪では弾けない
+    settings.judged = null;
+    if (s.judged && typeof s.judged === 'object' && !Array.isArray(s.judged)) {
+      const j = {};
+      for (const k of ['word', 'reading', 'grammar', 'math']) {
+        const v = Math.round(num(s.judged[k]));
+        if (v >= 1 && v <= 5) j[k] = v;
+      }
+      if (Object.keys(j).length) settings.judged = { ...j, at: iso(s.judged.at) };
+    }
+
     // mockHistory（模擬試験の履歴）は画面にそのまま出すので、数値と既知の値に矯正する
     if (Array.isArray(s.mockHistory)) {
       settings.mockHistory = s.mockHistory

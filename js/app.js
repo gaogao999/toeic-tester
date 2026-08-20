@@ -46,6 +46,10 @@
   const MATH_LEVEL_LABELS = { 1: 'Grade 3', 2: 'Grade 4', 3: 'Grade 5', 4: 'Grade 6', 5: 'Grade 7' };
   const mathLevelLabel = (level) => MATH_LEVEL_LABELS[level] || `レベル${level}`;
 
+  /** 科目に合わせた段の呼び名。英語は CEFR、算数は学年。今日の学習と模擬試験の両方で使う */
+  const ladderLabel = (kind, level) =>
+    kind === 'math' ? MATH_LEVEL_LABELS[level] : LEVEL_LABELS[level];
+
   // ============================================================
   // いま出す段（MIN_LEVEL）
   // ============================================================
@@ -77,6 +81,14 @@
       if (Number.isFinite(lv) && opt.value !== '' && lv < MIN_LEVEL[kind]) opt.remove();
     }
   }
+
+  /** 科目 → 出題範囲の「レベル」を保存している設定のキー */
+  const LEVEL_SETTING_KEY = {
+    word: 'level',
+    reading: 'readingLevel',
+    grammar: 'grammarLevel',
+    math: 'mathLevel'
+  };
 
   /** 保存された設定が伏せた段を指していたら「すべて」に戻す */
   const visibleLevelSetting = (value, kind) => {
@@ -208,6 +220,10 @@
         mathLevel: target.dataset.mlv,
         mathScope: 'all'
       });
+    }
+    // 「今日の学習」の行は、レベル判定で出た段に絞って開く
+    if (target.dataset.lvkind && target.dataset.lv) {
+      Storage.updateSettings({ [LEVEL_SETTING_KEY[target.dataset.lvkind]]: target.dataset.lv });
     }
     showView(target.dataset.view);
   });
@@ -451,6 +467,22 @@
     ].filter((g) => g.available);
   }
 
+  /**
+   * レベル判定で出た段。**「今日の学習」はここで測った段に絞って開く。**
+   *
+   * 何も指定しないと「すべて」になり、B1 も B2 も混ざって出る。
+   * 測った段に絞れば、いま伸ばすところだけを練習できる。まだ受けていなければ null
+   */
+  function judgedLevelOf(key) {
+    const j = Storage.getSettings().judged;
+    // 献立の key と階段の kind は「長文」だけ名前が違う（passages / reading）
+    const kind = key === 'passages' ? 'reading' : key;
+    const lv = j && j[kind];
+    if (!lv || !MIN_LEVEL[kind]) return null;
+    // 段を伏せたあとに古い判定が残っていることがある。出せる範囲へ寄せる
+    return Math.min(Math.max(lv, MIN_LEVEL[kind]), MAX_LEVEL[kind]);
+  }
+
   function renderTodayMenu() {
     const counts = Storage.getTodayCounts();
     const goals = todayGoals();
@@ -465,10 +497,17 @@
         const done = counts[g.key];
         const complete = done >= g.goal;
         const percent = Math.min((done / g.goal) * 100, 100);
-        return `<button class="today-item ${complete ? 'is-complete' : ''}" data-view="${g.view}">
+        const kind = g.key === 'passages' ? 'reading' : g.key;
+        const lv = judgedLevelOf(g.key);
+        const badge = lv
+          ? `<span class="today-level">${escapeHtml(ladderLabel(kind, lv))}</span>`
+          : '';
+        // 段が決まっていれば、押したときにその段へ絞ってから画面を開く
+        const setLv = lv ? ` data-lvkind="${kind}" data-lv="${lv}"` : '';
+        return `<button class="today-item ${complete ? 'is-complete' : ''}" data-view="${g.view}"${setLv}>
             <span class="today-icon">${complete ? '✓' : g.icon}</span>
             <span class="today-main">
-              <span class="today-name">${g.name}</span>
+              <span class="today-name">${g.name}${badge}</span>
               <span class="progress-bar slim"><span class="progress-fill" style="width:${percent}%"></span></span>
             </span>
             <span class="today-count">${done} / ${g.goal} ${g.unit}</span>
@@ -479,12 +518,18 @@
     const days = daysUntilExam();
     const word = goals.find((g) => g.key === 'word');
     const quota = isWeekend() ? '土日' : '平日';
-    $('#today-note').textContent =
+    const base =
       days > 0
         ? word
           ? `${quota}のノルマです。未習得の単語はあと ${word.left} 語、試験まで ${days} 日。`
           : `${quota}のノルマです。試験まで ${days} 日。単語データがまだありません。`
         : '試験日を過ぎました。';
+
+    // 段が出ていない科目があるなら、レベル判定を受ければ絞れることを伝える
+    const judgedAny = goals.some((g) => judgedLevelOf(g.key));
+    $('#today-note').innerHTML = judgedAny
+      ? `${escapeHtml(base)} 各行の段は<b>レベル判定の結果</b>です。押すとその段に絞って開きます。`
+      : `${escapeHtml(base)} <button class="linkish" data-view="mock">レベル判定</button>を受けると、ここが測った段に絞られます。`;
   }
 
   /** 保存済みの設定を各入力欄に反映する */
@@ -548,7 +593,7 @@
    * tools/stamp-version.mjs で書き換える。
    * スマホで開いたときに、手元のものが最新かを確かめるためのもの。
    */
-  const APP_VERSION = '2026-08-20 (a9fb149)';
+  const APP_VERSION = '2026-08-20 (546161c)';
 
   const EXAM_DATE = '2027-01-07';
 
@@ -910,7 +955,10 @@
 
   function resetQuizToSetup() {
     stopTempo();
-    updateFilterCount();
+    // **選択欄を保存済みの設定に合わせ直す。**「今日の学習」や単元マップから来ると
+    // 設定だけが変わっていて、画面の選択欄は前のままになる。
+    // 出題は設定を見るので中身は正しいが、表示が「すべて」のまま食い違う
+    syncFilterInputs();
     const enough = getFilteredWords().length > 0;
     $('#quiz-body').hidden = true;
     $('#tempo-body').hidden = true;
@@ -1336,6 +1384,8 @@
     $('#reading-result').hidden = true;
     $('#reading-list-view').hidden = false;
 
+    // 保存された範囲に合わせ直す。「今日の学習」から来たときはそこで設定済み
+    $('#reading-level').value = visibleLevelSetting(Storage.getSettings().readingLevel, 'reading');
     const level = $('#reading-level').value;
     const list = PASSAGES.filter((r) => level === 'all' || String(r.level) === level);
 
@@ -1501,7 +1551,10 @@
   }
 
   function initReading() {
-    $('#reading-level').addEventListener('change', showReadingList);
+    $('#reading-level').addEventListener('change', (e) => {
+      Storage.updateSettings({ readingLevel: e.target.value });
+      showReadingList();
+    });
     $('#reading-random').addEventListener('click', startRandomReading);
 
     $('#reading-list').addEventListener('click', (e) => {
@@ -2168,11 +2221,9 @@
     asked: 0
   });
 
-  /** 階段の高さの上限・下限・呼び名。**科目ごとに違う**（英語は3〜4、算数は1〜5） */
+  /** 階段の高さの上限・下限。**科目ごとに違う**（英語は3〜4、算数は1〜5） */
   const ladderTop = (kind) => MAX_LEVEL[kind];
   const ladderBottom = (kind) => MIN_LEVEL[kind];
-  const ladderLabel = (kind, level) =>
-    kind === 'math' ? MATH_LEVEL_LABELS[level] : LEVEL_LABELS[level];
 
   /** 近いレベルから順に探す。中央→下→上の順で、在庫切れでも止まらないようにする */
   function levelsNear(kind, level) {
@@ -2534,6 +2585,7 @@
     const adaptive = mock.mode === 'adaptive' ? buildAdaptiveSummary(results) : null;
 
     saveMockHistory({ date: new Date().toISOString(), correct, total, rate, minutes, mode: mock.mode });
+    if (adaptive) saveJudgedLevels(adaptive);
 
     const limitMinutes = mock.mode === 'adaptive' ? null : MOCK_SIZES[$('#mock-size').value].minutes;
     runDiagnosis({ correct, total, rate, minutes, limitMinutes, byKind, adaptive });
@@ -2602,10 +2654,21 @@
    * どの段も取れていなければ null を返し、呼び出し側が「一番下より下」と言う。
    */
   function reachedLevel(byLevel) {
+    const levels = Object.keys(byLevel).map(Number).sort((a, b) => a - b);
     let reached = null;
-    for (const lv of Object.keys(byLevel).map(Number).sort((a, b) => a - b)) {
-      const v = byLevel[lv];
-      if (v.answered >= REACHED_ANSWERS && v.correct / v.answered >= REACHED_RATE) reached = lv;
+    for (const lv of levels) {
+      // **その段だけでなく「その段以上」の成績を合わせて見る。**
+      // 段だけを見ると、すらすら上がっていった子がどの段にも3問残らず、
+      // 「一番下より下」と出た（6問全問正解で「Grade 3 より下」）。
+      // 上の段で通用しているなら、その段はもう通過している
+      let correct = 0;
+      let answered = 0;
+      for (const x of levels) {
+        if (x < lv) continue;
+        correct += byLevel[x].correct;
+        answered += byLevel[x].answered;
+      }
+      if (answered >= REACHED_ANSWERS && correct / answered >= REACHED_RATE) reached = lv;
     }
     return reached;
   }
@@ -2618,12 +2681,14 @@
    * いま英語の一番下は 標準 B1 なので、そこで7割に届かなければ「標準 B1 より下」と出る
    * （A2 を伏せている以上、どの段かまでは測れない。測れていないことをそのまま言う）
    */
-  function adaptiveLevelLabel(kind, estimate, byLevel) {
+  function adaptiveLevelOf(kind, estimate, byLevel) {
     const bottom = ladderBottom(kind);
     const reached = reachedLevel(byLevel);
-    if (reached === null) return `${ladderLabel(kind, bottom)} より下`;
+    // 一番下でも7割に届かないとき。**学習に使う段は一番下**（そこから固めるしかない）
+    if (reached === null) return { level: null, study: bottom, label: `${ladderLabel(kind, bottom)} より下` };
     const staircase = Math.min(ladderTop(kind), Math.max(bottom, Math.round(estimate)));
-    return ladderLabel(kind, Math.min(staircase, reached));
+    const lv = Math.min(staircase, reached);
+    return { level: lv, study: lv, label: ladderLabel(kind, lv) };
   }
 
   /** 科目1つぶんの判定をまとめる */
@@ -2673,13 +2738,17 @@
                 ? '一番やさしいところから上がれなかった'
                 : '上下がまだ少ない';
 
+    const judged = adaptiveLevelOf(kind, estimate, byLevel);
+    const enough = mine.length >= REACHED_ANSWERS;
+
     return {
       科目: KIND_LABELS[kind],
       kind,
       // 算数の「レベル」は学年の段階であって CEFR ではない
       尺度: kind === 'math' ? '学年（Grade）' : 'CEFR',
-      推定レベル:
-        mine.length < REACHED_ANSWERS ? '測るには問題数が足りない' : adaptiveLevelLabel(kind, estimate, byLevel),
+      推定レベル: enough ? judged.label : '測るには問題数が足りない',
+      // 「今日の学習」から開くときに絞る段。問題数が足りなければ何も言わない
+      学習に使う段: enough ? judged.study : null,
       推定値: Math.round(estimate * 10) / 10,
       出題: mine.length,
       正答: mine.filter((r) => r.isCorrect).length,
@@ -2915,6 +2984,25 @@
       show();
       toast('和訳を消しました');
     });
+  }
+
+  /**
+   * レベル判定で出た段を控えておく。「今日の学習」から開くときに、この段へ絞る。
+   *
+   * **測れた科目だけを書き換える。**問題数が足りなかった科目まで上書きすると、
+   * 前に英語だけで測った結果を、次の算数だけの回が消してしまう。
+   */
+  function saveJudgedLevels(adaptive) {
+    const judged = { ...(Storage.getSettings().judged || {}) };
+    let any = false;
+    for (const row of adaptive['科目ごと'] || []) {
+      if (row['学習に使う段'] === null) continue;
+      judged[row.kind] = row['学習に使う段'];
+      any = true;
+    }
+    if (!any) return;
+    judged.at = new Date().toISOString();
+    Storage.updateSettings({ judged });
   }
 
   // 模擬試験の結果は設定と一緒に保存しておく（直近5回ぶん）
@@ -3456,6 +3544,7 @@
     trimLevelOptions('#grammar-level', 'grammar');
     Storage.updateSettings({
       level: visibleLevelSetting(Storage.getSettings().level, 'word'),
+      readingLevel: visibleLevelSetting(Storage.getSettings().readingLevel, 'reading'),
       grammarLevel: visibleLevelSetting(Storage.getSettings().grammarLevel, 'grammar')
     });
     initFilters();

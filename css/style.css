@@ -943,6 +943,17 @@ body {
 .today-item.is-complete .today-icon { color: var(--green); font-weight: 700; }
 .today-main { flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 .today-name { font-size: 0.85rem; font-weight: 700; text-align: left; }
+/* レベル判定で出た段。科目名の右に小さく添える */
+.today-level {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--primary-soft, rgba(99, 102, 241, 0.15));
+  color: var(--primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
 .today-count {
   flex-shrink: 0;
   font-size: 0.75rem;
