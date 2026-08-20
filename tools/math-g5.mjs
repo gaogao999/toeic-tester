@@ -331,7 +331,7 @@ export function coordinates(seed, n) {
       const dx = int(r, 2, 8);
       out.push(problem({
         question: `Point A is at (${x}, ${y}). Point B is at (${x + dx}, ${y}). What is the distance from A to B?`,
-        answer: dx, unit: '目盛り',
+        answer: dx, unit: 'units',
         explanation: `y が同じなので横に並んでいる。${x + dx} − ${x} = ${dx}。`,
         figure: { kind: 'points', pts: [[x, y], [x + dx, y]], labels: ['A', 'B'] },
         grade: G, category: '座標'
@@ -340,7 +340,7 @@ export function coordinates(seed, n) {
       const w = int(r, 2, 9), h = int(r, 2, 9);
       out.push(problem({
         question: `A rectangle has corners at (${x}, ${y}), (${x + w}, ${y}), (${x + w}, ${y + h}) and (${x}, ${y + h}). What is its area?`,
-        answer: w * h, unit: '平方目盛り',
+        answer: w * h, unit: 'square units',
         explanation: `よこは ${x + w} − ${x} = ${w}、たては ${y + h} − ${y} = ${h}。${w} × ${h} = ${w * h}。`,
         figure: { kind: 'points', pts: [[x, y], [x + w, y], [x + w, y + h], [x, y + h]], closed: true },
         grade: G, category: '座標'
@@ -366,7 +366,7 @@ export function unitConversion(seed, n) {
     { q: (v) => `How many square centimeters are in ${v} square meters?`, f: (v) => v * 10000, a: [2, 3, 5, 7], u: 'cm²', e: (v) => `1辺が100倍なので面積は 100 × 100 = 10000 倍。${v} × 10000 = ${v * 10000} cm²。` },
     { q: (v) => `How many cubic centimeters are in ${v} liters?`, f: (v) => v * 1000, a: [2, 3, 4, 6, 8], u: 'cm³', e: (v) => `1 L は1辺 10 cm の立方体ぶんで 1000 cm³。${v} × 1000 = ${v * 1000} cm³。` },
     { q: (v) => `How many meters are in ${v} kilometers?`, f: (v) => v * 1000, a: [2, 3, 5, 6, 9], u: 'm', e: (v) => `キロは1000倍を表す。${v} × 1000 = ${v * 1000} m。` },
-    { q: (v) => `How many seconds are in ${v} minutes?`, f: (v) => v * 60, a: [3, 4, 7, 8, 11], u: '秒', e: (v) => `1 分 = 60 秒。${v} × 60 = ${v * 60} 秒。` },
+    { q: (v) => `How many seconds are in ${v} minutes?`, f: (v) => v * 60, a: [3, 4, 7, 8, 11], u: 'seconds', e: (v) => `1 分 = 60 秒。${v} × 60 = ${v * 60} 秒。` },
     { q: (v) => `How many square meters are in ${v} hectares?`, f: (v) => v * 10000, a: [2, 4, 6, 9], u: 'm²', e: (v) => `1 ha は1辺 100 m の正方形の面積で 10000 m²。${v} × 10000 = ${v * 10000} m²。` },
     { q: (v) => `${v} grams is how many kilograms?`, f: (v) => v / 1000, a: [2000, 3500, 4000, 7500], u: 'kg', e: (v) => `1000 g で 1 kg になる。${v} ÷ 1000 = ${v / 1000} kg。` }
   ];

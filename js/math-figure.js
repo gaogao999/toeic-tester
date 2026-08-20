@@ -329,6 +329,14 @@ const MathFigure = (() => {
     return svg(poly(pts) + marks + label(cx, H - 8, `${n} sides`, 'f-mini'));
   }
 
+  /**
+   * 円。**直径を与えて半径を問う問題があるので、2本の線を見分けられるように描く。**
+   *
+   * 直径は横一文字、問われている半径は**中心から上へ伸びる縦線**にして、
+   * 重ならないようにしてある。以前は半径のラベルを直径の線のすぐ下に置いていたので、
+   * 「8 cm」が直径なのか半径なのか読み取れなかった。
+   * ラベルに「半径」と日本語で書いてもいた（問題文は英語なので混ざる）。
+   */
   function circle(f) {
     const r = 62;
     const cx = W / 2;
@@ -338,8 +346,10 @@ const MathFigure = (() => {
     if (show === 'd') {
       mark =
         line(cx - r, cy, cx + r, cy, 'f-dash') +
-        label(cx, cy - 8, withUnit(f.d, f.unit)) +
-        (f.ask === 'r' ? label(cx + r / 2, cy + 20, '半径 ?', 'f-ask') : '');
+        label(cx, cy + 18, withUnit(f.d, f.unit)) +
+        (f.ask === 'r'
+          ? line(cx, cy, cx, cy - r, 'f-dash f-ask-line') + label(cx + 10, cy - r / 2 + 4, '?', 'f-ask', 'start')
+          : '');
     } else {
       mark = line(cx, cy, cx + r, cy, 'f-dash') + label(cx + r / 2, cy - 8, withUnit(f.r, f.unit));
     }
@@ -510,8 +520,14 @@ const MathFigure = (() => {
     );
   }
 
+  /**
+   * 円柱。**高さが問題に出てこないときは高さを書かない。**
+   * 「底面積は？」に高さの数字が添えてあると、使う数字なのかと迷わせる
+   * （m129 が実際にそうなっていた）。形を描くには高さが要るので、
+   * 指定が無いときは見た目のつり合いで決める
+   */
   function cylinder(f) {
-    const [rw, hh] = fit(f.r * 2, f.h, 110, 104);
+    const [rw, hh] = fit(f.r * 2, f.h ?? f.r * 1.6, 110, 104);
     const rx = rw / 2;
     const ry = Math.max(10, rx * 0.32);
     const cx = W / 2;
@@ -524,7 +540,7 @@ const MathFigure = (() => {
         line(cx, top, cx + rx, top, 'f-dash') +
         // 半径のラベルは上の楕円より上に逃がす。線の上に載せると読めない
         label(cx + rx / 2, top - ry - 7, withUnit(f.r, f.unit)) +
-        label(cx + rx + 10, (top + bot) / 2 + 4, withUnit(f.h, f.unit), 'f-label', 'start')
+        (f.h === undefined ? '' : label(cx + rx + 10, (top + bot) / 2 + 4, withUnit(f.h, f.unit), 'f-label', 'start'))
     );
   }
 
@@ -556,7 +572,7 @@ const MathFigure = (() => {
                 rightAngle(apex, y + bh, -1, -1, 7) +
                 label(x + bw / 2, y + bh + 17, withUnit(f.base, f.unit)) +
                 label(apex + 6, y + bh / 2 + 4, withUnit(f.height, f.unit), 'f-label', 'start')
-              : label(x + bw / 2, y + bh + 17, `底面 ${f.area} ${f.unit || ''}²`, 'f-mini')) +
+              : label(x + bw / 2, y + bh + 17, `base ${f.area} ${f.unit || ''}²`, 'f-mini')) +
             // 長さは奥へ伸びる辺に沿えて置く
             label(x + bw + ddx / 2 + 6, y + bh - ddy / 2 + 20, withUnit(f.length, f.unit), 'f-label', 'middle'))
     );
@@ -590,7 +606,7 @@ const MathFigure = (() => {
         label(apex[0] + 8, (apexY + center[1]) / 2, withUnit(f.h, f.unit), 'f-label', 'start') +
         (f.s
           ? label(cx, by + 17, withUnit(f.s, f.unit))
-          : label(cx, by + 17, `底面 ${f.area} ${f.unit || ''}²`, 'f-mini'))
+          : label(cx, by + 17, `base ${f.area} ${f.unit || ''}²`, 'f-mini'))
     );
   }
 

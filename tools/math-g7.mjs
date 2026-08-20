@@ -386,7 +386,7 @@ export function inequalities(seed, n) {
       const price = int(r, 2, 9) * 100, budget = price * int(r, 3, 9) + int(r, 0, price - 1);
       out.push(problem({
         question: `Notebooks cost ${price} yen each. With ${budget} yen, what is the greatest number you can buy?`,
-        answer: Math.floor(budget / price), unit: '冊',
+        answer: Math.floor(budget / price), unit: 'notebooks',
         explanation: `${price}x ≦ ${budget} を解くと x ≦ ${Math.round((budget / price) * 100) / 100}。冊数は整数なので最大 ${Math.floor(budget / price)} 冊。`,
         grade: G, category: '不等式'
       }));
@@ -407,7 +407,7 @@ export function equationWords(seed, n) {
       const x = int(r, 5, 40), d = int(r, 2, 15);
       out.push(problem({
         question: `${name} has ${d} more marbles than Sam. Together they have ${2 * x + d} marbles. How many does Sam have?`,
-        answer: x, unit: '個',
+        answer: x, unit: 'marbles',
         explanation: `サムを x とすると ${name} は x + ${d}。x + (x + ${d}) = ${2 * x + d}。2x = ${2 * x} なので x = ${x} 個。`,
         grade: G, category: '方程式'
       }));
@@ -433,7 +433,7 @@ export function equationWords(seed, n) {
       const parent = k * (age + years) - years;
       out.push(problem({
         question: `${name} is ${age} years old. In ${years} years, ${name}'s parent will be ${k} times as old as ${name}. How old is the parent now?`,
-        answer: parent, unit: '歳',
+        answer: parent, unit: 'years old',
         explanation: `${years} 年後、${name} は ${age + years} 歳。親はその ${k} 倍で ${k * (age + years)} 歳。いまは ${k * (age + years)} − ${years} = ${parent} 歳。`,
         grade: G, category: '方程式'
       }));

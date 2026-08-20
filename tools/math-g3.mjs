@@ -79,7 +79,7 @@ export function division(seed, n) {
       const rem = int(r, 1, b - 1);
       out.push(problem({
         question: `What is the remainder when ${b * q + rem} is divided by ${b}?`,
-        answer: rem, unit: 'あまり',
+        answer: rem, unit: '',
         explanation: `${b} × ${q} = ${b * q}。${b * q + rem} − ${b * q} = ${rem} が残る。あまりは割る数より小さくなる。`,
         grade: G, category: 'わり算'
       }));
@@ -87,7 +87,7 @@ export function division(seed, n) {
       const rem = int(r, 1, b - 1);
       out.push(problem({
         question: `${b * q + rem} candies are shared equally among ${b} children. How many does each child get?`,
-        answer: q, unit: '個',
+        answer: q, unit: 'candies',
         explanation: `${b * q + rem} ÷ ${b} = ${q} あまり ${rem}。1人分は ${q} 個で、${rem} 個あまる。`,
         grade: G, category: 'わり算'
       }));
@@ -222,7 +222,7 @@ export function measurement(seed, n) {
     { q: (v) => `How many millimeters are in ${v} centimeters?`, f: (v) => v * 10, a: [3, 6, 8, 12, 14], u: 'mm', e: (v) => `1 cm は 10 mm。${v} × 10 = ${v * 10} mm。` },
     { q: (v) => `How many meters are in ${v} kilometers?`, f: (v) => v * 1000, a: [2, 3, 4, 7], u: 'm', e: (v) => `1 km は 1000 m。${v} × 1000 = ${v * 1000} m。` },
     { q: (v) => `How many grams are in ${v} kilograms?`, f: (v) => v * 1000, a: [2, 3, 5, 8], u: 'g', e: (v) => `1 kg は 1000 g。${v} × 1000 = ${v * 1000} g。` },
-    { q: (v) => `How many seconds are in ${v} minutes?`, f: (v) => v * 60, a: [2, 4, 6, 9], u: '秒', e: (v) => `1 分は 60 秒。${v} × 60 = ${v * 60} 秒。` },
+    { q: (v) => `How many seconds are in ${v} minutes?`, f: (v) => v * 60, a: [2, 4, 6, 9], u: 'seconds', e: (v) => `1 分は 60 秒。${v} × 60 = ${v * 60} 秒。` },
     { q: (v) => `How many centimeters are in ${v} meters?`, f: (v) => v * 100, a: [3, 5, 6, 9], u: 'cm', e: (v) => `1 m は 100 cm。${v} × 100 = ${v * 100} cm。` }
   ];
   const out = [];
@@ -237,7 +237,7 @@ export function measurement(seed, n) {
       const two = (v) => String(v).padStart(2, '0');
       out.push(problem({
         question: `How many minutes are there from ${two(h)}:${two(m1)} to ${two(endH)}:${two(endM)}?`,
-        answer: add, unit: '分',
+        answer: add, unit: 'minutes',
         explanation: `${two(h)}:${two(m1)} から次の正時 ${two(h + 1)}:00 までが ${60 - m1} 分。そこから ${two(endH)}:${two(endM)} までが ${add - (60 - m1)} 分。合わせて ${add} 分。`,
         grade: G, category: '単位と量'
       }));
@@ -318,7 +318,7 @@ export function wordProblems(seed, n) {
       const per = int(r, 4, 12);
       out.push(problem({
         question: `${name} has ${box} boxes with ${per} pencils in each box. How many pencils are there in total?`,
-        answer: box * per, unit: '本',
+        answer: box * per, unit: 'pencils',
         explanation: `1箱 ${per} 本が ${box} 箱なので ${per} × ${box} = ${box * per} 本。`,
         grade: G, category: '文章題'
       }));
@@ -327,7 +327,7 @@ export function wordProblems(seed, n) {
       const spend = int(r, 50, 190);
       out.push(problem({
         question: `${name} had ${start} yen and spent ${spend} yen. How much is left?`,
-        answer: start - spend, unit: '円',
+        answer: start - spend, unit: 'yen',
         explanation: `${start} − ${spend} = ${start - spend} 円。`,
         grade: G, category: '文章題'
       }));
@@ -336,7 +336,7 @@ export function wordProblems(seed, n) {
       const groups = int(r, 3, 9);
       out.push(problem({
         question: `${per * groups} children are put into groups of ${per}. How many groups are there?`,
-        answer: groups, unit: '組',
+        answer: groups, unit: 'groups',
         explanation: `${per * groups} ÷ ${per} = ${groups} 組。`,
         grade: G, category: '文章題'
       }));
@@ -345,7 +345,7 @@ export function wordProblems(seed, n) {
       const more = int(r, 30, 200);
       out.push(problem({
         question: `${name} read ${a} pages. Sam read ${more} pages more than ${name}. How many pages did Sam read?`,
-        answer: a + more, unit: 'ページ',
+        answer: a + more, unit: 'pages',
         explanation: `「〜より多い」は足す。${a} + ${more} = ${a + more} ページ。`,
         grade: G, category: '文章題'
       }));
@@ -361,10 +361,10 @@ export function wordProblems(seed, n) {
 export function barCharts(seed, n) {
   const r = rng(seed);
   const sets = [
-    { labels: ['Mina', 'Tom', 'Anna', 'Ken'], what: 'books each child read', unit: '冊', yLabel: '冊' },
-    { labels: ['Mon', 'Tue', 'Wed', 'Thu'], what: 'glasses of water drunk each day', unit: '杯', yLabel: '杯' },
-    { labels: ['Cats', 'Dogs', 'Birds', 'Fish'], what: 'pets kept by the class', unit: 'ひき', yLabel: 'ひき' },
-    { labels: ['Red', 'Blue', 'Green', 'Yellow'], what: 'children who chose each color', unit: '人', yLabel: '人' }
+    { labels: ['Mina', 'Tom', 'Anna', 'Ken'], what: 'books each child read', unit: 'books', yLabel: 'books' },
+    { labels: ['Mon', 'Tue', 'Wed', 'Thu'], what: 'glasses of water drunk each day', unit: 'glasses', yLabel: 'glasses' },
+    { labels: ['Cats', 'Dogs', 'Birds', 'Fish'], what: 'pets kept by the class', unit: 'pets', yLabel: 'pets' },
+    { labels: ['Red', 'Blue', 'Green', 'Yellow'], what: 'children who chose each color', unit: 'children', yLabel: 'children' }
   ];
   const out = [];
   for (let i = 0; i < n; i++) {

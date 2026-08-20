@@ -188,7 +188,7 @@ export function measurement(seed, n) {
     { q: (v) => `How many centimeters are in ${v} meters?`, f: (v) => v * 100, a: [2, 3, 4, 5, 7, 8], u: 'cm', e: (v) => `1 m = 100 cm なので ${v} × 100 = ${v * 100} cm。` },
     { q: (v) => `How many grams are in ${v} kilograms?`, f: (v) => v * 1000, a: [2, 3, 4, 6, 9], u: 'g', e: (v) => `1 kg = 1000 g なので ${v} × 1000 = ${v * 1000} g。` },
     { q: (v) => `How many milliliters are in ${v} liters?`, f: (v) => v * 1000, a: [2, 3, 5, 6, 8], u: 'mL', e: (v) => `1 L = 1000 mL なので ${v} × 1000 = ${v * 1000} mL。` },
-    { q: (v) => `How many minutes are in ${v} hours?`, f: (v) => v * 60, a: [2, 3, 4, 5, 6, 7], u: '分', e: (v) => `1 時間 = 60 分なので ${v} × 60 = ${v * 60} 分。` },
+    { q: (v) => `How many minutes are in ${v} hours?`, f: (v) => v * 60, a: [2, 3, 4, 5, 6, 7], u: 'minutes', e: (v) => `1 時間 = 60 分なので ${v} × 60 = ${v * 60} 分。` },
     { q: (v) => `How many millimeters are in ${v} centimeters?`, f: (v) => v * 10, a: [4, 7, 9, 12, 15], u: 'mm', e: (v) => `1 cm = 10 mm なので ${v} × 10 = ${v * 10} mm。` }
   ];
   const out = [];
@@ -272,7 +272,7 @@ export function wordProblems(seed, n) {
       const per = int(r, 6, 15);
       out.push(problem({
         question: `${name} buys ${packs} packs of pencils. Each pack has ${per} pencils. How many pencils does ${name} have?`,
-        answer: packs * per, unit: '本',
+        answer: packs * per, unit: 'pencils',
         explanation: `1袋 ${per} 本が ${packs} 袋なので ${per} × ${packs} = ${packs * per} 本。`,
         grade: G, category: '文章題'
       }));
@@ -282,7 +282,7 @@ export function wordProblems(seed, n) {
       const g = pick(r, groups);
       out.push(problem({
         question: `${total} students are put into ${g} equal groups. How many students are in each group?`,
-        answer: total / g, unit: '人',
+        answer: total / g, unit: 'students',
         explanation: `${total} ÷ ${g} = ${total / g} 人ずつ。`,
         grade: G, category: '文章題'
       }));
@@ -292,7 +292,7 @@ export function wordProblems(seed, n) {
       const paid = Math.ceil((price * count) / 1000) * 1000;
       out.push(problem({
         question: `${name} buys ${count} notebooks for ${price} yen each and pays with ${paid} yen. How much change does ${name} get?`,
-        answer: paid - price * count, unit: '円',
+        answer: paid - price * count, unit: 'yen',
         explanation: `代金は ${price} × ${count} = ${price * count} 円。おつりは ${paid} − ${price * count} = ${paid - price * count} 円。`,
         grade: G, category: '文章題'
       }));
@@ -302,7 +302,7 @@ export function wordProblems(seed, n) {
       const got = int(r, 5, 20);
       out.push(problem({
         question: `${name} had ${start} stickers, gave away ${gave}, and then received ${got} more. How many stickers does ${name} have now?`,
-        answer: start - gave + got, unit: '枚',
+        answer: start - gave + got, unit: 'stickers',
         explanation: `${start} − ${gave} = ${start - gave}、そこに ${got} 足して ${start - gave + got} 枚。`,
         grade: G, category: '文章題'
       }));

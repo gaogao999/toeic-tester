@@ -78,7 +78,7 @@ export function ratios(seed, n) {
       const unitSize = int(r, 3, 12);
       out.push(problem({
         question: `${(a + b) * unitSize} candies are shared in the ratio ${a}:${b}. How many does the first person get?`,
-        answer: a * unitSize, unit: '個',
+        answer: a * unitSize, unit: 'candies',
         explanation: `${a} + ${b} = ${a + b} 等分にする。${(a + b) * unitSize} ÷ ${a + b} = ${unitSize}。1人目は ${unitSize} × ${a} = ${a * unitSize} 個。`,
         grade: G, category: '比'
       }));
@@ -106,7 +106,7 @@ export function percentApplied(seed, n) {
       const off = pick(r, [10, 20, 25, 30, 40, 50]);
       out.push(problem({
         question: `A shirt costs ${price} yen. It is on sale for ${off}% off. What is the sale price?`,
-        answer: price - (price * off) / 100, unit: '円',
+        answer: price - (price * off) / 100, unit: 'yen',
         explanation: `値引き額は ${price} × ${off / 100} = ${(price * off) / 100} 円。${price} − ${(price * off) / 100} = ${price - (price * off) / 100} 円。`,
         grade: G, category: '割合'
       }));
@@ -117,7 +117,7 @@ export function percentApplied(seed, n) {
       if (((before * up) / 100) % 1 !== 0) { i--; continue; }
       out.push(problem({
         question: `The number of members increased from ${before} by ${up}%. How many members are there now?`,
-        answer: before + (before * up) / 100, unit: '人',
+        answer: before + (before * up) / 100, unit: 'members',
         explanation: `増えた分は ${before} × ${up / 100} = ${(before * up) / 100} 人。合計 ${before + (before * up) / 100} 人。`,
         grade: G, category: '割合'
       }));
@@ -161,7 +161,7 @@ export function speed(seed, n) {
     } else {
       out.push(problem({
         question: `How many hours does it take to travel ${v * t} km at ${v} km/h?`,
-        answer: t, unit: '時間',
+        answer: t, unit: 'hours',
         explanation: `時間 = 道のり ÷ 速さ = ${v * t} ÷ ${v} = ${t} 時間。`,
         grade: G, category: '速さ'
       }));
@@ -325,7 +325,7 @@ export function numberTheory(seed, n) {
       if (a === b) { i--; continue; }
       out.push(problem({
         question: `Bus A comes every ${a} minutes and bus B every ${b} minutes. They leave together now. In how many minutes will they next leave together?`,
-        answer: (a / gcd(a, b)) * b, unit: '分',
+        answer: (a / gcd(a, b)) * b, unit: 'minutes',
         explanation: `次にそろうのは最小公倍数。${a} と ${b} の最小公倍数は ${(a / gcd(a, b)) * b} 分。`,
         grade: G, category: '約数と倍数'
       }));
@@ -335,7 +335,7 @@ export function numberTheory(seed, n) {
       if (gcd(a / g, b / g) !== 1) { i--; continue; }
       out.push(problem({
         question: `${a} pencils and ${b} erasers are shared equally among children with none left over. What is the greatest number of children?`,
-        answer: g, unit: '人',
+        answer: g, unit: 'children',
         explanation: `両方を割り切れる最大の数、つまり最大公約数。${a} と ${b} の最大公約数は ${g} 人。`,
         grade: G, category: '約数と倍数'
       }));
@@ -354,7 +354,7 @@ export function unitRate(seed, n) {
       const per = int(r, 3, 30) * 10, area = int(r, 2, 9);
       out.push(problem({
         question: `A town has ${per * area} people living in ${area} km². What is the population density in people per km²?`,
-        answer: per, unit: '人/km²',
+        answer: per, unit: 'people/km²',
         explanation: `人口密度 = 人口 ÷ 面積 = ${per * area} ÷ ${area} = ${per} 人/km²。`,
         grade: G, category: '単位量あたり'
       }));
@@ -370,7 +370,7 @@ export function unitRate(seed, n) {
       const unitPrice = int(r, 2, 20) * 10, count = int(r, 3, 12);
       out.push(problem({
         question: `${count} apples cost ${unitPrice * count} yen in total. How much is one apple?`,
-        answer: unitPrice, unit: '円',
+        answer: unitPrice, unit: 'yen',
         explanation: `1個あたり = 合計 ÷ 個数 = ${unitPrice * count} ÷ ${count} = ${unitPrice} 円。`,
         grade: G, category: '単位量あたり'
       }));

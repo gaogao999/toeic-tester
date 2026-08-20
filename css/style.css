@@ -792,6 +792,8 @@ body {
 .math-figure .f-arc { stroke: var(--text-muted); stroke-width: 1.6; fill: none; }
 /* 問われている角。ここだけ色を変えて、どこを答えるのか一目で分かるようにする */
 .math-figure .f-arc-ask { stroke: var(--orange); stroke-width: 2.4; }
+/* 問われている線分。直径を与えて半径を問う問題で、2本を見分けるために色を変える */
+.math-figure .f-ask-line { stroke: var(--orange); stroke-width: 2.4; stroke-opacity: 1; }
 .math-figure .f-right { fill: none; stroke: var(--text-muted); stroke-width: 1.4; }
 .math-figure .f-dot { fill: var(--primary); stroke: none; }
 

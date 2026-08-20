@@ -317,6 +317,9 @@ const BAD_WORDING = [
   { re: /\blots of\b/i, why: '「たくさんの」と読まれる。「◯ tenths」「◯ groups of」にする' },
   { re: /\bof a number\b/i, why: '何を指すか曖昧。具体的に書く' }
 ];
+/** ひらがな・カタカナ・漢字。解説以外に出てきたら落とす */
+const JA = /[\u3040-\u30ff\u4e00-\u9faf]/;
+
 const BR_SPELLING = [
   { re: /\bmetres?\b/i, use: 'meters' },
   { re: /\blitres?\b/i, use: 'liters' },
@@ -418,6 +421,13 @@ export function audit(list) {
     // 英語の言い回し
     for (const b of BAD_WORDING) if (b.re.test(p.question)) fail(p, `読み違えられる言い回し: ${b.why}`);
     for (const u of BR_SPELLING) if (u.re.test(p.question)) fail(p, `つづりが米式でない（${u.use} に）`);
+
+    // **子が読む場所に日本語を混ぜない。**解説だけが日本語で、それ以外は英語。
+    // 単位は答えの横と4択にそのまま出るし、図のラベルは画面に描かれる。
+    // 「A circle has a diameter of 8 cm」の図に「半径 ?」と出ていたのを実際に踏んだ
+    if (JA.test(p.question)) fail(p, '問題文に日本語が混ざっている');
+    if (JA.test(p.unit || '')) fail(p, `単位に日本語が混ざっている（${p.unit}）`);
+    if (p.figure && JA.test(JSON.stringify(p.figure))) fail(p, `図の指定に日本語が混ざっている（${JSON.stringify(p.figure)}）`);
 
     // 検算
     const expected = recompute(p.question);

@@ -146,7 +146,7 @@ export const FIGURES = {
   m113: { kind: 'trapezoid', top: 6, bottom: 10, height: 5, unit: 'cm' },
   m114: { kind: 'triangleAngles', a: 90, b: 35 },
   // 面積が分かっていて1辺を問う。図には面積を書き、辺に ? を置く
-  m115: { kind: 'rect', w: 9, h: 9, unit: 'cm', area: 81, ask: '1辺 ?' },
+  m115: { kind: 'rect', w: 9, h: 9, unit: 'cm', area: 81, ask: true },
   m116: { kind: 'parallelogram', base: 12, height: 7, unit: 'cm' },
   m118: { kind: 'triangle', base: 8, height: 6, unit: 'cm', area: 24, askHeight: true },
   m119: { kind: 'sector', r: 6, angle: 90, unit: 'cm' },
@@ -160,7 +160,8 @@ export const FIGURES = {
   // 「面はいくつあるか」なので寸法は書かない。関係ない数字は迷いのもと
   m127: { kind: 'prism', plain: true },
   m128: { kind: 'cube', plain: true },
-  m129: { kind: 'cylinder', r: 4, h: 6, unit: 'cm' },
+  // 底面積だけを問うので高さは書かない（使う数字と紛らわしい）
+  m129: { kind: 'cylinder', r: 4, unit: 'cm' },
   m130: { kind: 'box', a: 3, b: 4, c: 5, unit: 'cm' },
   m131: { kind: 'cylinder', r: 5, h: 10, unit: 'cm' },
   m132: { kind: 'cone', r: 3, h: 8, unit: 'cm' },
