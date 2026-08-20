@@ -21,6 +21,13 @@ const AI = (() => {
   // 公表しているが、EIS が英検を基準にしている証拠は無いため。
   const LEVELS = ['入門（A1）', '基礎 A2', '標準 B1', '応用 B2'];
 
+  // **いま出していない段は診断でも語らない。**
+  // A2 は易しすぎるので伏せてあり、そこに「到達しました」と言われても行き先が無い。
+  // **js/app.js の MIN_LEVEL と対で直すこと。**片方だけ動かすと、
+  // アプリでは出せない段を診断が名指しすることになる
+  const MIN_LEVEL = { word: 3, reading: 3 };
+  const VISIBLE_LEVELS = LEVELS.slice(MIN_LEVEL.word - 1);
+
   // ============================================================
   // APIキーの保管
   // ============================================================
@@ -53,19 +60,24 @@ const AI = (() => {
    * これまでの学習記録も合わせて集計する（判定の根拠を厚くするため）。
    */
   function accuracyByLevel() {
-    const rows = LEVELS.map((name, i) => ({ level: name, correct: 0, wrong: 0 }));
+    const rows = LEVELS.map((name) => ({ level: name, correct: 0, wrong: 0 }));
     for (const w of WORD_DATA) {
+      // 伏せている段の記録は数えない。**いま出していない段の古い成績で
+      // 「基礎 A2 に到達」と判定されると、そこへ戻る道が画面に無い**
+      if (w.level < MIN_LEVEL.word) continue;
       const rec = Storage.getRecord(w.id);
       const row = rows[w.level - 1];
       if (!row) continue;
       row.correct += rec.correct;
       row.wrong += rec.wrong;
     }
-    return rows.map((r) => ({
-      level: r.level,
-      answered: r.correct + r.wrong,
-      accuracy: r.correct + r.wrong > 0 ? Math.round((r.correct / (r.correct + r.wrong)) * 100) : null
-    }));
+    return rows
+      .filter((r) => VISIBLE_LEVELS.includes(r.level))
+      .map((r) => ({
+        level: r.level,
+        answered: r.correct + r.wrong,
+        accuracy: r.correct + r.wrong > 0 ? Math.round((r.correct / (r.correct + r.wrong)) * 100) : null
+      }));
   }
 
   /**
@@ -85,9 +97,12 @@ const AI = (() => {
       if (rec.correct + rec.wrong > 0) cur.subjects.add(subject);
       map.set(name, cur);
     };
-    WORD_DATA.forEach((w) => add(w.category, Storage.getRecord(w.id), '単語'));
+    // 伏せている段は数えない。出せない段の古い成績で「ここが苦手」と言われても、
+    // 案内した先にその問題が無い
+    WORD_DATA.filter((w) => w.level >= MIN_LEVEL.word)
+      .forEach((w) => add(w.category, Storage.getRecord(w.id), '単語'));
     MATH_DATA.forEach((p) => add(p.category, Storage.getRecord(p.id), '算数'));
-    READING_DATA.forEach((r) =>
+    READING_DATA.filter((r) => r.level >= MIN_LEVEL.reading).forEach((r) =>
       r.questions.forEach((q, i) => add(r.topic, Storage.getRecord(`${r.id}-${i + 1}`), '長文読解'))
     );
 
@@ -252,7 +267,7 @@ const AI = (() => {
     properties: {
       level: {
         type: 'string',
-        enum: [...LEVELS, 'A1未満', '判定するには解答数が不足'],
+        enum: [...VISIBLE_LEVELS, `${VISIBLE_LEVELS[0]} より下`, '判定するには解答数が不足'],
         description: '現時点で到達していると考えられる CEFR の段階'
       },
       levelReason: { type: 'string', description: 'その段階と判断した根拠。数字を挙げて1〜2文で' },

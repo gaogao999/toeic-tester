@@ -46,6 +46,44 @@
   const MATH_LEVEL_LABELS = { 1: 'Grade 3', 2: 'Grade 4', 3: 'Grade 5', 4: 'Grade 6', 5: 'Grade 7' };
   const mathLevelLabel = (level) => MATH_LEVEL_LABELS[level] || `レベル${level}`;
 
+  // ============================================================
+  // いま出す段（MIN_LEVEL）
+  // ============================================================
+  //
+  // **A2（レベル2）は易しすぎて学習にならないので、英語の3科目とも伏せている。**
+  // 長文の入門（A1・書き下ろしの2本）は A2 より更に易しいので、あわせて伏せる。
+  // 算数はそのまま（Grade 3 はつまずいた子が戻ってくる場所なので落とさない）。
+  //
+  // **データは消していない。**この数字を 2 に戻せばそのまま出る。
+  // 学習記録は ID をキーに残っているので、戻したときに以前の記録もそのまま生きる。
+  //
+  // 段を足す・減らすときはここだけを直すこと。画面の選択肢も、模擬試験の階段も、
+  // 記録の集計も、すべてここから引いている。**js/ai.js の MIN_WORD_LEVEL と対で直すこと**
+  // （診断が「基礎 A2 に到達」と、アプリでは出せない段を語ってしまうため）。
+  const MIN_LEVEL = { word: 3, math: 1, reading: 3, grammar: 3 };
+
+  // 以降はこの3つを使い、生の *_DATA は直接触らない。
+  // フィルタを1か所にまとめておかないと、数え落としが必ずどこかに残る
+  const WORDS = WORD_DATA.filter((w) => w.level >= MIN_LEVEL.word);
+  const PASSAGES = READING_DATA.filter((r) => r.level >= MIN_LEVEL.reading);
+  const GRAMMAR = GRAMMAR_DATA.filter((q) => q.level >= MIN_LEVEL.grammar);
+
+  /** 伏せている段を選択欄から取り除く。'all' などレベル以外の値はそのまま残す */
+  function trimLevelOptions(selector, kind) {
+    const sel = $(selector);
+    if (!sel) return;
+    for (const opt of [...sel.options]) {
+      const lv = Number(opt.value);
+      if (Number.isFinite(lv) && opt.value !== '' && lv < MIN_LEVEL[kind]) opt.remove();
+    }
+  }
+
+  /** 保存された設定が伏せた段を指していたら「すべて」に戻す */
+  const visibleLevelSetting = (value, kind) => {
+    const lv = Number(value);
+    return Number.isFinite(lv) && String(value) !== 'all' && lv < MIN_LEVEL[kind] ? 'all' : value;
+  };
+
   let toastTimer = null;
   function toast(message) {
     const el = $('#toast');
@@ -113,7 +151,7 @@
 
   function getFilteredWords() {
     const s = Storage.getSettings();
-    return WORD_DATA.filter((w) => {
+    return WORDS.filter((w) => {
       if (s.level !== 'all' && String(w.level) !== String(s.level)) return false;
       if (s.category !== 'all' && w.category !== s.category) return false;
       // 教材由来の語だけに絞る（toefl の印は tools/build-gloss-vocab.mjs が付ける）
@@ -295,15 +333,15 @@
   const WEAK_LINE = 70;
 
   function weakRows(minAnswered) {
-    const readingItems = READING_DATA.flatMap((r) =>
+    const readingItems = PASSAGES.flatMap((r) =>
       r.questions.map((q, i) => ({ id: `${r.id}-${i + 1}`, category: r.topic }))
     );
     return [
-      ...accuracyByCategory(WORD_DATA).map((r) => ({ ...r, subject: '単語', view: 'quiz' })),
+      ...accuracyByCategory(WORDS).map((r) => ({ ...r, subject: '単語', view: 'quiz' })),
       ...accuracyByCategory(readingItems).map((r) => ({ ...r, subject: '長文読解', view: 'reading' })),
       ...accuracyByCategory(MATH_DATA).map((r) => ({ ...r, subject: '算数', view: 'math' })),
       // 文法は分野の欄に単元名（unit）を入れて、同じ集計に乗せる
-      ...accuracyByCategory(GRAMMAR_DATA.map((q) => ({ ...q, category: q.unit })))
+      ...accuracyByCategory(GRAMMAR.map((q) => ({ ...q, category: q.unit })))
         .map((r) => ({ ...r, subject: '文法', view: 'grammar' }))
     ]
       .filter((r) => r.answered >= minAnswered && r.rate < WEAK_LINE)
@@ -358,12 +396,12 @@
   function todayGoals() {
     const quota = isWeekend() ? DAILY_GOALS.weekend : DAILY_GOALS.weekday;
 
-    const wordsLeft = WORD_DATA.filter((w) => !Storage.isLearned(w.id)).length;
+    const wordsLeft = WORDS.filter((w) => !Storage.isLearned(w.id)).length;
     const mathLeft = MATH_DATA.filter((p) => !Storage.isLearned(p.id)).length;
-    const readingLeft = READING_DATA.filter(
+    const readingLeft = PASSAGES.filter(
       (r) => r.questions.some((q, i) => !Storage.isLearned(`${r.id}-${i + 1}`))
     ).length;
-    const grammarLeft = GRAMMAR_DATA.filter((q) => !Storage.isLearned(q.id)).length;
+    const grammarLeft = GRAMMAR.filter((q) => !Storage.isLearned(q.id)).length;
 
     // データが無い科目は献立に出さない。達成できないノルマを残すと
     // 「今日の分は達成」に一生ならず、続ける気を削ぐため
@@ -376,7 +414,7 @@
         unit: '語',
         left: wordsLeft,
         view: 'quiz',
-        available: WORD_DATA.length > 0
+        available: WORDS.length > 0
       },
       {
         key: 'math',
@@ -396,7 +434,7 @@
         unit: '問',
         left: grammarLeft,
         view: 'grammar',
-        available: GRAMMAR_DATA.length > 0
+        available: GRAMMAR.length > 0
       },
       {
         key: 'passages',
@@ -408,7 +446,7 @@
         unit: '本',
         left: readingLeft,
         view: 'reading',
-        available: READING_DATA.length > 0
+        available: PASSAGES.length > 0
       }
     ].filter((g) => g.available);
   }
@@ -493,7 +531,7 @@
     });
 
     // 学習ハブの「単語一覧」行に総語数を出す
-    $('#list-total-note').textContent = `${WORD_DATA.length.toLocaleString()}語`;
+    $('#list-total-note').textContent = `${WORDS.length.toLocaleString()}語`;
     $('#filter-tempo-time').addEventListener('change', (e) => {
       Storage.updateSettings({ tempoTime: Number(e.target.value) });
     });
@@ -510,7 +548,7 @@
    * tools/stamp-version.mjs で書き換える。
    * スマホで開いたときに、手元のものが最新かを確かめるためのもの。
    */
-  const APP_VERSION = '2026-08-20 (737c213)';
+  const APP_VERSION = '2026-08-20 (8d8eda5)';
 
   const EXAM_DATE = '2027-01-07';
 
@@ -577,10 +615,10 @@
       $('#countdown-weeks').textContent =
         weeks > 0 ? `あと ${weeks} 週間と ${rest} 日` : `あと ${rest} 日`;
 
-      const remaining = WORD_DATA.filter((w) => !Storage.isLearned(w.id)).length;
+      const remaining = WORDS.filter((w) => !Storage.isLearned(w.id)).length;
       const perDay = Math.ceil(remaining / days);
       // 単語データが空のときに「全て覚えました」と出ると嘘になるので分ける
-      $('#countdown-pace').textContent = WORD_DATA.length === 0
+      $('#countdown-pace').textContent = WORDS.length === 0
         ? '単語データがありません'
         : remaining > 0
           ? `未習得 ${remaining} 語 → 1日 ${perDay} 語のペース`
@@ -1071,8 +1109,8 @@
     const source = shuffle(words).slice(0, length);
 
     return source.map((w) => {
-      const sameCategory = WORD_DATA.filter((x) => x.category === w.category && x.id !== w.id);
-      const anyOther = WORD_DATA.filter((x) => x.id !== w.id);
+      const sameCategory = WORDS.filter((x) => x.category === w.category && x.id !== w.id);
+      const anyOther = WORDS.filter((x) => x.id !== w.id);
       const used = new Set([w.meaning]);
       const wrong = [];
 
@@ -1296,7 +1334,7 @@
     $('#reading-list-view').hidden = false;
 
     const level = $('#reading-level').value;
-    const list = READING_DATA.filter((r) => level === 'all' || String(r.level) === level);
+    const list = PASSAGES.filter((r) => level === 'all' || String(r.level) === level);
 
     $('#reading-list').innerHTML = list
       .map((r) => {
@@ -1324,7 +1362,7 @@
    */
   function startRandomReading() {
     const level = $('#reading-level').value;
-    const pool = READING_DATA.filter((r) => level === 'all' || String(r.level) === level);
+    const pool = PASSAGES.filter((r) => level === 'all' || String(r.level) === level);
     if (!pool.length) {
       toast('この難易度の長文がありません');
       return;
@@ -1335,7 +1373,7 @@
   }
 
   function startReading(passageId) {
-    const passage = READING_DATA.find((r) => r.id === passageId);
+    const passage = PASSAGES.find((r) => r.id === passageId);
     if (!passage) return;
 
     reading.passage = passage;
@@ -1733,7 +1771,7 @@
 
   function getFilteredGrammar() {
     const s = Storage.getSettings();
-    return GRAMMAR_DATA.filter((q) => {
+    return GRAMMAR.filter((q) => {
       if (s.grammarLevel !== 'all' && String(q.level) !== String(s.grammarLevel)) return false;
       if (s.grammarUnit !== 'all' && q.unit !== s.grammarUnit) return false;
       if (s.grammarScope === 'unlearned') return !Storage.isLearned(q.id);
@@ -1880,7 +1918,7 @@
   function initGrammar() {
     // 単元の一覧はデータ側の並び（習う順）をそのまま使う。
     // 問題が1問も無い単元は出さない（選んでも0問になるだけなので）
-    const used = new Set(GRAMMAR_DATA.map((q) => q.unit));
+    const used = new Set(GRAMMAR.map((q) => q.unit));
     $('#grammar-unit').innerHTML =
       '<option value="all">すべて</option>' +
       GRAMMAR_UNITS.filter((u) => used.has(u))
@@ -1930,6 +1968,9 @@
   // 単語と長文は4段階（CEFR B2 まで）、算数は3段階しかないので上限で頭打ちにする
   // 文法だけ**レベル1の問題が無い**（教材が A2 から始まるため）。
   // poolFor が空を返しても nextAdaptiveQuestion が別の科目へ回すので、階段は止まらない
+  //
+  // **下限はファイル冒頭の MIN_LEVEL。**いま英語は 3〜4 の2段しかないので、
+  // レベル判定の刻みはそのぶん粗くなる（A2 を出し直せば4段に戻る）
   const MAX_LEVEL = { word: 4, math: 5, reading: 4, grammar: 4 };
 
   // 上下の向きが変わった回数がこれだけ溜まれば、レベルは十分に絞れたとみなす
@@ -1957,7 +1998,7 @@
 
   /** 単語の4択（英単語 → 意味）を作る */
   function buildWordChoice(word) {
-    const distractors = shuffle(WORD_DATA.filter((w) => w.id !== word.id && w.meaning !== word.meaning))
+    const distractors = shuffle(WORDS.filter((w) => w.id !== word.id && w.meaning !== word.meaning))
       .slice(0, 3);
     const options = shuffle([word, ...distractors]);
     return {
@@ -2028,14 +2069,14 @@
     }
 
     if (subject === 'english') {
-      const passage = shuffle(READING_DATA)[0];
+      const passage = shuffle(PASSAGES)[0];
       passage.questions.forEach((q, i) => questions.push(buildReadingQuestion(passage, q, i)));
       // 本番（MAP Growth）は Reading と Language Usage が別のセクションなので、
       // 英語のうちおよそ3分の1を文法にあてる
-      shuffle(GRAMMAR_DATA)
+      shuffle(GRAMMAR)
         .slice(0, Math.max(Math.round(total / 3), 0))
         .forEach((g) => questions.push(buildGrammarMockQuestion(g)));
-      shuffle(WORD_DATA)
+      shuffle(WORDS)
         .slice(0, Math.max(total - questions.length, 0))
         .forEach((w) => questions.push(buildWordChoice(w)));
       return shuffle(questions).slice(0, total);
@@ -2045,12 +2086,12 @@
     const englishCount = Math.round(total * 0.6);
     const mathCount = total - englishCount;
 
-    const passage = shuffle(READING_DATA)[0];
+    const passage = shuffle(PASSAGES)[0];
     passage.questions.forEach((q, i) => questions.push(buildReadingQuestion(passage, q, i)));
-    shuffle(GRAMMAR_DATA)
+    shuffle(GRAMMAR)
       .slice(0, Math.max(Math.round(englishCount / 3), 0))
       .forEach((g) => questions.push(buildGrammarMockQuestion(g)));
-    shuffle(WORD_DATA)
+    shuffle(WORDS)
       .slice(0, Math.max(englishCount - questions.length, 0))
       .forEach((w) => questions.push(buildWordChoice(w)));
 
@@ -2068,11 +2109,12 @@
   /** その科目・そのレベルで出せる問題の一覧 */
   function poolFor(kind, level) {
     const lv = Math.min(level, MAX_LEVEL[kind]);
-    if (kind === 'word') return WORD_DATA.filter((w) => w.level === lv);
+    if (lv < MIN_LEVEL[kind]) return [];   // 伏せている段からは出さない
+    if (kind === 'word') return WORDS.filter((w) => w.level === lv);
     if (kind === 'math') return MATH_DATA.filter((p) => p.level === lv);
-    if (kind === 'grammar') return GRAMMAR_DATA.filter((q) => q.level === lv);
+    if (kind === 'grammar') return GRAMMAR.filter((q) => q.level === lv);
     const out = [];
-    READING_DATA.filter((r) => r.level === lv).forEach((r) =>
+    PASSAGES.filter((r) => r.level === lv).forEach((r) =>
       r.questions.forEach((q, i) => out.push({ passage: r, q, i }))
     );
     return out;
@@ -2094,6 +2136,19 @@
    */
   const ladderTop = () => (mock.subject === 'math' ? MAX_LEVEL.math : MAX_LEVEL.word);
 
+  /**
+   * 階段の高さの下限。**伏せている段には降ろさない。**
+   * ここを 1 のままにすると、出せる問題が無い高さで階段が空回りし、
+   * levelsNear に助けられて上の段の問題が「レベル1の問題」として出てしまう。
+   *
+   * **「英語＋算数」のときは英語の下限に合わせる。**階段の段番号は
+   * 英語の CEFR と算数の学年で共通なので、下限を算数の 1 まで下げると、
+   * 一番下の2段には算数しか無い状態になる。そこで足踏みした子に
+   * 「入門（A1）」と CEFR を名乗ることになるが、その段はいま出していない。
+   * その代わり、混ぜた回では算数も Grade 5 からになる（算数だけの回は Grade 3 から）
+   */
+  const ladderBottom = () => (mock.subject === 'math' ? MIN_LEVEL.math : MIN_LEVEL.word);
+
   /** 階段の高さの呼び名。英語は CEFR、算数だけのときは学年の段階 */
   const ladderLabel = (level) =>
     mock.subject === 'math' ? MATH_LEVEL_LABELS[level] : LEVEL_LABELS[level];
@@ -2101,8 +2156,8 @@
   /** 近いレベルから順に探す。中央→下→上の順で、在庫切れでも止まらないようにする */
   function levelsNear(level) {
     const out = [level];
-    for (let d = 1; d < ladderTop(); d++) {
-      if (level - d >= 1) out.push(level - d);
+    for (let d = 1; d <= ladderTop() - ladderBottom(); d++) {
+      if (level - d >= ladderBottom()) out.push(level - d);
       if (level + d <= ladderTop()) out.push(level + d);
     }
     return out;
@@ -2153,7 +2208,7 @@
       }
     } else {
       mock.streak = 0;
-      mock.level = Math.max(1, mock.level - 1);
+      mock.level = Math.max(ladderBottom(), mock.level - 1);
     }
 
     const dir = mock.level > before ? 1 : mock.level < before ? -1 : 0;
@@ -2236,7 +2291,7 @@
     mock.subject = subject;
     mock.index = 0;
     mock.startedAt = Date.now();
-    mock.level = 1; // かならずやさしい問題から始める
+    mock.level = ladderBottom(); // かならず出せる中でいちばんやさしい段から始める
     mock.streak = 0;
     mock.dir = 0;
     mock.reversals = [];
@@ -2482,15 +2537,19 @@
 
   /**
    * 推定レベルを級の名前にする。
-   * 一番下から一度も上がれず、しかも取りこぼしが多いときだけ「5級未満」とする。
+   * 一番下から一度も上がれず、しかも取りこぼしが多いときだけ「その下」とする。
+   *
+   * 一番下は ladderBottom()。**伏せている段があるので 1 とはかぎらない。**
+   * いま英語の一番下は 標準 B1 なので、そこで取りこぼしが続けば「標準 B1 より下」と出る
+   * （A2 を伏せている以上、どの段かまでは測れない。測れていないことをそのまま言う）
    */
   function adaptiveLevelLabel(estimate, byLevel) {
-    const low = byLevel[1];
-    const bottomedOut = estimate < 1.25 && low && low.answered >= 3 && low.correct / low.answered < 0.5;
-    if (bottomedOut) {
-      return mock.subject === 'math' ? `${MATH_LEVEL_LABELS[1]}より前` : 'A1未満';
-    }
-    return ladderLabel(Math.min(ladderTop(), Math.max(1, Math.round(estimate))));
+    const bottom = ladderBottom();
+    const low = byLevel[bottom];
+    const bottomedOut =
+      estimate < bottom + 0.25 && low && low.answered >= 3 && low.correct / low.answered < 0.5;
+    if (bottomedOut) return `${ladderLabel(bottom)} より下`;
+    return ladderLabel(Math.min(ladderTop(), Math.max(bottom, Math.round(estimate))));
   }
 
   /** レベル判定の結果をまとめる。画面にも AI 診断にも同じものを渡す */
@@ -2506,13 +2565,18 @@
     const estimate = estimateAdaptiveLevel();
     const reached = Math.max(...results.map((r) => r.q.askedAt));
 
-    // どういう終わり方をしたかで、推定の確からしさが変わる
+    // どういう終わり方をしたかで、推定の確からしさが変わる。
+    //
+    // **「上がりきった」は、最後まで上に張り付いていたときだけ言う。**
+    // 一度でも最上段に触れたかどうかで判定していたら、正答率10%の回に
+    // 「一番難しい 応用 B2 まで正解し続けました」と出た。段が2つしか無いと
+    // まぐれ2連続で最上段に届いてしまうので、推定値のほうも見る
     const shape =
       mock.reversals.length >= 2
         ? '上下を繰り返して落ち着いた'
-        : reached >= ladderTop()
+        : reached >= ladderTop() && estimate >= ladderTop() - 0.5
           ? '一番難しいところまで上がりきった'
-          : reached <= 1
+          : reached <= ladderBottom()
             ? '一番やさしいところから上がれなかった'
             : '上下がまだ少ない';
 
@@ -2541,13 +2605,19 @@
     $('#mock-adaptive').hidden = !adaptive;
     if (!adaptive) return;
 
+    // 高さは「下限〜上限」を 0〜100% に割り直す。伏せている段があると
+    // lv / top では棒がどれも高いところに固まり、上下が読み取れなくなる。
+    // 段が1つしか無いときは 0 割りになるので、そのときは満杯にする
     const top = ladderTop();
+    const bottom = ladderBottom();
+    const span = top - bottom;
     $('#mock-adaptive-chart').innerHTML = results
       .map((r, i) => {
         const lv = r.q.askedAt;
+        const h = span > 0 ? 25 + ((lv - bottom) / span) * 75 : 100;
         const title = `${i + 1}問目 ${ladderLabel(lv)} ${r.isCorrect ? '正解' : '不正解'}`;
         return `<span class="adaptive-step ${r.isCorrect ? 'ok' : 'ng'}"
-                      style="height:${(lv / top) * 100}%" title="${escapeHtml(title)}"></span>`;
+                      style="height:${h}%" title="${escapeHtml(title)}"></span>`;
       })
       .join('');
 
@@ -2557,7 +2627,7 @@
     const notes = {
       '上下を繰り返して落ち着いた': `難易度が ${rev} 回上下しました。行き来した高さの平均から、いまの実力は ${level} あたりと見ています。`,
       '一番難しいところまで上がりきった': `最後まで難易度が上がり続け、用意した中で一番難しい ${ladderLabel(top)} の問題まで正解できました。ここで測れるのは ${ladderLabel(top)} までです。`,
-      '一番やさしいところから上がれなかった': `一番やさしい ${ladderLabel(1)} から難易度を上げられませんでした。まずはここの${what}を確実にしていきましょう。`,
+      '一番やさしいところから上がれなかった': `一番やさしい ${ladderLabel(ladderBottom())} から難易度を上げられませんでした。まずはここの${what}を確実にしていきましょう。`,
       '上下がまだ少ない': `まだ難易度の上下が少ないため、後半に出した問題の高さから ${level} あたりと見ています。問題数を増やすとより正確になります。`
     };
     $('#mock-adaptive-note').textContent = notes[adaptive['測り方']];
@@ -2884,9 +2954,9 @@
     $('#stats-answers').textContent = stats.totalAnswers;
     $('#stats-rate').textContent = `${rate}%`;
     $('#stats-streak').textContent = Storage.getStreak();
-    $('#stats-weak').textContent = WORD_DATA.filter((w) => Storage.isWeak(w.id)).length;
-    $('#stats-learned').textContent = WORD_DATA.filter((w) => Storage.isLearned(w.id)).length;
-    $('#stats-mastered').textContent = WORD_DATA.filter((w) => Storage.isMastered(w.id)).length;
+    $('#stats-weak').textContent = WORDS.filter((w) => Storage.isWeak(w.id)).length;
+    $('#stats-learned').textContent = WORDS.filter((w) => Storage.isLearned(w.id)).length;
+    $('#stats-mastered').textContent = WORDS.filter((w) => Storage.isMastered(w.id)).length;
 
     renderWeakAreas();
     renderAccuracyByCategory();
@@ -2934,11 +3004,11 @@
   }
 
   function renderMasteryByLevel() {
-    const levels = [...new Set(WORD_DATA.map((w) => w.level))].sort();
+    const levels = [...new Set(WORDS.map((w) => w.level))].sort();
 
     $('#mastery-levels').innerHTML = levels
       .map((lv) => {
-        const words = WORD_DATA.filter((w) => w.level === lv);
+        const words = WORDS.filter((w) => w.level === lv);
         const counts = {};
         words.forEach((w) => {
           const k = masteryStage(Storage.getRecord(w.id));
@@ -3110,12 +3180,12 @@
 
   function renderAccuracyByCategory() {
     // 長文は「本」単位ではなく題材で集計する
-    const readingItems = READING_DATA.flatMap((r) =>
+    const readingItems = PASSAGES.flatMap((r) =>
       r.questions.map((q, i) => ({ id: `${r.id}-${i + 1}`, category: r.topic }))
     );
 
     const groups = [
-      { name: '📖 単語', rows: accuracyByCategory(WORD_DATA) },
+      { name: '📖 単語', rows: accuracyByCategory(WORDS) },
       { name: '📕 長文読解', rows: accuracyByCategory(readingItems) },
       { name: '🔢 算数', rows: accuracyByCategory(MATH_DATA) }
     ].filter((g) => g.rows.length > 0);
@@ -3209,6 +3279,16 @@
 
   function init() {
     Speech.init();
+    // 伏せている段を選択欄から先に落とす。**各画面の init より前に。**
+    // あとから落とすと、保存された設定を value に入れたときに選択肢が無くて
+    // 空欄になり、そのまま保存し直されて設定が壊れる
+    trimLevelOptions('#filter-level', 'word');
+    trimLevelOptions('#reading-level', 'reading');
+    trimLevelOptions('#grammar-level', 'grammar');
+    Storage.updateSettings({
+      level: visibleLevelSetting(Storage.getSettings().level, 'word'),
+      grammarLevel: visibleLevelSetting(Storage.getSettings().grammarLevel, 'grammar')
+    });
     initFilters();
     initCountdown();
     initMath();
