@@ -104,8 +104,25 @@ EIS の Grade 8 入試だから。日本の中1にない単元（確率など）
   出ていることが分かった（piano / exam / color が B1 のままだった）
 - **冊子の巻頭・巻末まで数えていた。**巻頭は「TOEFL Junior とはどんな試験か」を大人向けに
   説明した文章で、その冊子のレベルで書かれた英文ではない。ここを含めていたために
-  communication / relationship / research が A2 になっていた。
-  本編は A2 が p13〜136、B1・B2 が p15〜139
+  communication / relationship / research が A2 になっていた
+
+**何を「その冊子のレベルの英文」とみなすかは、教材を1冊ずつ確かめて決めてある。**
+範囲と除外の理由は `tools/relevel-vocab.mjs` の冒頭に書いた。要点だけ:
+
+| 冊子 | 前付 | 本編 | Directions | 後付 |
+| --- | --- | --- | --- | --- |
+| A2 Basic | p1–12 | **p13–136** | p14 / p125 | p137–147 |
+| B1 Intermediate | p1–14 | **p15–138** | p16 / p126 | p139–143 |
+| B2 Advanced | p1–14 | **p15–138** | p16 / p126 | p139–143 |
+
+- **Directions（試験の受け方の説明）を入れない。3冊とも同じ文**が載っている（違うのは
+  OCR の揺れだけ）。全レベルに同じ文がある以上レベルの手がかりにならず、含めると
+  共通のサンプル問題から concept / theory / relatively / Newton が A2 になる
+- **版面の柱と設問の定型文を入れない**（`PART 2`、`Questions 1-4 refer to the following
+  announcement` など）。含めると announcement / biography / notice / passage が A2 になる
+- 読解教材は**本文・題・語注・選択肢を入れ、設問の文は入れない**。
+  `In the passage, the word X is closest in meaning to` はどのレベルにも出る定型で、
+  ここだけに出る語は infer / paragraph / summarize など12語
 
 ### ID は変えない
 
