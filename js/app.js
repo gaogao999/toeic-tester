@@ -548,7 +548,7 @@
    * tools/stamp-version.mjs で書き換える。
    * スマホで開いたときに、手元のものが最新かを確かめるためのもの。
    */
-  const APP_VERSION = '2026-08-20 (e008ba1)';
+  const APP_VERSION = '2026-08-20 (287d2eb)';
 
   const EXAM_DATE = '2027-01-07';
 
@@ -2539,20 +2539,48 @@
   }
 
   /**
+   * **その段に到達したと言うのに必要な正答率と解答数。**
+   * 7割は js/ai.js の機械判定と同じ線。どちらの経路で判定しても同じ基準にする。
+   * 解答数は、階段だと上の段に数問しか回らないことがあるので 3 問から見る
+   */
+  const REACHED_RATE = 0.7;
+  const REACHED_ANSWERS = 3;
+
+  /**
+   * **実際に取れている一番上の段。**階段の推定値を、これで頭打ちにする。
+   *
+   * 階段法は「正答率が7割になる高さで落ち着く」という前提の上に立っているが、
+   * **段が2つしか無いとその前提が崩れる。**4択のまぐれ当たりは25%、2問続けて
+   * 当たる確率は6%あり、30問も解けば何度か起きる。そのたびに最上段へ跳ね上がって
+   * すぐ落ちるので、折り返しの平均は実力と関係なく 3.5 前後に寄る。
+   * 実際、正答率33%（ほぼ当てずっぽう）の回に「応用 B2」と出た。
+   *
+   * そこで「その段で7割取れているか」を別に見て、取れていない段は名乗らせない。
+   * どの段も取れていなければ null を返し、呼び出し側が「一番下より下」と言う。
+   */
+  function reachedLevel(byLevel) {
+    let reached = null;
+    for (const lv of Object.keys(byLevel).map(Number).sort((a, b) => a - b)) {
+      const v = byLevel[lv];
+      if (v.answered >= REACHED_ANSWERS && v.correct / v.answered >= REACHED_RATE) reached = lv;
+    }
+    return reached;
+  }
+
+  /**
    * 推定レベルを級の名前にする。
-   * 一番下から一度も上がれず、しかも取りこぼしが多いときだけ「その下」とする。
+   * 階段の推定値と、実際に7割取れている段の**低いほう**を採る。
    *
    * 一番下は ladderBottom()。**伏せている段があるので 1 とはかぎらない。**
-   * いま英語の一番下は 標準 B1 なので、そこで取りこぼしが続けば「標準 B1 より下」と出る
+   * いま英語の一番下は 標準 B1 なので、そこで7割に届かなければ「標準 B1 より下」と出る
    * （A2 を伏せている以上、どの段かまでは測れない。測れていないことをそのまま言う）
    */
   function adaptiveLevelLabel(estimate, byLevel) {
     const bottom = ladderBottom();
-    const low = byLevel[bottom];
-    const bottomedOut =
-      estimate < bottom + 0.25 && low && low.answered >= 3 && low.correct / low.answered < 0.5;
-    if (bottomedOut) return `${ladderLabel(bottom)} より下`;
-    return ladderLabel(Math.min(ladderTop(), Math.max(bottom, Math.round(estimate))));
+    const reached = reachedLevel(byLevel);
+    if (reached === null) return `${ladderLabel(bottom)} より下`;
+    const staircase = Math.min(ladderTop(), Math.max(bottom, Math.round(estimate)));
+    return ladderLabel(Math.min(staircase, reached));
   }
 
   /** レベル判定の結果をまとめる。画面にも AI 診断にも同じものを渡す */
@@ -2568,14 +2596,23 @@
     const estimate = estimateAdaptiveLevel();
     const reached = Math.max(...results.map((r) => r.q.askedAt));
 
+    // 階段が出した高さと、実際に7割取れている高さ。**低いほうを採る**
+    const staircase = Math.min(ladderTop(), Math.max(ladderBottom(), Math.round(estimate)));
+    const solid = reachedLevel(byLevel);
+    const cappedByRate = solid === null || solid < staircase;
+
     // どういう終わり方をしたかで、推定の確からしさが変わる。
+    //
+    // **正答率が届いていない回は、まずそう言う。**階段の言い分（何回折り返した、
+    // 平均がいくつ）をそのまま出すと、正答率33%の回に「応用 B2 あたり」と
+    // 説明することになる。段が2つしか無いと、まぐれ2連続でも最上段に届く。
     //
     // **「上がりきった」は、最後まで上に張り付いていたときだけ言う。**
     // 一度でも最上段に触れたかどうかで判定していたら、正答率10%の回に
-    // 「一番難しい 応用 B2 まで正解し続けました」と出た。段が2つしか無いと
-    // まぐれ2連続で最上段に届いてしまうので、推定値のほうも見る
-    const shape =
-      mock.reversals.length >= 2
+    // 「一番難しい 応用 B2 まで正解し続けました」と出た
+    const shape = cappedByRate
+      ? '正答率が届いていない'
+      : mock.reversals.length >= 2
         ? '上下を繰り返して落ち着いた'
         : reached >= ladderTop() && estimate >= ladderTop() - 0.5
           ? '一番難しいところまで上がりきった'
@@ -2592,6 +2629,9 @@
       最高到達難易度: ladderLabel(reached),
       折り返し回数: mock.reversals.length,
       測り方: shape,
+      // 階段の言い分だけでは足りないので、正答率で見直したかどうかも渡す
+      正答率で下げた: cappedByRate,
+      到達したと言える一番上: solid === null ? null : ladderLabel(solid),
       難易度ごとの正答: Object.keys(byLevel)
         .sort()
         .map((lv) => ({
@@ -2614,6 +2654,7 @@
     const top = ladderTop();
     const bottom = ladderBottom();
     const span = top - bottom;
+    const reached = Math.max(...results.map((r) => r.q.askedAt));
     $('#mock-adaptive-chart').innerHTML = results
       .map((r, i) => {
         const lv = r.q.askedAt;
@@ -2627,7 +2668,12 @@
     const rev = adaptive['折り返し回数'];
     const level = adaptive['推定レベル'];
     const what = mock.subject === 'math' ? '問題' : '単語';
+    // 「どの段で何問中何問」を1つ添える。数字が無いと、なぜ下げたのかが伝わらない
+    const rates = (adaptive['難易度ごとの正答'] || [])
+      .map((r) => `${r.難易度} ${r.正答}/${r.出題}`)
+      .join(' ／ ');
     const notes = {
+      '正答率が届いていない': `難易度は ${ladderLabel(reached)} まで上がりましたが、そこで7割を取れていません（${rates}）。まぐれ当たりでも難易度は上がるので、正答率のほうを見て ${level} としています。`,
       '上下を繰り返して落ち着いた': `難易度が ${rev} 回上下しました。行き来した高さの平均から、いまの実力は ${level} あたりと見ています。`,
       '一番難しいところまで上がりきった': `最後まで難易度が上がり続け、用意した中で一番難しい ${ladderLabel(top)} の問題まで正解できました。ここで測れるのは ${ladderLabel(top)} までです。`,
       '一番やさしいところから上がれなかった': `一番やさしい ${ladderLabel(ladderBottom())} から難易度を上げられませんでした。まずはここの${what}を確実にしていきましょう。`,
