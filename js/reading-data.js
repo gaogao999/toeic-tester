@@ -22,7 +22,7 @@
 const READING_DATA = [
   {
     id: 'r1',
-    title: 'The First Day',
+    title: '転校した日の朝',
     level: 1,
     topic: '学校生活',
     words: 170,
@@ -87,7 +87,7 @@ const READING_DATA = [
 
   {
     id: 'r2',
-    title: 'Sports Day Announcement',
+    title: '体育祭のお知らせ',
     level: 1,
     topic: 'お知らせ',
     words: 150,
@@ -145,7 +145,7 @@ const READING_DATA = [
 
   {
     id: 'r3',
-    title: 'Why Bees Matter',
+    title: 'ミツバチがいなくなったら',
     level: 2,
     topic: '理科',
     words: 200,
@@ -211,7 +211,7 @@ const READING_DATA = [
 
   {
     id: 'r4',
-    title: 'The Ocean and Our Plastic',
+    title: '海に流れ着くプラスチック',
     level: 2,
     topic: '環境',
     words: 210,
@@ -282,7 +282,7 @@ const READING_DATA = [
 
   {
     id: 'r5',
-    title: 'The Boy Who Built a Windmill',
+    title: '風車を作った少年',
     level: 2,
     topic: '伝記',
     words: 200,
@@ -353,7 +353,7 @@ const READING_DATA = [
 
   {
     id: 'r6',
-    title: 'Water for the New Year',
+    title: 'タイの新年ソンクラーン',
     level: 3,
     topic: '文化',
     words: 220,
@@ -424,7 +424,7 @@ const READING_DATA = [
 
   {
     id: 'r7',
-    title: 'Screens and Sleep',
+    title: '寝る前のスマホと睡眠',
     level: 3,
     topic: '科学・生活',
     words: 215,
@@ -495,7 +495,7 @@ const READING_DATA = [
 
   {
     id: 'r8',
-    title: 'The Sounds We Cannot Hear',
+    title: 'ゾウが交わす低い音',
     level: 3,
     topic: '理科',
     words: 205,
@@ -574,7 +574,7 @@ const READING_DATA = [
   // ============================================================
   {
     id: 'r9',
-    title: 'A Message from Your Host Family',
+    title: 'ホストファミリーからの手紙',
     level: 2,
     topic: '手紙・メール',
     words: 210,
@@ -653,7 +653,7 @@ const READING_DATA = [
   },
   {
     id: 'r10',
-    title: 'The Wallet on the Bus',
+    title: 'バスで拾った財布',
     level: 2,
     topic: '日常生活',
     words: 215,
@@ -733,7 +733,7 @@ const READING_DATA = [
   // ============================================================
   {
     id: 'r11',
-    title: 'The Long Journey of Chocolate',
+    title: 'チョコレートがたどった道',
     level: 3,
     topic: '歴史',
     words: 250,
@@ -808,7 +808,7 @@ const READING_DATA = [
   },
   {
     id: 'r12',
-    title: 'Should School Start Later?',
+    title: '始業時刻を遅らせるべきか',
     level: 3,
     topic: '社会',
     words: 255,
@@ -887,7 +887,7 @@ const READING_DATA = [
   // ============================================================
   {
     id: 'r13',
-    title: 'Why We Forget',
+    title: '人はなぜ忘れるのか',
     level: 4,
     topic: '科学',
     words: 290,
@@ -962,7 +962,7 @@ const READING_DATA = [
   },
   {
     id: 'r14',
-    title: 'Translation Machines and the Future of Language Learning',
+    title: '翻訳機と外国語学習',
     level: 4,
     topic: '技術',
     words: 295,
@@ -1037,7 +1037,7 @@ const READING_DATA = [
   },
   {
     id: 'r15',
-    title: 'The Real Price of Cheap Clothes',
+    title: '安い服の本当の値段',
     level: 4,
     topic: '環境・経済',
     words: 290,
@@ -1112,7 +1112,7 @@ const READING_DATA = [
   },
   {
     id: 'r16',
-    title: 'The Forest Beneath the Forest',
+    title: '地下でつながる森',
     level: 4,
     topic: '生物',
     words: 295,
@@ -1192,7 +1192,7 @@ const READING_DATA = [
 
   {
     id: 'r17',
-    title: 'International Food Day',
+    title: '国際フードデーの案内',
     level: 2,
     topic: '手紙・メール',
     words: 180,
@@ -1254,7 +1254,7 @@ const READING_DATA = [
 
   {
     id: 'r18',
-    title: 'New Library Hours',
+    title: '図書館の新しい開館時間',
     level: 2,
     topic: 'お知らせ',
     words: 185,
@@ -1322,7 +1322,7 @@ const READING_DATA = [
 
   {
     id: 'r19',
-    title: 'A Day at the Aquarium',
+    title: '水族館への遠足',
     level: 3,
     topic: '学校生活',
     words: 255,
@@ -1387,7 +1387,7 @@ const READING_DATA = [
 
   {
     id: 'r20',
-    title: 'The Ocean\'s Quick-Change Artist',
+    title: 'タコの身の守り方',
     level: 3,
     topic: '理科',
     words: 260,
@@ -1457,7 +1457,7 @@ const READING_DATA = [
 
   {
     id: 'r21',
-    title: 'A Month at Westbrook College',
+    title: '姉妹校での1か月',
     level: 4,
     topic: '文化',
     words: 305,
@@ -1527,7 +1527,7 @@ const READING_DATA = [
 
   {
     id: 'r22',
-    title: 'Islands of Heat',
+    title: '都市が暑くなる理由',
     level: 4,
     topic: '環境',
     words: 305,
@@ -1602,7 +1602,7 @@ const READING_DATA = [
   },
   {
     id: 'r23',
-    title: 'Show & Tell Tomorrow',
+    title: 'ショー・アンド・テルの連絡',
     level: 2,
     topic: '手紙・メール',
     words: 192,
@@ -1662,7 +1662,7 @@ const READING_DATA = [
   },
   {
     id: 'r24',
-    title: 'Monkeys on the Loose',
+    title: '動物園から逃げたサル',
     level: 2,
     topic: '学校生活',
     words: 213,
@@ -1745,7 +1745,7 @@ const READING_DATA = [
   },
   {
     id: 'r25',
-    title: 'The Ideas of Sigmund Freud',
+    title: '精神分析を生んだ人',
     level: 2,
     topic: '伝記',
     words: 233,
@@ -1851,7 +1851,7 @@ const READING_DATA = [
   },
   {
     id: 'r26',
-    title: 'New Rules for Halloween Night',
+    title: 'ハロウィーンの新しい決まり',
     level: 2,
     topic: 'お知らせ',
     words: 149,
@@ -1900,7 +1900,7 @@ const READING_DATA = [
   },
   {
     id: 'r27',
-    title: 'Talent Show Try-Outs',
+    title: 'タレントショーの選考会',
     level: 2,
     topic: '手紙・メール',
     words: 167,
@@ -1950,7 +1950,7 @@ const READING_DATA = [
   },
   {
     id: 'r28',
-    title: 'Understanding Heart Attacks',
+    title: '心臓発作はなぜ起きるか',
     level: 2,
     topic: '理科',
     words: 186,
@@ -2000,7 +2000,7 @@ const READING_DATA = [
   },
   {
     id: 'r29',
-    title: 'Photography in the Civil War',
+    title: '南北戦争と新しい技術',
     level: 2,
     topic: '歴史',
     words: 180,
@@ -2050,7 +2050,7 @@ const READING_DATA = [
   },
   {
     id: 'r30',
-    title: 'Spooky Day at Sully School',
+    title: 'スプーキーデーの案内',
     level: 2,
     topic: 'お知らせ',
     words: 94,
@@ -2104,7 +2104,7 @@ const READING_DATA = [
   },
   {
     id: 'r31',
-    title: 'Climbing Mount Whitmore',
+    title: '吹雪のテントの中で',
     level: 2,
     topic: '日常生活',
     words: 363,
@@ -2156,7 +2156,7 @@ const READING_DATA = [
   },
   {
     id: 'r32',
-    title: 'Why You Should Exercise',
+    title: '運動はどれくらい必要か',
     level: 2,
     topic: '科学・生活',
     words: 213,
@@ -2207,7 +2207,7 @@ const READING_DATA = [
   },
   {
     id: 'r33',
-    title: 'Draco and His Harsh Laws',
+    title: '古代ギリシャ最初の立法者',
     level: 2,
     topic: '歴史',
     words: 202,
@@ -2258,7 +2258,7 @@ const READING_DATA = [
   },
   {
     id: 'r34',
-    title: 'Where Have You Been, Polly?',
+    title: '欠席した友だちへの手紙',
     level: 2,
     topic: '手紙・メール',
     words: 161,
@@ -2309,7 +2309,7 @@ const READING_DATA = [
   },
   {
     id: 'r35',
-    title: 'Spelling Bee Report',
+    title: '州のスペリング大会',
     level: 2,
     topic: '学校生活',
     words: 166,
@@ -2358,7 +2358,7 @@ const READING_DATA = [
   },
   {
     id: 'r36',
-    title: 'Amelia Earhart',
+    title: '女性飛行士アメリア・イアハート',
     level: 2,
     topic: '伝記',
     words: 149,
@@ -2409,7 +2409,7 @@ const READING_DATA = [
   },
   {
     id: 'r37',
-    title: 'The Art of the Fresco',
+    title: 'フレスコ画の描き方',
     level: 2,
     topic: '文化',
     words: 189,
@@ -2459,7 +2459,7 @@ const READING_DATA = [
   },
   {
     id: 'r38',
-    title: 'International Potluck Party',
+    title: '毎年4月の恒例行事',
     level: 2,
     topic: 'お知らせ',
     words: 143,
@@ -2508,7 +2508,7 @@ const READING_DATA = [
   },
   {
     id: 'r39',
-    title: 'The Lemonade Stand Robbery',
+    title: '暑い日の商売',
     level: 2,
     topic: '日常生活',
     words: 304,
@@ -2560,7 +2560,7 @@ const READING_DATA = [
   },
   {
     id: 'r40',
-    title: 'How Volcanoes Form',
+    title: '火山ができるしくみ',
     level: 2,
     topic: '理科',
     words: 177,
@@ -2609,7 +2609,7 @@ const READING_DATA = [
   },
   {
     id: 'r41',
-    title: 'Catching the Wind',
+    title: '新しいエネルギーを探して',
     level: 2,
     topic: '環境',
     words: 210,
@@ -2659,7 +2659,7 @@ const READING_DATA = [
   },
   {
     id: 'r42',
-    title: 'Billy and the Frog',
+    title: '授業中に起きた騒ぎ',
     level: 2,
     topic: '学校生活',
     words: 236,
@@ -2744,7 +2744,7 @@ const READING_DATA = [
   },
   {
     id: 'r43',
-    title: 'Freak Waves',
+    title: '突然あらわれる巨大な波',
     level: 2,
     topic: '科学',
     words: 248,
@@ -2828,7 +2828,7 @@ const READING_DATA = [
   },
   {
     id: 'r44',
-    title: 'First Day, Torn Shirt',
+    title: '登校初日のできごと',
     level: 2,
     topic: '日常生活',
     words: 359,
@@ -2886,7 +2886,7 @@ const READING_DATA = [
   },
   {
     id: 'r45',
-    title: 'Hot Dog Champion',
+    title: '早食い大会の優勝者',
     level: 2,
     topic: '学校生活',
     words: 228,
@@ -2936,7 +2936,7 @@ const READING_DATA = [
   },
   {
     id: 'r46',
-    title: 'The Harm of Acid Rain',
+    title: '酸性雨がもたらすもの',
     level: 2,
     topic: '環境',
     words: 200,
@@ -2986,7 +2986,7 @@ const READING_DATA = [
   },
   {
     id: 'r47',
-    title: 'Come with Us on Saturday',
+    title: '週末の予定を知らせるメール',
     level: 2,
     topic: '手紙・メール',
     words: 156,
@@ -3036,7 +3036,7 @@ const READING_DATA = [
   },
   {
     id: 'r48',
-    title: 'Birth Order and Personality',
+    title: '長子・末子・ひとりっ子',
     level: 2,
     topic: '科学・生活',
     words: 188,
@@ -3087,7 +3087,7 @@ const READING_DATA = [
   },
   {
     id: 'r49',
-    title: 'Penguin Facts You Never Knew',
+    title: 'ペンギンの意外な生態',
     level: 2,
     topic: '生物',
     words: 205,
@@ -3137,7 +3137,7 @@ const READING_DATA = [
   },
   {
     id: 'r50',
-    title: 'Alaska: Wild and Cold',
+    title: '49番目に加わった州',
     level: 2,
     topic: '社会',
     words: 202,
@@ -3186,7 +3186,7 @@ const READING_DATA = [
   },
   {
     id: 'r51',
-    title: 'The Championship in the Snow',
+    title: '雪の中の決勝戦',
     level: 2,
     topic: '学校生活',
     words: 254,
@@ -3247,7 +3247,7 @@ const READING_DATA = [
   },
   {
     id: 'r52',
-    title: 'The Strange Death of William the Conqueror',
+    title: '征服王ウィリアムの最期',
     level: 2,
     topic: '歴史',
     words: 225,
@@ -3309,7 +3309,7 @@ const READING_DATA = [
   },
   {
     id: 'r53',
-    title: 'Reading Festival Schedule',
+    title: '読書フェスティバルの日程',
     level: 2,
     topic: 'お知らせ',
     words: 122,
@@ -3375,7 +3375,7 @@ const READING_DATA = [
   },
   {
     id: 'r54',
-    title: 'A Letter from Coach McMahon',
+    title: 'コーチからの返事',
     level: 2,
     topic: '手紙・メール',
     words: 199,
@@ -3437,7 +3437,7 @@ const READING_DATA = [
   },
   {
     id: 'r55',
-    title: 'Teacher of the Year',
+    title: '表彰された先生',
     level: 2,
     topic: '学校生活',
     words: 173,
@@ -3520,7 +3520,7 @@ const READING_DATA = [
   },
   {
     id: 'r56',
-    title: 'A Rainy Day Hike',
+    title: '雨の音がうるさかった日',
     level: 2,
     topic: '日常生活',
     words: 295,
@@ -3605,7 +3605,7 @@ const READING_DATA = [
   },
   {
     id: 'r57',
-    title: 'Wondering at the Stars',
+    title: '光年という距離',
     level: 2,
     topic: '科学',
     words: 237,
@@ -3689,7 +3689,7 @@ const READING_DATA = [
   },
   {
     id: 'r58',
-    title: 'Reading in the Digital Age',
+    title: '紙の本と電子書籍',
     level: 2,
     topic: '技術',
     words: 227,
@@ -3861,7 +3861,7 @@ const READING_DATA = [
   },
   {
     id: 'r60',
-    title: '7年生のブロードウェイ観劇旅行',
+    title: '舞台を見にいった週末',
     level: 3,
     topic: '学校生活',
     words: 249,
@@ -4051,7 +4051,7 @@ const READING_DATA = [
   },
   {
     id: 'r62',
-    title: '野獣にされた王子',
+    title: '魔女にかけられた呪い',
     level: 3,
     topic: '文化',
     words: 288,
@@ -4102,7 +4102,7 @@ const READING_DATA = [
   },
   {
     id: 'r63',
-    title: 'ヨーロッパで一番好きな国',
+    title: '家族で回った夏のヨーロッパ',
     level: 3,
     topic: '文化',
     words: 196,
@@ -4203,7 +4203,7 @@ const READING_DATA = [
   },
   {
     id: 'r65',
-    title: '万能の人レオナルド・ダ・ヴィンチ',
+    title: 'ルネサンスを生きた人',
     level: 3,
     topic: '伝記',
     words: 241,
@@ -4407,7 +4407,7 @@ const READING_DATA = [
   },
   {
     id: 'r69',
-    title: 'ピアノの誕生',
+    title: 'クリストフォリという楽器職人',
     level: 3,
     topic: '文化',
     words: 243,
@@ -4557,7 +4557,7 @@ const READING_DATA = [
   },
   {
     id: 'r72',
-    title: 'Y2K問題とは何だったのか',
+    title: '西暦を2桁で書いていたころ',
     level: 3,
     topic: '技術',
     words: 190,
@@ -4755,7 +4755,7 @@ const READING_DATA = [
   },
   {
     id: 'r76',
-    title: '地球温暖化のしくみと影響',
+    title: '20世紀に起きた変化',
     level: 3,
     topic: '環境',
     words: 150,
@@ -4939,7 +4939,7 @@ const READING_DATA = [
   },
   {
     id: 'r79',
-    title: '階段から落ちた日の贈り物',
+    title: 'いつも通りに始まった一日',
     level: 3,
     topic: '日常生活',
     words: 341,
@@ -5076,7 +5076,7 @@ const READING_DATA = [
   },
   {
     id: 'r81',
-    title: 'クラスのペットを決める投票',
+    title: 'ジョーンズ先生の恒例行事',
     level: 3,
     topic: '学校生活',
     words: 220,
@@ -5177,7 +5177,7 @@ const READING_DATA = [
   },
   {
     id: 'r83',
-    title: 'アメリカ国歌の意外な生まれ',
+    title: '砲撃の夜に書かれた詩',
     level: 3,
     topic: '歴史',
     words: 231,
@@ -5276,7 +5276,7 @@ const READING_DATA = [
   },
   {
     id: 'r85',
-    title: 'アメリカを支えたハドソン川',
+    title: 'ヘンリー・ハドソンが測った川',
     level: 3,
     topic: '社会',
     words: 229,
@@ -5326,7 +5326,7 @@ const READING_DATA = [
   },
   {
     id: 'r86',
-    title: 'ベーブ・ルースの生涯',
+    title: '野球殿堂に最初に選ばれた選手',
     level: 3,
     topic: '伝記',
     words: 210,
@@ -5675,7 +5675,7 @@ const READING_DATA = [
   },
   {
     id: 'r92',
-    title: '地震のしくみを知ろう',
+    title: 'プレートと断層のはなし',
     level: 3,
     topic: '理科',
     words: 235,
@@ -5759,7 +5759,7 @@ const READING_DATA = [
   },
   {
     id: 'r93',
-    title: 'カフェテリアの大騒動',
+    title: 'タコスの日の昼休み',
     level: 3,
     topic: '学校生活',
     words: 270,
@@ -6030,7 +6030,7 @@ const READING_DATA = [
   },
   {
     id: 'r96',
-    title: '宇宙に生命はいるのか',
+    title: '宇宙をめぐる二つの説',
     level: 3,
     topic: '科学',
     words: 256,
@@ -6863,7 +6863,7 @@ const READING_DATA = [
   },
   {
     id: 'r112',
-    title: '望遠鏡の宿題と宇宙人',
+    title: '望遠鏡を持ち帰った夜',
     level: 4,
     topic: '日常生活',
     words: 368,
@@ -7972,7 +7972,7 @@ const READING_DATA = [
   },
   {
     id: 'r133',
-    title: 'イルカのコミュニケーション',
+    title: '海で最も賢い動物',
     level: 4,
     topic: '生物',
     words: 259,
