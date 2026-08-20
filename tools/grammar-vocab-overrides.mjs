@@ -6,6 +6,7 @@
  *
  * 中身を足すときの考え方:
  *   GRAMMAR_DROP     … 単語カードにしても覚えようがないもの（活用形の断片・熟語の一部）
+ *   GRAMMAR_REWRITE  … 拾えた語形より、別の語形で覚えるほうが良いもの
  *   GRAMMAR_MEANINGS … 英和辞書が場違いな語義を先頭に置いているもの
  *   GRAMMAR_POS      … 語義の日本語からは品詞を当てられないもの
  *   KEEP_AS_IS       … -ing / -ed の形のまま覚える語（活用形に戻さない）
@@ -34,6 +35,8 @@ export const METALANGUAGE = new Set([
   'interrogative', 'demonstrative', 'reflexive', 'inversion', 'usage',
   'subjective', 'generalization', 'comma', 'consonant', 'vowel', 'prefix',
   'unreal', 'habitual', 'continuation', 'successive', 'demotic',
+  'coordinate',   // 等位接続詞（coordinate conjunction）の説明にしか出ない
+
   // 教材の体裁・奥付
   'chapter', 'unit', 'section', 'page', 'index', 'edition', 'license',
   'publishing', 'publication', 'reproduce', 'retrieval', 'transmit',
@@ -45,7 +48,9 @@ export const METALANGUAGE = new Set([
 export const KEEP_AS_IS = new Set([
   'wedding', 'meeting', 'building', 'feeling', 'ending', 'saving', 'setting',
   'training', 'writing', 'painting', 'reading', 'meaning', 'clothing', 'landing',
-  'advanced', 'crowded', 'excited', 'interested', 'tired', 'married'
+  'advanced', 'crowded', 'excited', 'interested', 'tired', 'married',
+  // be 動詞と組で覚える形。原形をあとから収録しても、こちらは残す
+  'relieved', 'devoted', 'stuck', 'exhausted', 'confusing', 'entertaining'
 ]);
 
 /** 単語カードにしない語 */
@@ -76,8 +81,26 @@ export const GRAMMAR_DROP = new Set([
   'don',
   // 地の文から拾うようにして出てきたもの
   'pop',        // popcorn / pop music の一部。単独では「ポンという音」になってしまう
-  'grasping'    // grasp の派生。辞書の語義が「欲深い」で教材の使われ方と合わない
+  'grasping',   // grasp の派生。辞書の語義が「欲深い」で教材の使われ方と合わない
+  // 登場人物の名前。**一度これで beaver を収録してしまい、あとで消した**
+  'beaver'      // Mrs. Beaver（Narnia の登場人物）としてしか出てこない
 ]);
+
+/**
+ * **拾えた語形より、別の語形で覚えるほうが良いもの。**
+ *
+ * 教材にたまたま出た形がそのまま見出しになると、`angles`（複数形）や
+ * `calculating`（動名詞）のような、覚える単位として不自然なカードができる。
+ * さらに辞書がその語形に別の語義を持っていると、`angles → アングル族`のように
+ * 意味まで外れる。gate() が GRAMMAR_DROP のあとにこれを通す。
+ */
+export const GRAMMAR_REWRITE = {
+  angles: 'angle',            // 「four equal angles」。辞書の angles は民族名
+  calculating: 'calculate',   // 「good at calculating」
+  removed: 'remove',          // 「must be removed from Antarctica」
+  inspiring: 'inspire',       // 「an inspiring older student」
+  appointed: 'appoint'
+};
 
 /** 英和辞書の語義が教材の使われ方と合わないもの */
 export const GRAMMAR_MEANINGS = {
@@ -255,7 +278,71 @@ export const GRAMMAR_MEANINGS = {
   placement: '配置',
   bunny: 'ウサギ',
   boldness: '大胆さ',
-  domestically: '国内で、家庭で'
+  domestically: '国内で、家庭で',
+
+  // ---- 語彙練習リスト由来を消したあと、教材から入れ直したぶん ----
+  // **拾った例文と突き合わせて直している。**辞書は語義を1つ選ぶだけなので、
+  // 教材での使われ方とずれたものが必ず混ざる（下の「→」がその例文）
+  // **既存の語と語義が丸かぶりにならないようにする。**同じ日本語のカードが2枚あると
+  // 4択で「どちらも正解」になる（gain / claim / mean / eliminate / criticize が相手）
+  obtain: '手に入れる',
+  intend: '〜するつもりだ',
+  remove: '取り除く、撤去する',
+  blame: '責める',
+  noticeable: '人目につく',
+  delay: '遅らせる',
+
+  progress: '進歩、上達',
+  confusing: '紛らわしい、ややこしい',
+  load: '積み荷、荷物',
+  relate: '関連づける',
+  accept: '受け入れる',              // → She can't accept the fact that she failed
+  cross: '横切る、渡る',             // → They help us cross the street safely
+  consist: '成り立つ',
+  firm: '固い、揺るがない',          // → His decision to quit his job is still firm
+  frequently: 'しばしば、頻繁に',
+  found: '設立する、創設する',       // → The organization was founded by Mr. Guggenheim
+  ruin: '台無しにする',
+  marathon: 'マラソン',
+  celebration: '祝賀、お祝い',
+  angle: '角、角度',
+  calculate: '計算する',
+  remove: '取り除く',
+  inspire: '奮い立たせる',
+  appoint: '任命する、指定する',
+  eager: '熱心な、〜したがる',
+  business: '商売、企業',            // → used widely by schools and businesses
+  court: '裁判所、コート',
+  relieved: 'ほっとした',
+  benefit: '利益、恩恵',
+  pack: '包み、パック',              // → Each pack contains twenty pieces
+  conclude: '結論を出す、終える',
+  demand: '要求する',
+  grant: '認める、与える',           // → We all take it for granted that…
+  noticeable: '目立つ',
+  prefer: '〜のほうを好む',
+  stuck: '動けなくなった',           // → I wouldn't have gotten stuck here
+  spiritual: '精神的な、霊的な',
+  qualify: '資格を得る',             // → qualifying themselves for the state competition
+  access: 'アクセスする、利用する',  // → To access the website, visit…
+  contribute: '寄与する、一因となる',
+  direction: '方向、指示',           // → Had the tour guide given better directions
+  feature: '特徴、機能',             // → they have impressive features such as cameras
+  loss: '損失、失うこと',
+  beam: '光線、ビーム',              // → reconstructed with a laser beam
+  charity: '慈善、慈善団体',
+  carnival: 'カーニバル、祭り',
+  perspective: '見方、視野',         // → a work experience that expands my perspective
+  panic: 'うろたえる、あわてる',     // → You don't have to panic
+  positive: '前向きな、積極的な',
+  negative: '否定的な、消極的な',
+  sensible: '分別のある、賢明な',
+  neglect: '怠る、おろそかにする',   // → students will neglect their other responsibilities
+  demolish: '取り壊す、破壊する',
+  professional: 'プロの、専門的な',
+  informal: 'くだけた、非公式の',
+  formal: '正式な、堅苦しい',
+  favorable: '好都合な、有利な'      // → the preservation of favorable variations
 };
 
 /** 語義の語尾からは当てられない品詞 */
@@ -278,5 +365,11 @@ export const GRAMMAR_POS = {
   boost: 'v.', awake: 'adj.', accustomed: 'adj.', diet: 'n.',
   // 地の文から拾うようにして出てきたぶん
   appropriate: 'adj.', capital: 'n.', boldness: 'n.', domestically: 'adv.',
-  scoop: 'v.', seldom: 'adv.'
+  scoop: 'v.', seldom: 'adv.',
+  // 教材から入れ直したぶん。辞書の語義だけでは名詞に見えるものが多い
+  frequently: 'adv.', afterward: 'adv.', nevertheless: 'adv.',
+  eager: 'adj.', relieved: 'adj.', devoted: 'adj.', stuck: 'adj.',
+  noticeable: 'adj.', sensible: 'adj.', positive: 'adj.', negative: 'adj.',
+  prefer: 'v.', cross: 'v.', grant: 'v.', panic: 'v.', access: 'v.',
+  qualify: 'v.', found: 'v.', feature: 'n.', perspective: 'n.', benefit: 'n.'
 };

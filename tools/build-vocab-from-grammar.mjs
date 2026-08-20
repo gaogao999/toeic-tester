@@ -37,7 +37,7 @@ import {
 // 違う見出し・違う意味で2つ入るのを防ぐため
 import { MEANINGS, DROP, REWRITE, POS, SPELLING_FIX } from './passage-vocab-overrides.mjs';
 import {
-  GRAMMAR_DROP, GRAMMAR_MEANINGS, GRAMMAR_POS, KEEP_AS_IS, METALANGUAGE
+  GRAMMAR_DROP, GRAMMAR_MEANINGS, GRAMMAR_POS, GRAMMAR_REWRITE, KEEP_AS_IS, METALANGUAGE
 } from './grammar-vocab-overrides.mjs';
 
 const WORD_DATA = load('js/data.js', 'WORD_DATA');
@@ -165,7 +165,7 @@ function headwordOf(raw) {
 
 /** 手直し表を通してから、収録してよいかを判定する */
 function gate(word) {
-  let head = REWRITE[word] || word;
+  let head = GRAMMAR_REWRITE[word] || REWRITE[word] || word;
   head = SPELLING_FIX[head] || head;   // 英式のつづりは米式へ（アメリカ式の学校を受けるため）
   if (FUNCTION_WORDS.has(head)) return null;
   if (DROP.has(head) || GRAMMAR_DROP.has(head)) return null;

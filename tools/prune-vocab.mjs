@@ -32,6 +32,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, load, FUNCTION_WORDS, candidates, loadDictionary } from './vocab-lib.mjs';
+// 取り込み側が語形を寄せているものは、こちらも同じに寄せる（relevel-vocab.mjs と同じ理由）
+import { GRAMMAR_REWRITE } from './grammar-vocab-overrides.mjs';
 
 /** レベル判定と**同じ教材・同じ範囲**を見る。片方だけ基準が違うと辻褄が合わなくなる */
 const BOOKS = [
@@ -83,7 +85,9 @@ const inMaterial = new Set();
 for (const raw of texts.join('\n').toLowerCase().match(/[a-z]+(?:'[a-z]+)?/g) || []) {
   if (raw.length < 3 || FUNCTION_WORDS.has(raw)) continue;
   const head = candidates(raw).find((c) => dict.has(c));
-  if (head) inMaterial.add(head);
+  if (!head) continue;
+  inMaterial.add(head);
+  if (GRAMMAR_REWRITE[head]) inMaterial.add(GRAMMAR_REWRITE[head]);
 }
 
 const drop = WORD_DATA.filter((w) => !inMaterial.has(w.word.toLowerCase()));

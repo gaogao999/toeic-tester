@@ -49,7 +49,7 @@ index.html
 
 | ファイル | 中身 | 件数 |
 | --- | --- | --- |
-| `js/data.js` | 単語 | 2,941 |
+| `js/data.js` | 単語 | 3,037 |
 | `js/math-data.js` | 算数 | 884 |
 | `js/reading-data.js` | 長文読解 | 134 本 / 523 問 |
 | `js/grammar-data.js` | 文法 | 706 問 |
@@ -146,8 +146,34 @@ EIS の Grade 8 入試だから。日本の中1にない単元（確率など）
 なお `build-vocab-from-passages.mjs` は import しただけで `--emit` を見て `process.exit` する作りなので、
 取り込む前に argv から `--emit` を外している。
 
+消したあと `node tools/build-vocab-from-grammar.mjs --emit` で**96語が教材から入り直した**
+（うち70語は教材の例文つき）。`blame` `progress` `accept` `knowledge` `benefit` `professor` など、
+入試で普通に要る語。**入り口が変われば出どころが教材になる**ので、方針と辻褄が合う。
+
+そのため `prune-list-vocab.mjs` は**カテゴリが「文法教材の語」のものを対象外にしている。**
+語だけを見ると入れ直したぶんも「リスト由来」に見えてしまい（もともと候補620語なので当然）、
+走らせるたびに入れ直したカードを消してしまうため。
+
 **判定に使う教材と範囲は relevel-vocab.mjs とそろえること。**片方だけ違うと、
-収録はされるがレベルが決まらない語ができる。
+収録はされるがレベルが決まらない語ができる。`GRAMMAR_REWRITE`（`angles → angle` のように
+語形を寄せる表）も3つの道具すべてに効かせること。**取り込みだけに効かせたら、
+`angle` `calculate` `remove` `appoint` が「教材に出てこない語」として消される寸前だった。**
+
+### 順番
+
+単語データをいじったら、この順で走らせて全部 0 になることを見る。
+
+```
+node tools/build-vocab-from-grammar.mjs --emit   # 教材から足す
+node tools/relevel-vocab.mjs --emit              # レベルを初出から付け直す
+node tools/prune-vocab.mjs                       # 0 のはず
+node tools/prune-list-vocab.mjs                  # 0 のはず
+node tools/audit-vocab.mjs                       # ✗ 0 件
+```
+
+**relevel は取り込みのあとに必ず走らせる。**`build-vocab-from-grammar.mjs` は文法教材しか
+見ないので、読解教材の語注や選択肢にもっと易しく出ている語を取りこぼす
+（実際、入れ直した96語のうち22語がこれで易しい段へ動いた）。
 
 ### ID は変えない
 

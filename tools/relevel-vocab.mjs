@@ -51,6 +51,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, load, FUNCTION_WORDS, candidates, loadDictionary } from './vocab-lib.mjs';
+// 取り込み側が語形を寄せているものは、こちらも同じに寄せる。そろえないと
+// `angles → angle` のように、収録はされるが初出を引けない語ができる
+import { GRAMMAR_REWRITE } from './grammar-vocab-overrides.mjs';
 
 /** 文法教材3冊。[表示名, ファイル, レベル, 本編の開始, 本編の終了, Directions のページ] */
 const BOOKS = [
@@ -141,7 +144,9 @@ function headwords(text) {
   for (const raw of text.toLowerCase().match(/[a-z]+(?:'[a-z]+)?/g) || []) {
     if (raw.length < 3 || FUNCTION_WORDS.has(raw)) continue;
     const head = candidates(raw).find((c) => dict.has(c));
-    if (head) out.add(head);
+    if (!head) continue;
+    out.add(head);
+    if (GRAMMAR_REWRITE[head]) out.add(GRAMMAR_REWRITE[head]);
   }
   return out;
 }

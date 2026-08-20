@@ -66,7 +66,20 @@ for (const word of Object.keys(UNITS)) {
 }
 
 const WORD_DATA = load('js/data.js', 'WORD_DATA');
-const drop = WORD_DATA.filter((w) => fromList.has(w.word.toLowerCase()));
+
+/**
+ * **入れ直したぶんを巻き添えにしない。**
+ *
+ * 削除のあと `build-vocab-from-grammar.mjs` が同じ語を教材から入れ直しているので、
+ * 語だけを見ると「リスト由来」と区別が付かない（もともとリストの候補620語なので当然）。
+ * 入り口が教材のものはカテゴリが「文法教材の語」になるので、そこで分ける。
+ * これが無いと、走らせるたびに入れ直したカードを消してしまう。
+ */
+const FROM_MATERIAL = new Set(['文法教材の語']);
+
+const drop = WORD_DATA.filter(
+  (w) => fromList.has(w.word.toLowerCase()) && !FROM_MATERIAL.has(w.category)
+);
 
 const byLv = {};
 drop.forEach((w) => (byLv[w.level] = (byLv[w.level] || 0) + 1));
