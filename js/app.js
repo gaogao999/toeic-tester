@@ -548,7 +548,7 @@
    * tools/stamp-version.mjs で書き換える。
    * スマホで開いたときに、手元のものが最新かを確かめるためのもの。
    */
-  const APP_VERSION = '2026-08-20 (0723f21)';
+  const APP_VERSION = '2026-08-20 (827ff99)';
 
   const EXAM_DATE = '2027-01-07';
 
@@ -1961,12 +1961,25 @@
   };
 
   // レベル判定のときは時間制限を外すぶん、問題数を少なくする
-  const ADAPTIVE_SIZES = { short: { total: 15 }, standard: { total: 20 }, full: { total: 30 } };
+  /**
+   * レベル判定の問題数は**1科目あたり**で決める。
+   * 科目ごとに階段を持つので、総数で決めると科目数が増えたぶん1科目が痩せる
+   * （4科目で計15問だと1科目4問。それでは階段が動かず、どの科目も測れない）
+   */
+  const ADAPTIVE_SIZES = { short: { perKind: 6 }, standard: { perKind: 10 }, full: { perKind: 15 } };
+  const adaptiveTotal = (subject, key) => ADAPTIVE_SIZES[key].perKind * KINDS_FOR[subject].length;
 
   const MOCK_SIZE_LABELS = {
-    fixed: { short: '短め（20問・15分）', standard: '標準（30問・30分）', full: '本番想定（40問・45分）' },
-    adaptive: { short: '短め（15問）', standard: '標準（20問）', full: 'じっくり（30問）' }
+    fixed: { short: '短め（20問・15分）', standard: '標準（30問・30分）', full: '本番想定（40問・45分）' }
   };
+
+  /** レベル判定の問題数は科目の数で変わるので、選択肢の文言もそのつど作る */
+  function adaptiveSizeLabel(subject, key) {
+    const n = KINDS_FOR[subject].length;
+    const per = ADAPTIVE_SIZES[key].perKind;
+    const name = { short: '短め', standard: '標準', full: 'じっくり' }[key];
+    return n === 1 ? `${name}（${per}問）` : `${name}（1科目${per}問・計${per * n}問）`;
+  }
 
   // 単語と長文は4段階（CEFR B2 まで）、算数は3段階しかないので上限で頭打ちにする
   // 文法だけ**レベル1の問題が無い**（教材が A2 から始まるため）。
@@ -1991,10 +2004,8 @@
     // ここから下はレベル判定のときだけ使う
     subject: 'both',
     maxQuestions: 0,
-    level: 1,
-    streak: 0,
-    dir: 0,
-    reversals: [],
+    // 科目ごとの階段。startMock で { word: …, reading: …, grammar: …, math: … } を作る
+    ladders: {},
     used: new Set(),
     done: false
   };
@@ -2124,61 +2135,77 @@
   }
 
   /** 出題の混ぜ具合。単語ばかりにならないよう重みで散らす */
-  const ADAPTIVE_KINDS = {
-    both: ['word', 'word', 'reading', 'grammar', 'math', 'math'],
-    english: ['word', 'word', 'reading', 'reading', 'grammar', 'grammar'],
+  /**
+   * どの科目を測るか。**科目ごとに独立した階段を持つ**ので、ここは重みではなく顔ぶれ。
+   * 出題は「いちばん問題数の少ない科目」から順に回す（後述の pickKind）ので、
+   * 30問なら4科目におよそ7〜8問ずつ行きわたる
+   */
+  const KINDS_FOR = {
+    both: ['word', 'reading', 'grammar', 'math'],
+    english: ['word', 'reading', 'grammar'],
     math: ['math']
   };
+
+  const KIND_LABELS = { word: '単語', reading: '長文読解', grammar: '文法', math: '算数' };
 
   const questionKey = (kind, item) =>
     kind === 'reading' ? `${item.passage.id}-${item.i + 1}` : String(item.id);
 
   /**
-   * 階段の高さの上限。算数も Grade 4〜7 の4段になったので、いまはどちらも4。
-   * 段数が食い違ったときに気づけるよう MAX_LEVEL から引く（直接 4 と書かない）
-   */
-  const ladderTop = () => (mock.subject === 'math' ? MAX_LEVEL.math : MAX_LEVEL.word);
-
-  /**
-   * 階段の高さの下限。**伏せている段には降ろさない。**
-   * ここを 1 のままにすると、出せる問題が無い高さで階段が空回りし、
-   * levelsNear に助けられて上の段の問題が「レベル1の問題」として出てしまう。
+   * 科目1つぶんの階段。
    *
-   * **「英語＋算数」のときは英語の下限に合わせる。**階段の段番号は
-   * 英語の CEFR と算数の学年で共通なので、下限を算数の 1 まで下げると、
-   * 一番下の2段には算数しか無い状態になる。そこで足踏みした子に
-   * 「入門（A1）」と CEFR を名乗ることになるが、その段はいま出していない。
-   * その代わり、混ぜた回では算数も Grade 5 からになる（算数だけの回は Grade 3 から）
+   * **科目ごとに分ける理由。**以前は全科目で1本の階段を共有していたので、
+   * 出てくるのは「英語と算数を混ぜた1つの数字」だけだった。単語は得意だが長文は苦手、
+   * という差が見えないし、段番号を共有していたせいで英語の下限に算数まで引きずられていた
+   * （A2 を伏せた回は算数も Grade 5 からしか出なかった）。分ければどちらも解ける。
    */
-  const ladderBottom = () => (mock.subject === 'math' ? MIN_LEVEL.math : MIN_LEVEL.word);
+  const newLadder = (kind) => ({
+    kind,
+    level: MIN_LEVEL[kind],
+    streak: 0,
+    dir: 0,
+    reversals: [],
+    asked: 0
+  });
 
-  /** 階段の高さの呼び名。英語は CEFR、算数だけのときは学年の段階 */
-  const ladderLabel = (level) =>
-    mock.subject === 'math' ? MATH_LEVEL_LABELS[level] : LEVEL_LABELS[level];
+  /** 階段の高さの上限・下限・呼び名。**科目ごとに違う**（英語は3〜4、算数は1〜5） */
+  const ladderTop = (kind) => MAX_LEVEL[kind];
+  const ladderBottom = (kind) => MIN_LEVEL[kind];
+  const ladderLabel = (kind, level) =>
+    kind === 'math' ? MATH_LEVEL_LABELS[level] : LEVEL_LABELS[level];
 
   /** 近いレベルから順に探す。中央→下→上の順で、在庫切れでも止まらないようにする */
-  function levelsNear(level) {
+  function levelsNear(kind, level) {
     const out = [level];
-    for (let d = 1; d <= ladderTop() - ladderBottom(); d++) {
-      if (level - d >= ladderBottom()) out.push(level - d);
-      if (level + d <= ladderTop()) out.push(level + d);
+    for (let d = 1; d <= ladderTop(kind) - ladderBottom(kind); d++) {
+      if (level - d >= ladderBottom(kind)) out.push(level - d);
+      if (level + d <= ladderTop(kind)) out.push(level + d);
     }
     return out;
   }
 
   /**
-   * いまのレベルから1問取り出す。
-   * 科目は重み付きで引き、その科目が尽きていたら他の科目、
-   * それでも無ければ近いレベルへと順に手を広げる。
+   * 次に出す科目。**いちばん出題数の少ない科目**から回す。
+   * 重み付きの抽選だと偏りが出て、科目によっては3問しか出ないまま終わる。
+   * 科目ごとにレベルを測る以上、どの科目にも同じくらいの問題数を配る必要がある
+   */
+  function pickKind() {
+    const kinds = KINDS_FOR[mock.subject].filter((k) => mock.ladders[k]);
+    const fewest = Math.min(...kinds.map((k) => mock.ladders[k].asked));
+    return shuffle(kinds.filter((k) => mock.ladders[k].asked === fewest))[0];
+  }
+
+  /**
+   * 1問取り出す。その科目のいまの高さから探し、在庫が無ければ近い高さ、
+   * それでも無ければ他の科目へ回す（在庫切れで階段が止まらないように）
    */
   function nextAdaptiveQuestion() {
-    const weighted = ADAPTIVE_KINDS[mock.subject];
-    // 引いた科目を先頭に、残りは控えとして後ろに並べる
-    const wanted = weighted[Math.floor(Math.random() * weighted.length)];
-    const kinds = [wanted, ...shuffle([...new Set(weighted)].filter((k) => k !== wanted))];
+    const wanted = pickKind();
+    const rest = shuffle(KINDS_FOR[mock.subject].filter((k) => k !== wanted && mock.ladders[k]));
 
-    for (const lv of levelsNear(mock.level)) {
-      for (const kind of kinds) {
+    for (const kind of [wanted, ...rest]) {
+      const ladder = mock.ladders[kind];
+      for (const lv of levelsNear(kind, ladder.level)) {
         const pool = poolFor(kind, lv).filter((x) => !mock.used.has(questionKey(kind, x)));
         if (!pool.length) continue;
         const item = pool[Math.floor(Math.random() * pool.length)];
@@ -2191,56 +2218,66 @@
               : kind === 'grammar'
                 ? buildGrammarMockQuestion(item)
                 : buildReadingQuestion(item.passage, item.q, item.i);
-        // 語そのものの級ではなく、階段のどの高さで出したかを残す
-        q.askedAt = mock.level;
+        // 語そのものの級ではなく、その科目の階段のどの高さで出したかを残す
+        q.askedAt = ladder.level;
+        ladder.asked += 1;
         return q;
       }
     }
     return null;
   }
 
-  /** 正解なら2問で1段上げ、不正解なら即1段下げる。折り返した高さを控えておく */
-  function stepStaircase(isCorrect) {
-    const before = mock.level;
+  /**
+   * 正解なら2問で1段上げ、不正解なら即1段下げる。折り返した高さを控えておく。
+   * **その問題を出した科目の階段だけ**を動かす
+   */
+  function stepStaircase(q, isCorrect) {
+    const ladder = mock.ladders[q.kind];
+    if (!ladder) return;
+    const before = ladder.level;
 
     if (isCorrect) {
-      mock.streak += 1;
-      if (mock.streak >= 2) {
-        mock.level = Math.min(ladderTop(), mock.level + 1);
-        mock.streak = 0;
+      ladder.streak += 1;
+      if (ladder.streak >= 2) {
+        ladder.level = Math.min(ladderTop(q.kind), ladder.level + 1);
+        ladder.streak = 0;
       }
     } else {
-      mock.streak = 0;
-      mock.level = Math.max(ladderBottom(), mock.level - 1);
+      ladder.streak = 0;
+      ladder.level = Math.max(ladderBottom(q.kind), ladder.level - 1);
     }
 
-    const dir = mock.level > before ? 1 : mock.level < before ? -1 : 0;
+    const dir = ladder.level > before ? 1 : ladder.level < before ? -1 : 0;
     if (dir !== 0) {
-      if (mock.dir !== 0 && dir !== mock.dir) mock.reversals.push(before);
-      mock.dir = dir;
+      if (ladder.dir !== 0 && dir !== ladder.dir) ladder.reversals.push(before);
+      ladder.dir = dir;
     }
   }
 
   /**
    * 推定レベル。折り返し地点の平均を使う。
    * 最初の折り返しは、下から上がってくる途中の勢いが残っているので捨てる。
-   * 折り返しが足りないときは、後半に出した問題の高さの平均で代える。
+   * 折り返しが足りないときは、その科目で後半に出した問題の高さの平均で代える。
    */
-  function estimateAdaptiveLevel() {
-    const rev = mock.reversals.length >= 3 ? mock.reversals.slice(1) : mock.reversals;
-    if (rev.length >= 2) {
-      return rev.reduce((a, b) => a + b, 0) / rev.length;
-    }
-    const asked = mock.questions.map((q) => q.askedAt);
+  function estimateAdaptiveLevel(ladder, results) {
+    const rev = ladder.reversals.length >= 3 ? ladder.reversals.slice(1) : ladder.reversals;
+    if (rev.length >= 2) return rev.reduce((a, b) => a + b, 0) / rev.length;
+
+    const asked = results.filter((r) => r.q.kind === ladder.kind).map((r) => r.q.askedAt);
     const half = asked.slice(Math.floor(asked.length / 2));
-    if (!half.length) return 1;
+    if (!half.length) return ladderBottom(ladder.kind);
     return half.reduce((a, b) => a + b, 0) / half.length;
   }
 
-  /** 十分に絞れたか。折り返しが溜まれば残り問題数にかかわらず終える */
+  /**
+   * 十分に絞れたか。
+   * **全科目の階段が折り返しきったとき**に、残り問題数にかかわらず終える。
+   * 1科目だけ落ち着いても、ほかの科目がまだ測れていないので打ち切らない
+   */
   function adaptiveShouldStop() {
     if (mock.questions.length >= mock.maxQuestions) return true;
-    return mock.questions.length >= MIN_ADAPTIVE_QUESTIONS && mock.reversals.length >= ENOUGH_REVERSALS;
+    if (mock.questions.length < MIN_ADAPTIVE_QUESTIONS) return false;
+    return Object.values(mock.ladders).every((l) => l.reversals.length >= ENOUGH_REVERSALS);
   }
 
   function isAnswerCorrect(q, given) {
@@ -2256,18 +2293,23 @@
     const mode = $('#mock-format').value;
     const sizeKey = $('#mock-size').value;
 
-    // 形式によって問題数も時間も変わるので、選択肢の文言ごと入れ替える
+    // 形式によって問題数も時間も変わるので、選択肢の文言ごと入れ替える。
+    // レベル判定は**科目の数でも変わる**ので、構成を変えたときも作り直す
     [...$('#mock-size').options].forEach((opt) => {
-      opt.textContent = MOCK_SIZE_LABELS[mode][opt.value];
+      opt.textContent =
+        mode === 'adaptive' ? adaptiveSizeLabel(subject, opt.value) : MOCK_SIZE_LABELS.fixed[opt.value];
     });
 
     const label =
-      subject === 'math' ? '算数のみ' : subject === 'english' ? '英語のみ（長文＋単語）' : '英語＋算数';
+      subject === 'math' ? '算数のみ' : subject === 'english' ? '英語のみ' : '英語＋算数';
 
     if (mode === 'adaptive') {
       $('#mock-intro').textContent =
-        'やさしい問題から始めて、正解すると少しずつ難しく、間違えるとやさしくなります。行き来した高さから、いまの実力がどのあたりかを見積もります。';
-      $('#mock-plan').textContent = `${label}／最大 ${ADAPTIVE_SIZES[sizeKey].total} 問／時間制限なし（レベルが定まれば早めに終わります）`;
+        'やさしい問題から始めて、正解すると少しずつ難しく、間違えるとやさしくなります。行き来した高さから、いまの実力がどのあたりかを見積もります。科目ごとに別々の難易度で進むので、科目ごとのレベルが出ます。';
+      const names = KINDS_FOR[subject].map((k) => KIND_LABELS[k]);
+      const measures = names.length > 1 ? `${names.join('・')}を1科目ずつ測ります` : `${names[0]}を測ります`;
+      $('#mock-plan').textContent =
+        `${label}／${measures}／最大 ${adaptiveTotal(subject, sizeKey)} 問／時間制限なし`;
     } else {
       $('#mock-intro').textContent =
         '本番と同じように、途中で答え合わせをせず最後にまとめて採点します。制限時間内に解き切る練習です。';
@@ -2294,15 +2336,14 @@
     mock.subject = subject;
     mock.index = 0;
     mock.startedAt = Date.now();
-    mock.level = ladderBottom(); // かならず出せる中でいちばんやさしい段から始める
-    mock.streak = 0;
-    mock.dir = 0;
-    mock.reversals = [];
+    // 科目ごとに階段を1本ずつ。どれも、その科目で出せる中でいちばんやさしい段から始める
+    mock.ladders = {};
+    for (const kind of KINDS_FOR[subject]) mock.ladders[kind] = newLadder(kind);
     mock.used = new Set();
     mock.done = false;
 
     if (mode === 'adaptive') {
-      mock.maxQuestions = ADAPTIVE_SIZES[sizeKey].total;
+      mock.maxQuestions = adaptiveTotal(subject, sizeKey);
       const first = nextAdaptiveQuestion();
       mock.questions = first ? [first] : [];
       mock.answers = first ? [null] : [];
@@ -2377,7 +2418,8 @@
     $('#mock-counter').textContent = adaptive ? `${mock.index + 1} 問目` : `${mock.index + 1} / ${total}`;
     $('#mock-progress').style.width = `${((mock.index + 1) / total) * 100}%`;
     $('#mock-tag').textContent = q.tag;
-    if (adaptive) $('#mock-level').textContent = `いまの難易度 ${ladderLabel(q.askedAt)}`;
+    // 科目ごとに難易度が違うので、どの科目の何段目かをそのまま出す
+    if (adaptive) $('#mock-level').textContent = `${KIND_LABELS[q.kind]}：${ladderLabel(q.kind, q.askedAt)}`;
 
     // 長文は本文を一緒に見せる
     if (q.kind === 'reading') {
@@ -2447,7 +2489,8 @@
       return;
     }
 
-    stepStaircase(isAnswerCorrect(mock.questions[mock.index], given));
+    const answered = mock.questions[mock.index];
+    stepStaircase(answered, isAnswerCorrect(answered, given));
 
     if (adaptiveShouldStop()) {
       finishMock();
@@ -2571,115 +2614,192 @@
    * 推定レベルを級の名前にする。
    * 階段の推定値と、実際に7割取れている段の**低いほう**を採る。
    *
-   * 一番下は ladderBottom()。**伏せている段があるので 1 とはかぎらない。**
+   * 一番下は ladderBottom(kind)。**伏せている段があるので 1 とはかぎらない。**
    * いま英語の一番下は 標準 B1 なので、そこで7割に届かなければ「標準 B1 より下」と出る
    * （A2 を伏せている以上、どの段かまでは測れない。測れていないことをそのまま言う）
    */
-  function adaptiveLevelLabel(estimate, byLevel) {
-    const bottom = ladderBottom();
+  function adaptiveLevelLabel(kind, estimate, byLevel) {
+    const bottom = ladderBottom(kind);
     const reached = reachedLevel(byLevel);
-    if (reached === null) return `${ladderLabel(bottom)} より下`;
-    const staircase = Math.min(ladderTop(), Math.max(bottom, Math.round(estimate)));
-    return ladderLabel(Math.min(staircase, reached));
+    if (reached === null) return `${ladderLabel(kind, bottom)} より下`;
+    const staircase = Math.min(ladderTop(kind), Math.max(bottom, Math.round(estimate)));
+    return ladderLabel(kind, Math.min(staircase, reached));
   }
 
-  /** レベル判定の結果をまとめる。画面にも AI 診断にも同じものを渡す */
-  function buildAdaptiveSummary(results) {
+  /** 科目1つぶんの判定をまとめる */
+  function summarizeLadder(kind, results) {
+    const mine = results.filter((r) => r.q.kind === kind);
+    const ladder = mock.ladders[kind];
+
     const byLevel = {};
-    results.forEach((r) => {
+    mine.forEach((r) => {
       const lv = r.q.askedAt;
       byLevel[lv] = byLevel[lv] || { correct: 0, answered: 0 };
       byLevel[lv].answered += 1;
       if (r.isCorrect) byLevel[lv].correct += 1;
     });
 
-    const estimate = estimateAdaptiveLevel();
-    const reached = Math.max(...results.map((r) => r.q.askedAt));
+    const estimate = estimateAdaptiveLevel(ladder, results);
+    const highest = mine.length ? Math.max(...mine.map((r) => r.q.askedAt)) : ladderBottom(kind);
 
     // 階段が出した高さと、実際に7割取れている高さ。**低いほうを採る**
-    const staircase = Math.min(ladderTop(), Math.max(ladderBottom(), Math.round(estimate)));
+    const staircase = Math.min(ladderTop(kind), Math.max(ladderBottom(kind), Math.round(estimate)));
     const solid = reachedLevel(byLevel);
     const cappedByRate = solid === null || solid < staircase;
 
     // どういう終わり方をしたかで、推定の確からしさが変わる。
     //
-    // **正答率が届いていない回は、まずそう言う。**階段の言い分（何回折り返した、
-    // 平均がいくつ）をそのまま出すと、正答率33%の回に「応用 B2 あたり」と
-    // 説明することになる。段が2つしか無いと、まぐれ2連続でも最上段に届く。
+    // **問題数が足りない回は、まずそう言う。**科目ごとに測ると1科目あたりの
+    // 問題数が減るので、そもそも測れていない回がある。
+    //
+    // **正答率が届いていない回も、階段の言い分より正答率を先に言う。**
+    // 何回折り返した・平均がいくつ、をそのまま出すと、正答率33%の回に
+    // 「応用 B2 あたり」と説明することになる。段が2つしか無いと、
+    // まぐれ2連続でも最上段に届く。
     //
     // **「上がりきった」は、最後まで上に張り付いていたときだけ言う。**
     // 一度でも最上段に触れたかどうかで判定していたら、正答率10%の回に
     // 「一番難しい 応用 B2 まで正解し続けました」と出た
-    const shape = cappedByRate
-      ? '正答率が届いていない'
-      : mock.reversals.length >= 2
-        ? '上下を繰り返して落ち着いた'
-        : reached >= ladderTop() && estimate >= ladderTop() - 0.5
-          ? '一番難しいところまで上がりきった'
-          : reached <= ladderBottom()
-            ? '一番やさしいところから上がれなかった'
-            : '上下がまだ少ない';
+    const shape =
+      mine.length < REACHED_ANSWERS
+        ? '問題数が足りない'
+        : cappedByRate
+          ? '正答率が届いていない'
+          : ladder.reversals.length >= 2
+            ? '上下を繰り返して落ち着いた'
+            : highest >= ladderTop(kind) && estimate >= ladderTop(kind) - 0.5
+              ? '一番難しいところまで上がりきった'
+              : highest <= ladderBottom(kind)
+                ? '一番やさしいところから上がれなかった'
+                : '上下がまだ少ない';
 
     return {
-      対象: mock.subject === 'math' ? '算数のみ' : mock.subject === 'english' ? '英語のみ' : '英語＋算数',
-      // 算数だけのときの「レベル」は学年の段階であって CEFR ではない
-      CEFRで語れる: mock.subject !== 'math',
-      推定レベル: adaptiveLevelLabel(estimate, byLevel),
+      科目: KIND_LABELS[kind],
+      kind,
+      // 算数の「レベル」は学年の段階であって CEFR ではない
+      尺度: kind === 'math' ? '学年（Grade）' : 'CEFR',
+      推定レベル:
+        mine.length < REACHED_ANSWERS ? '測るには問題数が足りない' : adaptiveLevelLabel(kind, estimate, byLevel),
       推定値: Math.round(estimate * 10) / 10,
-      最高到達難易度: ladderLabel(reached),
-      折り返し回数: mock.reversals.length,
+      出題: mine.length,
+      正答: mine.filter((r) => r.isCorrect).length,
+      最高到達難易度: ladderLabel(kind, highest),
+      折り返し回数: ladder.reversals.length,
       測り方: shape,
       // 階段の言い分だけでは足りないので、正答率で見直したかどうかも渡す
       正答率で下げた: cappedByRate,
-      到達したと言える一番上: solid === null ? null : ladderLabel(solid),
       難易度ごとの正答: Object.keys(byLevel)
-        .sort()
+        .map(Number)
+        .sort((a, b) => a - b)
         .map((lv) => ({
-          難易度: ladderLabel(lv),
+          難易度: ladderLabel(kind, lv),
           正答: byLevel[lv].correct,
           出題: byLevel[lv].answered
         })),
-      出題順の難易度: results.map((r) => ({ 難易度: r.q.askedAt, 正解: r.isCorrect }))
+      出題順の難易度: mine.map((r) => ({ 難易度: r.q.askedAt, 正解: r.isCorrect }))
     };
   }
 
-  /** 難易度がどう上下したかを棒グラフで見せる */
+  /** 低い順に並べた英語の段の呼び名。見出しを決めるときの並べ替えに使う */
+  const LEVEL_ORDER = [1, 2, 3, 4].map((lv) => LEVEL_LABELS[lv]);
+
+  /**
+   * 英語ぜんたいの見出しに出す段。**3科目のうち一番低いところに合わせる。**
+   *
+   * 平均や中央値ではなく一番低いところを採るのは、入試では単語・長文・文法が
+   * どれも出るから。**一番弱い科目が足を引っぱる**ので、そこを見出しにしたほうが
+   * 次にやることがはっきりする。科目ごとの内訳は別に全部出している
+   */
+  function englishHeadline(perKind) {
+    const rows = perKind.filter((r) => r.kind !== 'math' && r.測り方 !== '問題数が足りない');
+    if (!rows.length) return null;
+    // 「◯◯ より下」は、その段の1つ下として並べる
+    const rank = (r) => {
+      const lv = LEVEL_ORDER.indexOf(r.推定レベル.replace(/ より下$/, ''));
+      return lv < 0 ? 99 : r.推定レベル.endsWith('より下') ? lv - 0.5 : lv;
+    };
+    return rows.slice().sort((a, b) => rank(a) - rank(b))[0];
+  }
+
+  /** レベル判定の結果をまとめる。画面にも AI 診断にも同じものを渡す */
+  function buildAdaptiveSummary(results) {
+    const perKind = KINDS_FOR[mock.subject]
+      .filter((k) => mock.ladders[k])
+      .map((k) => summarizeLadder(k, results));
+
+    const mathRow = perKind.find((r) => r.kind === 'math');
+    const head = englishHeadline(perKind);
+
+    return {
+      対象: mock.subject === 'math' ? '算数のみ' : mock.subject === 'english' ? '英語のみ' : '英語＋算数',
+      // 算数だけの回は CEFR を語れない
+      CEFRで語れる: mock.subject !== 'math' && !!head,
+      // 見出しの1つ。中身は科目ごとに出しているので、こちらは「代表値」
+      推定レベル: head ? head.推定レベル : mathRow ? mathRow.推定レベル : '測るには問題数が足りない',
+      見出しの根拠: head ? `英語3科目のうち一番低い ${head.科目}` : mathRow ? '算数のみ' : '問題数が足りない',
+      科目ごと: perKind
+    };
+  }
+
+  /** 科目ごとに、難易度がどう上下したかを棒グラフで見せる */
   function renderAdaptiveSummary(adaptive, results) {
     $('#mock-adaptive').hidden = !adaptive;
     if (!adaptive) return;
 
-    // 高さは「下限〜上限」を 0〜100% に割り直す。伏せている段があると
-    // lv / top では棒がどれも高いところに固まり、上下が読み取れなくなる。
+    // 棒の高さは**その科目の下限〜上限**を 0〜100% に割り直す。
+    // 科目ごとに段の数が違う（英語は3〜4の2段、算数は1〜5の5段）ので、
+    // 生のレベルを高さにすると科目間で比べられない。
     // 段が1つしか無いときは 0 割りになるので、そのときは満杯にする
-    const top = ladderTop();
-    const bottom = ladderBottom();
-    const span = top - bottom;
-    const reached = Math.max(...results.map((r) => r.q.askedAt));
-    $('#mock-adaptive-chart').innerHTML = results
-      .map((r, i) => {
-        const lv = r.q.askedAt;
-        const h = span > 0 ? 25 + ((lv - bottom) / span) * 75 : 100;
-        const title = `${i + 1}問目 ${ladderLabel(lv)} ${r.isCorrect ? '正解' : '不正解'}`;
-        return `<span class="adaptive-step ${r.isCorrect ? 'ok' : 'ng'}"
-                      style="height:${h}%" title="${escapeHtml(title)}"></span>`;
+    $('#mock-adaptive-chart').innerHTML = adaptive['科目ごと']
+      .map((row) => {
+        const kind = row.kind;
+        const span = ladderTop(kind) - ladderBottom(kind);
+        const bars = row['出題順の難易度']
+          .map((x, i) => {
+            const h = span > 0 ? 25 + ((x.難易度 - ladderBottom(kind)) / span) * 75 : 100;
+            const title = `${i + 1}問目 ${ladderLabel(kind, x.難易度)} ${x.正解 ? '正解' : '不正解'}`;
+            return `<span class="adaptive-step ${x.正解 ? 'ok' : 'ng'}"
+                          style="height:${h}%" title="${escapeHtml(title)}"></span>`;
+          })
+          .join('');
+        return `<div class="adaptive-row">
+            <div class="adaptive-row-head">
+              <span class="adaptive-row-name">${escapeHtml(row.科目)}</span>
+              <span class="adaptive-row-level">${escapeHtml(row.推定レベル)}</span>
+              <span class="adaptive-row-score">${row.正答}/${row.出題}</span>
+            </div>
+            <div class="adaptive-chart">${bars || '<span class="hint">出題なし</span>'}</div>
+            <p class="adaptive-note">${escapeHtml(ladderNote(row))}</p>
+          </div>`;
       })
       .join('');
 
-    const rev = adaptive['折り返し回数'];
-    const level = adaptive['推定レベル'];
-    const what = mock.subject === 'math' ? '問題' : '単語';
-    // 「どの段で何問中何問」を1つ添える。数字が無いと、なぜ下げたのかが伝わらない
-    const rates = (adaptive['難易度ごとの正答'] || [])
-      .map((r) => `${r.難易度} ${r.正答}/${r.出題}`)
-      .join(' ／ ');
-    const notes = {
-      '正答率が届いていない': `難易度は ${ladderLabel(reached)} まで上がりましたが、そこで7割を取れていません（${rates}）。まぐれ当たりでも難易度は上がるので、正答率のほうを見て ${level} としています。`,
-      '上下を繰り返して落ち着いた': `難易度が ${rev} 回上下しました。行き来した高さの平均から、いまの実力は ${level} あたりと見ています。`,
-      '一番難しいところまで上がりきった': `最後まで難易度が上がり続け、用意した中で一番難しい ${ladderLabel(top)} の問題まで正解できました。ここで測れるのは ${ladderLabel(top)} までです。`,
-      '一番やさしいところから上がれなかった': `一番やさしい ${ladderLabel(ladderBottom())} から難易度を上げられませんでした。まずはここの${what}を確実にしていきましょう。`,
-      '上下がまだ少ない': `まだ難易度の上下が少ないため、後半に出した問題の高さから ${level} あたりと見ています。問題数を増やすとより正確になります。`
-    };
-    $('#mock-adaptive-note').textContent = notes[adaptive['測り方']];
+    $('#mock-adaptive-note').textContent = adaptive['見出しの根拠']
+      ? `見出しの「${adaptive['推定レベル']}」は ${adaptive['見出しの根拠']} に合わせています。入試では3科目とも出るので、一番弱いところが足を引っぱるためです。`
+      : '';
+    $('#mock-adaptive-note').hidden = mock.subject === 'math';
+  }
+
+  /** 科目1つぶんの、判定の言いぶん */
+  function ladderNote(row) {
+    const kind = row.kind;
+    const level = row.推定レベル;
+    const what = kind === 'math' ? '問題' : kind === 'word' ? '単語' : '問題';
+    const rates = (row['難易度ごとの正答'] || []).map((r) => `${r.難易度} ${r.正答}/${r.出題}`).join(' ／ ');
+    switch (row.測り方) {
+      case '問題数が足りない':
+        return `${row.出題} 問しか出ていないので、この科目はまだ測れていません。問題数を増やすか、この科目だけで受けてみてください。`;
+      case '正答率が届いていない':
+        return `${row.最高到達難易度} まで上がりましたが、そこで7割を取れていません（${rates}）。まぐれ当たりでも難易度は上がるので、正答率のほうを見て ${level} としています。`;
+      case '上下を繰り返して落ち着いた':
+        return `難易度が ${row.折り返し回数} 回上下しました。行き来した高さの平均から ${level} と見ています。`;
+      case '一番難しいところまで上がりきった':
+        return `用意した中で一番難しい ${ladderLabel(kind, ladderTop(kind))} まで正解できました。ここで測れるのはここまでです。`;
+      case '一番やさしいところから上がれなかった':
+        return `一番やさしい ${ladderLabel(kind, ladderBottom(kind))} から上げられませんでした。まずはここの${what}を確実にしましょう。`;
+      default:
+        return `まだ難易度の上下が少ないため、後半に出した問題の高さから ${level} と見ています。問題数を増やすとより正確になります。`;
+    }
   }
 
   /**
