@@ -18,7 +18,8 @@ const Storage = (() => {
     records: {}, // { [wordId]: { box, correct, wrong, lastStudied, nextDue, starred, learned } }
     stats: { totalAnswers: 0, totalCorrect: 0, sessions: 0 },
     // [{ date, answered, correct, word, math, reading, grammar, minutes }]
-    // 真ん中の4つは科目別の解答数。minutes は**座っていた時間**（20分セッションの積み上げ）
+    // 真ん中の4つは科目別の解答数。minutes は**解いていた時間**
+    // （1問ずつ、出してから答えるまでの合計。画面を開いていた時間ではない）
     history: [],
     settings: {
       level: 'all',
@@ -327,11 +328,14 @@ const Storage = (() => {
   }
 
   /**
-   * 座っていた時間を足す。セッションを終えたときと中断したときに呼ぶ。
+   * 解いていた時間を足す。セッションを終えたときと中断したときに呼ぶ。
    *
-   * **問題数ではなく分で数える。**「20分だけ座る」を約束にしている以上、
-   * 記録も分で見せないと守れたかどうかが分からない。1問あたりの時間は
-   * 科目でまるで違う（単語20秒・長文90秒）ので、問題数では代わりにならない。
+   * **問題数ではなく分で数える。**1問あたりの時間は科目でまるで違うので
+   * （単語20秒・長文90秒）、問題数では「今日どれだけやったか」の代わりにならない。
+   *
+   * **足すのは経過時間ではなく、1問ずつ答えるのにかかった時間の合計。**
+   * 画面を開いたまま置いておけば経過時間は増えるが、その間に机に向かっていたかを
+   * アプリは知らない。呼ぶ側（js/app.js の `solvedMs()`）がそこを計算している。
    */
   function addMinutes(minutes) {
     const n = Math.max(0, Math.round(minutes));

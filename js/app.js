@@ -700,15 +700,27 @@
   const sessSpentMs = () => sess.elapsed + (sess.startedAt ? Date.now() - sess.startedAt : 0);
 
   /**
-   * 座った分を記録に足す。**中断のたびに足す。**
+   * **解いていた時間**（分）。1問ずつ、出してから答えるまでを足したもの。
+   *
+   * 経過時間（`sessSpentMs`）では駄目だった。画面を開いたまま置いておけば
+   * 増えてしまうので、**その時間に本当に机に向かっていたかを、アプリは知らない。**
+   * 1問ごとの時間なら、答えが返ってきた区間だけを数えるので、
+   * 少なくとも「その間は手を動かしていた」と言える。
+   * 5分を超えたぶんは `answerSession()` で切り捨ててある（離席ぶん）。
+   */
+  const solvedMs = () => sess.times.reduce((a, ms) => a + (ms || 0), 0);
+  const solvedMinutes = () => Math.max(1, Math.round(solvedMs() / 60000));
+
+  /**
+   * 解いていた分を記録に足す。**中断のたびに足す。**
    *
    * 終わったときだけ足していたら、いつも中断して終える人の記録が
-   * ずっと 0 分のままだった（実際には座っている）。二重に数えないよう、
+   * ずっと 0 分のままだった（実際には解いている）。二重に数えないよう、
    * すでに足したぶん（`sess.credited`）との差だけを足す
    */
   function creditMinutes() {
     if (!sess.results.some((r) => r !== null)) return; // 1問も答えていない回は数えない
-    const spent = Math.max(1, Math.round(sessSpentMs() / 60000));
+    const spent = solvedMinutes();
     const add = spent - (sess.credited || 0);
     if (add <= 0) return;
     Storage.addMinutes(add);
@@ -991,11 +1003,11 @@
 
   /**
    * セッションを閉じる。
-   * **座っていた分を記録する。**問題数ではなく分が、この画面が守らせたい約束なので
+   * **解いていた分を記録する。**経過時間ではない（`solvedMs()` の理由を見ること）
    */
   function finishSession() {
     stopSessionTimer();
-    const spentMinutes = Math.max(1, Math.round(sessSpentMs() / 60000));
+    const spentMinutes = solvedMinutes();
     const correct = sess.results.filter((r) => r === true).length;
     const answered = sess.results.filter((r) => r !== null).length;
 
@@ -1061,10 +1073,17 @@
 
     const now = new Date();
     $('#sr-meta').textContent =
-      `${now.getMonth() + 1}/${now.getDate()} ・ ${r.spentMinutes}分 ・ ${r.answered}問`;
-    // 途中でやめた回も「座れた」と言う。**問題数ではなく座ったことを褒める**
+      `${now.getMonth() + 1}/${now.getDate()} ・ 解いていた時間 ${r.spentMinutes}分`;
+    /**
+     * 見出しは**解いた数**。途中でやめた回も、答えた数をそのまま言う。
+     *
+     * 以前は「20分、座れた。」だった。**アプリは座ったかどうかを知らない。**
+     * 分かるのは画面を開いていた時間だけで、開いたまま置いておけば増える。
+     * 確かめられるのは「何問に答えたか」なので、そちらを言う。
+     * 数が小さくても、事実であれば言う意味がある（0問の回だけは数を言わない）。
+     */
     $('#sr-headline').textContent =
-      r.answered === 0 ? '今日はここまで。' : `${r.spentMinutes}分、座れた。`;
+      r.answered === 0 ? '今日はここまで。' : `${r.answered}問、やった。`;
 
     $('#sr-correct').textContent = r.correct;
     $('#sr-total').textContent = r.answered;
@@ -4080,15 +4099,20 @@
     }
   }
 
-  /** 今週どれだけ座れたか。**問題数ではなく分**（「20分だけ座る」の約束と揃える） */
+  /**
+   * 今週どれだけ解いたか。**問題数ではなく分**（1問あたりの時間が科目でまるで違うので、
+   * 20問でも5分の日と20分の日ができる）。ただし**画面を開いていた時間ではなく、
+   * 1問ずつ答えるのにかかった時間の合計**（`solvedMs()` の理由を見ること）
+   */
   function renderWeekBars() {
     const days = Storage.getMinutes(7);
     const max = Math.max(20, ...days.map((d) => d.minutes));
     const total = days.reduce((a, d) => a + d.minutes, 0);
+    // 「セッションの時間」ではなく「解いていた時間」。**開いていた時間ではない**
     $('#week-head').textContent =
       total > 0
-        ? `今週のセッション ・ 合計${total}分`
-        : '今週のセッション ・ まだありません。5分でもここに積み上がります';
+        ? `今週、解いていた時間 ・ 合計${total}分`
+        : '今週、解いていた時間 ・ まだありません。5分でもここに積み上がります';
     // 空のグラフに 96px 取ると、下の内容が押し下がるだけで何も伝わらない
     $('#weekbars').hidden = total === 0;
     if (total === 0) return;
