@@ -12,6 +12,12 @@
   --red: #d64545;
   --radius: 14px;
   --shadow: 0 2px 12px rgba(29, 36, 51, 0.07);
+  /* いちばん押してほしいものに使う「黒」。**暗いテーマでは背景に沈むので、
+     色を直書きせず必ずこの変数を通すこと**（暗いほうは一段持ち上げた面にしてある） */
+  --ink: #1a1d23;
+  --ink-text: #ffffff;
+  --ink-sub: rgba(255, 255, 255, 0.62);
+  --ink-2: rgba(255, 255, 255, 0.09);
 }
 
 /* 端末の設定がダークのとき。ただし利用者が明示的にライトを選んでいれば適用しない */
@@ -29,6 +35,10 @@
     --orange: #f0a739;
     --red: #f0645f;
     --shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    --ink: #2c3547;
+    --ink-text: #eef2f9;
+    --ink-sub: rgba(238, 242, 249, 0.62);
+    --ink-2: rgba(255, 255, 255, 0.08);
   }
 }
 
@@ -46,6 +56,10 @@
   --orange: #f0a739;
   --red: #f0645f;
   --shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  --ink: #2c3547;
+  --ink-text: #eef2f9;
+  --ink-sub: rgba(238, 242, 249, 0.62);
+  --ink-2: rgba(255, 255, 255, 0.08);
 }
 
 * { box-sizing: border-box; }
@@ -74,23 +88,15 @@ body {
   padding: 10px 16px;
 }
 
-.app-title {
+/* ヘッダは日付と連続日数だけ。アプリ名は毎日見るものではないので置かない */
+.header-today {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 0.82rem;
   font-weight: 700;
+  color: var(--text-muted);
 }
-
-.header-side { display: flex; align-items: center; gap: 8px; }
-
-.streak-badge {
-  padding: 3px 10px;
-  border-radius: 99px;
-  background: rgba(224, 138, 18, 0.14);
-  color: var(--orange);
-  font-size: 0.8rem;
-  font-weight: 700;
-  white-space: nowrap;
-}
+.header-streak { color: var(--green); }
+.header-streak[hidden] { display: none; }
 
 .gear-btn {
   border: none;
@@ -568,31 +574,404 @@ body {
 }
 
 /* ---------- 受験までのカウントダウン ---------- */
-/* 1画面に収めるため、現行の約230pxから150px前後まで圧縮している */
+/*
+  色を敷かず、**数字の大きさだけで伝える。**以前は青→緑のグラデーションを敷いていたが、
+  ここは毎日いちばん先に目に入る場所で、その下に置いた黒いセッションカードと
+  色を取り合っていた。押してほしいのはカードのほうなので、こちらは静かにする
+*/
 .countdown-card {
-  background: linear-gradient(135deg, var(--primary), var(--green));
-  color: #fff;
+  padding: 4px 2px 14px;
+  margin-bottom: 14px;
+  border-bottom: 2px solid var(--text);
+}
+.countdown-main { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.countdown-days { margin: 0; line-height: 0.9; }
+#countdown-number { font-size: 3.4rem; font-weight: 800; letter-spacing: -0.03em; }
+.countdown-unit { font-size: 1.05rem; font-weight: 700; margin-left: 3px; }
+.countdown-unit[hidden] { display: none; }
+.countdown-side { text-align: right; }
+.countdown-label { margin: 0; font-size: 0.78rem; font-weight: 700; }
+.countdown-weeks { margin: 2px 0 0; font-size: 0.78rem; color: var(--text-muted); }
+
+/* 1マス＝1週。日で数えると多すぎて残りの実感が湧かない */
+.weekgrid { display: flex; gap: 3px; margin-top: 12px; }
+.wk { flex: 1; height: 13px; border-radius: 3px; }
+.wk-now { background: var(--text); }
+.wk-todo { background: var(--surface-2); border: 1px solid var(--border); }
+.wk-exam { background: var(--green); }
+.weekgrid-legend {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* ---------- セッション（ホーム） ---------- */
+/* きのうの途中から。中断したセッションがあるときだけ出る */
+.resume-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  border: 1px solid var(--green);
   border-radius: var(--radius);
-  padding: 14px 16px;
-  margin-bottom: 12px;
-  text-align: center;
+  background: var(--surface);
+  background: color-mix(in srgb, var(--green) 10%, var(--surface));
+  color: var(--text);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.resume-card[hidden] { display: none; }
+.resume-play {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: var(--green);
+  color: #fff;
+  font-size: 0.8rem;
+}
+.resume-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.resume-title { font-size: 0.92rem; font-weight: 700; }
+.resume-sub { font-size: 0.78rem; color: var(--text-muted); }
+
+.pick-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.pick-count { font-weight: 700; color: var(--text); }
+
+/*
+  今日やる中身。**画面でいちばん濃い面**にして、ここだけ押せばいいと分かるようにする。
+  色は --ink を通す（暗いテーマで背景に沈まないよう、あちらでは持ち上げた面になる）
+*/
+.plan-card {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: var(--ink-text);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
   box-shadow: var(--shadow);
 }
-.countdown-label { margin: 0; font-size: 0.85rem; opacity: 0.9; }
-.countdown-days { margin: 2px 0; line-height: 1; }
-#countdown-number { font-size: 2.8rem; font-weight: 700; letter-spacing: -0.02em; }
-.countdown-unit { font-size: 1.1rem; font-weight: 700; margin-left: 4px; }
-.countdown-date { margin: 4px 0 0; font-size: 0.85rem; font-weight: 600; }
-.countdown-sub {
+.plan-card-static { cursor: default; margin-bottom: 16px; }
+.plan-top { display: flex; align-items: center; gap: 10px; }
+.plan-min { flex: 1; font-size: 1.05rem; font-weight: 700; }
+.plan-min b { font-size: 2rem; font-weight: 800; margin-right: 4px; letter-spacing: -0.02em; }
+.plan-sub { font-size: 0.78rem; color: var(--ink-sub); }
+.plan-play {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--green);
+  color: #fff;
+  font-size: 0.95rem;
+}
+.plan-kinds { display: flex; gap: 8px; margin-top: 12px; }
+.plan-kind {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.3);
-  font-size: 0.8rem;
-  opacity: 0.95;
+  align-items: center;
+  padding: 8px 2px;
+  border-radius: 10px;
+  background: var(--ink-2);
+  font-size: 0.68rem;
+  color: var(--ink-sub);
 }
+.plan-kind b { font-size: 1.1rem; font-weight: 800; color: var(--ink-text); }
+.plan-note { display: block; margin-top: 10px; font-size: 0.76rem; color: var(--ink-sub); }
+
+.minute-row { display: flex; gap: 8px; margin-top: 10px; }
+.minute-btn {
+  flex: 1;
+  padding: 13px 4px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.minute-btn:hover { border-color: var(--text); }
+
+/* ---------- セッション中 ---------- */
+.sess-bar {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.sess-clock { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.sess-clock.is-low { color: var(--red); }
+.sess-clock-unit { font-size: 0.72rem; color: var(--text-muted); }
+.sess-count { flex: 1; margin-left: 8px; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
+.sess-quit { padding: 6px 12px; font-size: 0.8rem; }
+
+/* 科目ごとの帯。幅がそのまま問題数の比になる（flex に問題数を入れている） */
+.sess-track { display: flex; gap: 4px; }
+.sess-seg { height: 6px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.sess-seg-fill { display: block; height: 100%; background: var(--text); border-radius: 99px; transition: width 0.3s ease; }
+.sess-legend {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 6px 0 12px;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+.sess-legend-kinds { display: flex; gap: 10px; flex-wrap: wrap; }
+.sess-kind.is-now { color: var(--text); font-weight: 700; }
+.sess-kind.is-done { color: var(--green); }
+.sess-legend-days { flex-shrink: 0; }
+
+/* 科目の切れ目に出す帯。ここで頭を切り替えてもらう */
+.sess-chip {
+  display: inline-block;
+  margin: 0 0 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  background: color-mix(in srgb, var(--green) 14%, var(--surface));
+  color: var(--green);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.sess-chip[hidden] { display: none; }
+.sess-chip.is-warn {
+  background: var(--surface-2);
+  background: color-mix(in srgb, var(--orange) 14%, var(--surface));
+  color: var(--orange);
+}
+
+.sess-passage { margin-bottom: 14px; }
+.sess-passage[hidden] { display: none; }
+.sess-passage-meta { margin: 0; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }
+.sess-passage-title { margin: 2px 0 8px; font-size: 1.05rem; font-weight: 700; }
+.sess-passage p { margin: 0 0 10px; font-size: 0.95rem; line-height: 1.8; }
+.sess-question { margin: 0 0 12px; font-size: 1rem; font-weight: 700; }
+/* 単語は設問文が語ひとつ。ほかの科目と同じ大きさだと小さすぎる */
+.sess-question.is-word { font-size: 1.7rem; letter-spacing: -0.01em; }
+
+/* 選択肢に記号の丸を付ける。長い選択肢でも「どれを押したか」が分かる */
+.choice-key {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+#sess-choices .choice { display: flex; align-items: center; }
+#sess-choices .choice.is-correct,
+#sess-choices .choice.is-wrong { color: inherit; }
+#sess-choices .choice.is-correct {
+  background: var(--surface-2);
+  background: color-mix(in srgb, var(--green) 14%, var(--surface));
+  border-color: var(--green);
+  color: var(--text);
+  font-weight: 700;
+}
+#sess-choices .choice.is-wrong {
+  background: var(--surface-2);
+  background: color-mix(in srgb, var(--red) 12%, var(--surface));
+  border-color: var(--red);
+  color: var(--text);
+}
+#sess-choices .choice.is-correct .choice-key { background: var(--green); color: #fff; }
+#sess-choices .choice.is-wrong .choice-key { background: var(--red); color: #fff; }
+
+/* 次へは画面の下に貼り付ける。長文は本文が長く、押せる場所まで遠い */
+.sess-foot {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 25;
+  display: flex;
+  gap: 10px;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+.sess-foot[hidden] { display: none; }
+.sess-foot .btn { flex: 1; padding: 14px 16px; }
+.sess-foot .btn-primary { flex: 2; background: var(--ink); color: var(--ink-text); }
+/* セッション中は下タブを隠す。途中で別の画面へ行かせない。
+   **body に付けた印で消す。**画面（section）は main の中にあるので、
+   兄弟セレクタでは下タブに届かない */
+body.in-session .bottom-nav { display: none; }
+
+/* ---------- セッション結果 ---------- */
+.streak-banner {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  background: color-mix(in srgb, var(--green) 12%, var(--surface));
+  color: var(--green);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.streak-banner[hidden] { display: none; }
+.sr-meta { margin: 0; font-size: 0.76rem; color: var(--text-muted); }
+.sr-headline { margin: 2px 0 14px; font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
+.sr-score { display: flex; align-items: baseline; gap: 8px; }
+.sr-num { font-size: 2.6rem; font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
+.sr-of { flex: 1; font-size: 0.9rem; color: var(--text-muted); }
+.sr-rate {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  background: color-mix(in srgb, var(--green) 14%, var(--surface));
+  color: var(--green);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.sr-rate.is-low {
+  background: var(--surface-2);
+  background: color-mix(in srgb, var(--red) 12%, var(--surface));
+  color: var(--red);
+}
+.sr-bar { margin: 10px 0 16px; }
+.sr-bar .progress-fill { background: var(--text); }
+
+.sr-kinds { display: grid; gap: 10px; }
+.sr-kind { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
+.sr-kind-name { width: 4.5em; flex-shrink: 0; font-weight: 700; white-space: nowrap; }
+.sr-kind-track { flex: 1; height: 8px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.sr-kind-fill { display: block; height: 100%; background: var(--text); border-radius: 99px; }
+.sr-kind-num { flex-shrink: 0; font-variant-numeric: tabular-nums; font-weight: 700; }
+.sr-kind.is-low .sr-kind-fill { background: var(--red); }
+.sr-kind.is-low .sr-kind-num { color: var(--red); }
+
+.sr-actions { display: flex; gap: 10px; margin-top: 4px; }
+.sr-actions .btn { flex: 1; padding: 15px 12px; }
+.sr-actions .btn-primary { background: var(--ink); color: var(--ink-text); }
+.sr-home { display: block; width: 100%; margin-top: 10px; }
+
+/* ---------- ぜんぶ ---------- */
+.view-title { margin: 0 0 4px; font-size: 1.45rem; font-weight: 800; letter-spacing: -0.02em; }
+.all-rows {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 14px 0 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.all-rows .row-line { padding: 14px 16px; }
+.all-rows .row-sub.is-weak { color: var(--red); font-weight: 700; }
+/* レベル判定で出た段。押すとその段に絞って開くことの目印 */
+.row-level {
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.row-mock { background: var(--ink); color: var(--ink-text); }
+.row-mock .row-sub { color: var(--ink-sub); }
+
+.focus-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.focus-chip {
+  padding: 9px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.focus-chip.is-active { background: var(--ink); color: var(--ink-text); border-color: var(--ink); font-weight: 700; }
+
+/* ---------- きろく ---------- */
+.stats-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  border-bottom: 2px solid var(--text);
+}
+.stats-head-days { font-size: 0.8rem; color: var(--text-muted); }
+.stats-head-days b { font-size: 1.2rem; color: var(--text); }
+
+.vocab-head { margin: 0 0 6px; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
+/* **track と のこり を同じ色にしない。**帯の端が見えず、全体の量が分からなくなる */
+.vocab-bar {
+  display: flex;
+  height: 14px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.vocab-seg { display: block; height: 100%; }
+.vocab-seg.is-done { background: var(--text); }
+.vocab-seg.is-shaky { background: var(--text-muted); }
+.vocab-seg.is-todo { background: var(--surface-2); }
+.vocab-legend { display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.74rem; color: var(--text-muted); }
+.vocab-key b { color: var(--text); }
+
+.week-head { margin: 20px 0 8px; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
+.weekbars { display: flex; align-items: flex-end; gap: 6px; height: 96px; margin-bottom: 18px; }
+.weekbars[hidden] { display: none; }
+.weekbar-col { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; }
+.weekbar {
+  width: 100%;
+  margin-top: auto;
+  border-radius: 6px 6px 0 0;
+  background: var(--text);
+}
+.weekbar.is-today { background: var(--green); }
+.weekbar.is-empty { background: var(--border); min-height: 4px; }
+.weekbar-label { margin-top: 4px; font-size: 0.7rem; color: var(--text-muted); }
+
+.qtypes { display: grid; gap: 10px; }
+.qtype-row { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
+.qtype-name { width: 6.5em; flex-shrink: 0; }
+.qtype-track { flex: 1; height: 8px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.qtype-fill { display: block; height: 100%; background: var(--text); border-radius: 99px; }
+.qtype-rate { flex-shrink: 0; width: 3em; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.qtype-row.is-low .qtype-fill { background: var(--red); }
+.qtype-row.is-low .qtype-rate { color: var(--red); }
+.qtype-go { width: 100%; margin-top: 4px; }
 
 /* ---------- カレンダー ---------- */
 .calendar-head {
@@ -911,56 +1290,6 @@ body {
 .choice.is-correct { background: var(--green); border-color: var(--green); color: #fff; font-weight: 700; }
 .choice.is-wrong { background: var(--red); border-color: var(--red); color: #fff; }
 .choice:disabled { cursor: default; }
-
-/* ---------- 今日の学習メニュー ---------- */
-.today-panel { padding-bottom: 12px; }
-.today-head { display: flex; align-items: center; justify-content: space-between; }
-.today-title { margin-bottom: 0; }
-.today-status {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-.today-status.is-done { color: var(--green); }
-
-.today-list { display: grid; gap: 8px; margin-top: 12px; }
-.today-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  background: var(--surface-2);
-  color: var(--text);
-  font-family: inherit;
-  cursor: pointer;
-}
-.today-item:hover { border-color: var(--primary); }
-.today-item.is-complete { border-color: var(--green); }
-.today-icon { flex-shrink: 0; font-size: 1rem; width: 1.4em; text-align: center; }
-.today-item.is-complete .today-icon { color: var(--green); font-weight: 700; }
-.today-main { flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-.today-name { font-size: 0.85rem; font-weight: 700; text-align: left; }
-/* レベル判定で出た段。科目名の右に小さく添える */
-.today-level {
-  margin-left: 6px;
-  padding: 1px 6px;
-  border-radius: 999px;
-  background: var(--primary-soft, rgba(99, 102, 241, 0.15));
-  color: var(--primary);
-  font-size: 0.7rem;
-  font-weight: 700;
-  white-space: nowrap;
-}
-.today-count {
-  flex-shrink: 0;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
-}
 
 /* ---------- 分野別の正答率 ---------- */
 .accuracy-groups { display: grid; gap: 16px; margin-top: 12px; }
@@ -1670,12 +1999,5 @@ ruby rt { font-size: 0.6em; color: var(--text-muted); font-weight: 400; }
   border: 1px solid var(--border);
 }
 
-/* リビジョン。タイトルの添え物なので、目立たせない */
-.app-version {
-  font-size: 0.62rem;
-  font-weight: 400;
-  color: var(--text-muted);
-  white-space: nowrap;
-  margin-left: 2px;
-}
-.app-title { display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; }
+/* リビジョン。設定画面のいちばん下に、目立たない字で出す */
+.app-version { font-size: 0.7rem; opacity: 0.7; }

@@ -17,7 +17,8 @@ const Storage = (() => {
   const DEFAULT_STATE = {
     records: {}, // { [wordId]: { box, correct, wrong, lastStudied, nextDue, starred, learned } }
     stats: { totalAnswers: 0, totalCorrect: 0, sessions: 0 },
-    // [{ date, answered, correct, word, math, reading, grammar }] — 後ろ4つは科目別の解答数
+    // [{ date, answered, correct, word, math, reading, grammar, minutes }]
+    // 真ん中の4つは科目別の解答数。minutes は**座っていた時間**（20分セッションの積み上げ）
     history: [],
     settings: {
       level: 'all',
@@ -34,6 +35,22 @@ const Storage = (() => {
       // { word: 3, reading: 4, grammar: 3, math: 5, at: '2026-08-20' }。
       // まだ受けていなければ null
       judged: null,
+      // **出題の重心。**セッションが問題を選ぶときの方針。
+      //   judged … レベル判定で出た段（既定）／ top … 一番上の段だけ／ weak … 間違えたものだけ
+      focus: 'judged',
+      // 何分のセッションを選んだか。次に開いたときも同じ長さを出す
+      sessionMinutes: 20,
+      /**
+       * **やりかけのセッション。**中断したときここに丸ごと入り、次に開くと続きから出る。
+       * { startedAt, minutes, kinds, queue:[…], index, results:[…], elapsed }
+       *
+       * 設定ではないが settings に置いている。**保存キー（eis-app:v1）と state の形は
+       * 壊さない**という決まりがあり、tryParse が records/stats/history/settings の
+       * 4つしか読まないため、新しい最上位キーを足すと古いデータから復元できなくなる
+       */
+      session: null,
+      // 終わったセッションの記録（直近20回）。[{ date, minutes, answered, correct, perKind }]
+      sessionHistory: [],
       mathLevel: 'all',
       mathCategory: 'all',
       mathScope: 'all',
@@ -134,6 +151,17 @@ const Storage = (() => {
     return 'word';
   }
 
+  /** 今日の1行を取り出す。無ければ作る。**解答数・長文の本数・分は同じ行に積む** */
+  function dayRecord() {
+    const key = todayKey();
+    let day = state.history.find((h) => h.date === key);
+    if (!day) {
+      day = { date: key, answered: 0, correct: 0, word: 0, math: 0, reading: 0, grammar: 0 };
+      state.history.push(day);
+    }
+    return day;
+  }
+
   function getRecord(wordId) {
     return (
       state.records[wordId] || {
@@ -170,12 +198,7 @@ const Storage = (() => {
     state.stats.totalAnswers += 1;
     if (isCorrect) state.stats.totalCorrect += 1;
 
-    const key = todayKey();
-    let day = state.history.find((h) => h.date === key);
-    if (!day) {
-      day = { date: key, answered: 0, correct: 0, word: 0, math: 0, reading: 0, grammar: 0 };
-      state.history.push(day);
-    }
+    const day = dayRecord();
     day.answered += 1;
     if (isCorrect) day.correct += 1;
 
@@ -283,7 +306,8 @@ const Storage = (() => {
       grammar: (day && day.grammar) || 0,
       // 読み終えた長文の本数。献立はこちらで数える
       passages: (day && day.passages) || 0,
-      answered: (day && day.answered) || 0
+      answered: (day && day.answered) || 0,
+      minutes: (day && day.minutes) || 0
     };
   }
 
@@ -296,15 +320,31 @@ const Storage = (() => {
    * 統計用にそのまま残す。
    */
   function completePassage() {
-    const key = todayKey();
-    let day = state.history.find((h) => h.date === key);
-    if (!day) {
-      day = { date: key, answered: 0, correct: 0, word: 0, math: 0, reading: 0, grammar: 0 };
-      state.history.push(day);
-    }
+    const day = dayRecord();
     day.passages = (day.passages || 0) + 1;
     save();
     return day.passages;
+  }
+
+  /**
+   * 座っていた時間を足す。セッションを終えたときと中断したときに呼ぶ。
+   *
+   * **問題数ではなく分で数える。**「20分だけ座る」を約束にしている以上、
+   * 記録も分で見せないと守れたかどうかが分からない。1問あたりの時間は
+   * 科目でまるで違う（単語20秒・長文90秒）ので、問題数では代わりにならない。
+   */
+  function addMinutes(minutes) {
+    const n = Math.max(0, Math.round(minutes));
+    if (!n) return 0;
+    const day = dayRecord();
+    day.minutes = (day.minutes || 0) + n;
+    save();
+    return day.minutes;
+  }
+
+  /** 直近 days 日ぶんの学習時間（分）。今日を最後に古い順で返す */
+  function getMinutes(days = 7) {
+    return getHistory(days).map((h) => ({ date: h.date, minutes: h.minutes || 0 }));
   }
 
   /** 今日を含む連続学習日数 */
@@ -322,6 +362,30 @@ const Storage = (() => {
       }
     }
     return streak;
+  }
+
+  /**
+   * これまでで一番長かった連続日数。セッション結果の「最長◯日まであと◯日」に使う。
+   *
+   * **記録の全期間を見る**（getStreak は今日から遡るだけなので、過去の記録は出せない）。
+   * 日付の穴で切れるので、history を日付順に並べてから隣り合いを数える。
+   */
+  function getBestStreak() {
+    const days = state.history
+      .filter((h) => h.answered > 0)
+      .map((h) => h.date)
+      .sort();
+    let best = 0;
+    let run = 0;
+    let prev = null;
+    for (const key of days) {
+      const d = new Date(`${key}T00:00:00`);
+      // 前の日のちょうど翌日なら続き、そうでなければ数え直し
+      run = prev && (d - prev) === 86400000 ? run + 1 : 1;
+      prev = d;
+      if (run > best) best = run;
+    }
+    return best;
   }
 
   function reset() {
@@ -387,7 +451,8 @@ const Storage = (() => {
         math: num(h.math),
         reading: num(h.reading),
         grammar: num(h.grammar),
-        passages: num(h.passages)
+        passages: num(h.passages),
+        minutes: num(h.minutes)
       }));
 
     // settings は既知の項目だけ受け取り、型が合わないものは初期値のままにする
@@ -407,6 +472,35 @@ const Storage = (() => {
       }
       if (Object.keys(j).length) settings.judged = { ...j, at: iso(s.judged.at) };
     }
+
+    // やりかけのセッションは**受け取らない。**別の端末で書き出したファイルの途中経過を
+    // 復元しても、そのとき出ていた問題は手元に無い。null にして「やりかけ無し」から始める。
+    // judged と同じく typeof null === 'object' なので上の輪では弾けない
+    settings.session = null;
+
+    // 出題の重心は知っている値だけ
+    settings.focus = ['judged', 'top', 'weak'].includes(s.focus) ? s.focus : 'judged';
+
+    // セッションの履歴は記録タブにそのまま出すので、数値と既知の科目だけに矯正する
+    settings.sessionHistory = (Array.isArray(s.sessionHistory) ? s.sessionHistory : [])
+      .filter((h) => h && typeof h === 'object')
+      .slice(0, 20)
+      .map((h) => {
+        const perKind = {};
+        for (const k of ['word', 'reading', 'grammar', 'math']) {
+          const v = h.perKind && h.perKind[k];
+          if (v && typeof v === 'object') {
+            perKind[k] = { correct: num(v.correct), answered: num(v.answered), ms: num(v.ms) };
+          }
+        }
+        return {
+          date: iso(h.date) || new Date().toISOString(),
+          minutes: num(h.minutes),
+          answered: num(h.answered),
+          correct: num(h.correct),
+          perKind
+        };
+      });
 
     // mockHistory（模擬試験の履歴）は画面にそのまま出すので、数値と既知の値に矯正する
     if (Array.isArray(s.mockHistory)) {
@@ -456,9 +550,12 @@ const Storage = (() => {
     getDay,
     getTodayCounts,
     completePassage,
+    addMinutes,
+    getMinutes,
     kindOf,
     todayKey,
     getStreak,
+    getBestStreak,
     reset,
     restoreBackup,
     hasBackup,

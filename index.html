@@ -5,73 +5,183 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>EIS合格応援アプリ</title>
 <link rel="stylesheet" href="css/style.css" />
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>" />
+<!--
+  アイコン。**残り時間を切り取った円**（黒＝過ぎたぶん、緑＝これから）。
+  ホームに出している「140日」の円グラフをそのまま小さくしたもので、
+  ホーム画面に並んだときに何のアプリかが色と形で分かる。
+  file:// で開くときのために相対パスで置いている
+-->
+<link rel="icon" href="icons/icon-180.png" />
+<link rel="apple-touch-icon" href="icons/icon-180.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="EIS" />
 </head>
 <body>
 
+<!--
+  ヘッダは「今日が何日か」と「何日続いているか」だけ。
+  アプリ名は毎日見るものではないので置かない（画面のいちばん上は、
+  座った回数を思い出させる場所にあてる）。リビジョンは設定画面の末尾に出す
+-->
 <header class="app-header">
-  <h1 class="app-title">
-    🎓 EIS合格応援アプリ
-    <span class="app-version" id="app-version" title="このリビジョンが動いています"></span>
-  </h1>
-  <div class="header-side">
-    <span class="streak-badge" id="header-streak" hidden>🔥 <b>0</b>日</span>
-    <button class="gear-btn" data-view="settings" aria-label="設定">⚙</button>
-  </div>
+  <p class="header-today">
+    <span id="header-date">—</span>
+    <span class="header-streak" id="header-streak" hidden>・ 連続 <b>0</b>日</span>
+  </p>
+  <button class="gear-btn" data-view="settings" aria-label="設定">⚙</button>
 </header>
 
 <main class="container">
 
-  <!-- ============ ホーム ============ -->
-  <!-- ============ ホーム ============ -->
-  <!-- 試験日までの残り日数 → 今日の学習メニュー → カレンダー の3つだけ -->
+  <!-- ============ セッション（ホーム） ============ -->
+  <!--
+    「何分やる？」を選んで座るだけの画面。**献立を自分で組ませない。**
+    残り日数 → やりかけの続き → 分を選ぶ、の3つだけを置く
+  -->
   <section class="view is-active" id="view-home">
     <div class="countdown-card">
-      <p class="countdown-label" id="countdown-label">EIS入試まで</p>
-      <p class="countdown-days"><span id="countdown-number">—</span><span class="countdown-unit">日</span></p>
-      <p class="countdown-date"><span id="countdown-date"></span> ・ <span id="countdown-weeks"></span></p>
-      <div class="countdown-sub">
-        <span id="countdown-pace"></span>
+      <div class="countdown-main">
+        <p class="countdown-days"><span id="countdown-number">—</span><span class="countdown-unit">日</span></p>
+        <div class="countdown-side">
+          <p class="countdown-label" id="countdown-label">EIS入試 <span id="countdown-date"></span></p>
+          <p class="countdown-weeks" id="countdown-weeks"></p>
+        </div>
+      </div>
+      <!-- 1マス＝1週。日で数えると多すぎて残りの実感が湧かない -->
+      <div class="weekgrid" id="weekgrid"></div>
+      <div class="weekgrid-legend">
+        <span>今週</span><span id="weekgrid-mid">1マス＝1週</span><span>入試の週</span>
       </div>
     </div>
 
-    <div class="panel today-panel">
-      <div class="today-head">
-        <h2 class="panel-title today-title">今日の学習</h2>
-        <span class="today-status" id="today-status"></span>
-      </div>
-      <div class="today-list" id="today-list"></div>
-      <p class="hint" id="today-note"></p>
+    <!-- 中断したセッションがあるときだけ出す -->
+    <button class="resume-card" id="resume-card" hidden>
+      <span class="resume-play">▶</span>
+      <span class="resume-main">
+        <span class="resume-title">きのうの途中から</span>
+        <span class="resume-sub" id="resume-sub"></span>
+      </span>
+      <span class="row-chevron">›</span>
+    </button>
+
+    <div class="pick-head">
+      <span>何分やる？</span>
+      <span class="pick-count" id="pick-count"></span>
     </div>
 
-    <div class="panel weak-spot" id="weak-spot" hidden>
-      <h2 class="panel-title">いま最も伸ばせるところ</h2>
-      <div class="row-line" id="weak-spot-row"></div>
+    <!-- 選んでいる長さの中身。押すとそのまま始まる -->
+    <button class="plan-card" id="plan-card">
+      <span class="plan-top">
+        <span class="plan-min"><b id="plan-minutes">20</b>分のセッション</span>
+        <span class="plan-sub">中身はまかせる</span>
+        <span class="plan-play">▶</span>
+      </span>
+      <span class="plan-kinds" id="plan-kinds"></span>
+    </button>
+
+    <div class="minute-row" id="minute-row"></div>
+
+    <p class="hint" id="plan-note"></p>
+  </section>
+
+  <!-- ============ セッション中 ============ -->
+  <section class="view" id="view-session">
+    <div class="sess-bar">
+      <span class="sess-clock" id="sess-clock">00:00</span>
+      <span class="sess-clock-unit">のこり</span>
+      <span class="sess-count" id="sess-count">0 / 0問</span>
+      <button class="btn btn-ghost sess-quit" id="sess-quit">中断</button>
     </div>
 
-    <!-- カレンダー本体は畳んでおき、要約1行だけを見せる（1画面に収めるため） -->
-    <details class="panel calendar-fold">
-      <summary class="row-line">
-        <span class="row-name">学習カレンダー</span>
-        <span class="row-sub" id="cal-summary"></span>
-        <span class="row-chevron">›</span>
-      </summary>
-      <div class="calendar-head">
-        <button class="btn btn-ghost cal-nav" id="cal-prev" aria-label="前の月">‹</button>
-        <span class="calendar-title" id="cal-title"></span>
-        <button class="btn btn-ghost cal-nav" id="cal-next" aria-label="次の月">›</button>
+    <div class="sess-track" id="sess-track"></div>
+    <div class="sess-legend">
+      <span class="sess-legend-kinds" id="sess-legend"></span>
+      <span class="sess-legend-days" id="sess-days"></span>
+    </div>
+
+    <p class="sess-chip" id="sess-chip" hidden></p>
+
+    <div class="panel sess-panel">
+      <p class="math-tag" id="sess-tag"></p>
+      <div class="sess-passage" id="sess-passage" hidden></div>
+      <p class="sess-question" id="sess-question"></p>
+      <div class="math-figure" id="sess-figure" hidden></div>
+
+      <div class="choices" id="sess-choices"></div>
+
+      <form class="answer-form" id="sess-form" hidden autocomplete="off">
+        <div class="math-input-row">
+          <input type="text" id="sess-input" class="answer-input" placeholder="答えを入力"
+                 inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" />
+          <span class="math-unit" id="sess-unit"></span>
+        </div>
+        <div class="answer-actions math-actions">
+          <button type="button" class="btn btn-ghost" id="sess-skip">わからない</button>
+          <button type="submit" class="btn btn-primary" id="sess-submit">答える</button>
+        </div>
+      </form>
+
+      <div class="quiz-feedback" id="sess-feedback" hidden>
+        <p class="feedback-title" id="sess-feedback-title"></p>
+        <p class="math-explanation" id="sess-explanation"></p>
       </div>
-      <div class="calendar" id="calendar"></div>
-      <div class="calendar-legend">
-        <span><i class="dot dot-exam"></i>試験日</span>
-        <span><i class="dot dot-today"></i>今日</span>
-        <span><i class="dot dot-studied"></i>学習した日</span>
+    </div>
+
+    <!-- 画面の下に貼り付く。長文は本文が長いので、次へが常に届くところに要る -->
+    <div class="sess-foot" id="sess-foot" hidden>
+      <button class="btn btn-ghost" id="sess-top" hidden>本文にもどる</button>
+      <button class="btn btn-primary" id="sess-next">次へ →</button>
+    </div>
+  </section>
+
+  <!-- ============ セッション結果 ============ -->
+  <section class="view" id="view-session-result">
+    <div class="streak-banner" id="sr-streak"></div>
+
+    <p class="sr-meta" id="sr-meta"></p>
+    <h2 class="sr-headline" id="sr-headline"></h2>
+
+    <div class="sr-score">
+      <span class="sr-num" id="sr-correct">0</span>
+      <span class="sr-of">/ <span id="sr-total">0</span> 正解</span>
+      <span class="sr-rate" id="sr-rate">0%</span>
+    </div>
+    <div class="progress-bar sr-bar"><div class="progress-fill" id="sr-fill"></div></div>
+
+    <div class="panel">
+      <div class="sr-kinds" id="sr-kinds"></div>
+      <p class="hint" id="sr-comment"></p>
+    </div>
+
+    <div class="plan-card plan-card-static" id="sr-next">
+      <span class="plan-top"><span class="plan-min" id="sr-next-title">次の20分</span></span>
+      <span class="plan-kinds" id="sr-next-kinds"></span>
+      <span class="plan-note" id="sr-next-note"></span>
+    </div>
+
+    <div class="sr-actions">
+      <button class="btn btn-secondary" id="sr-wrong" hidden>まちがい0問</button>
+      <button class="btn btn-primary" id="sr-again">もう20分やる</button>
+    </div>
+    <button class="btn btn-ghost sr-home" data-view="home">ホームへ</button>
+  </section>
+
+  <!-- ============ ぜんぶ（科目ごとの練習） ============ -->
+  <section class="view" id="view-all">
+    <h2 class="view-title">ぜんぶ</h2>
+    <p class="hint">セッションに任せないとき用。ふだんは使わなくていい。</p>
+
+    <div class="row-list all-rows" id="all-rows"></div>
+
+    <div class="panel">
+      <h2 class="panel-title">出題の重心</h2>
+      <div class="focus-chips" id="focus-chips">
+        <button class="focus-chip" data-focus="judged">いまの実力に合わせる</button>
+        <button class="focus-chip" data-focus="top">一番上だけ</button>
+        <button class="focus-chip" data-focus="weak">苦手だけ</button>
       </div>
-      <div class="calendar-actions">
-        <button class="btn btn-secondary" id="cal-today">今月へ</button>
-        <button class="btn btn-secondary" id="cal-exam">試験日の月へ</button>
-      </div>
-    </details>
+      <p class="hint" id="focus-note"></p>
+    </div>
   </section>
 
   <!-- ============ 単語カード ============ -->
@@ -764,6 +874,27 @@
 
   <!-- ============ 学習記録 ============ -->
   <section class="view" id="view-stats">
+    <div class="stats-head">
+      <h2 class="view-title">きろく</h2>
+      <span class="stats-head-days">入試まで <b id="stats-days">—</b>日</span>
+    </div>
+
+    <!-- 単語の全体像。3つに割った1本の帯だけを出す（数字を並べても頭に入らない） -->
+    <p class="vocab-head" id="vocab-head"></p>
+    <div class="vocab-bar" id="vocab-bar"></div>
+    <div class="vocab-legend" id="vocab-legend"></div>
+    <p class="hint" id="vocab-pace"></p>
+
+    <!-- 今週どれだけ座れたか。問題数ではなく分で見せる -->
+    <p class="week-head" id="week-head"></p>
+    <div class="weekbars" id="weekbars"></div>
+
+    <div class="panel">
+      <h2 class="panel-title">設問タイプ別</h2>
+      <p class="hint">長文でどこを落としているか。<b>押すとそのタイプだけを解けます。</b></p>
+      <div class="qtypes" id="qtypes"></div>
+    </div>
+
     <div class="panel stats-summary">
       <span>通算正答率 <b class="accent-green" id="stats-rate">0%</b> ・ <b id="stats-answers">0</b>問</span>
       <span class="accent-orange">🔥 連続 <b id="stats-streak">0</b>日</span>
@@ -791,6 +922,30 @@
       <h2 class="panel-title">伸ばせる分野</h2>
       <div class="row-list" id="stats-weak-areas"></div>
     </div>
+
+    <!-- カレンダー本体は畳んでおき、要約1行だけを見せる（1画面に収めるため） -->
+    <details class="panel calendar-fold">
+      <summary class="row-line">
+        <span class="row-name">学習カレンダー</span>
+        <span class="row-sub" id="cal-summary"></span>
+        <span class="row-chevron">›</span>
+      </summary>
+      <div class="calendar-head">
+        <button class="btn btn-ghost cal-nav" id="cal-prev" aria-label="前の月">‹</button>
+        <span class="calendar-title" id="cal-title"></span>
+        <button class="btn btn-ghost cal-nav" id="cal-next" aria-label="次の月">›</button>
+      </div>
+      <div class="calendar" id="calendar"></div>
+      <div class="calendar-legend">
+        <span><i class="dot dot-exam"></i>試験日</span>
+        <span><i class="dot dot-today"></i>今日</span>
+        <span><i class="dot dot-studied"></i>学習した日</span>
+      </div>
+      <div class="calendar-actions">
+        <button class="btn btn-secondary" id="cal-today">今月へ</button>
+        <button class="btn btn-secondary" id="cal-exam">試験日の月へ</button>
+      </div>
+    </details>
 
     <div class="panel">
       <h2 class="panel-title">算数の単元マップ</h2>
@@ -894,17 +1049,20 @@
         学習データは1日1回、このブラウザの中に自動でバックアップされます。
         間違ってリセットしたときなどは、ここから前日までの状態に戻せます。
       </p>
+      <p class="hint app-version" id="app-version" title="このリビジョンが動いています"></p>
     </div>
   </section>
 
 </main>
 
-<!-- 下タブ。4つに絞り、常に画面下に固定する -->
+<!--
+  下タブは3つ。**ふだん押すのは左の1つだけ**で済むようにしてある。
+  科目ごとの練習と模擬試験は「ぜんぶ」の下にまとめた
+-->
 <nav class="bottom-nav" id="tabs">
-  <button class="tab is-active" data-view="home"><span class="tab-icon">🏠</span>ホーム</button>
-  <button class="tab" data-view="quiz"><span class="tab-icon">📖</span>学習</button>
-  <button class="tab" data-view="mock"><span class="tab-icon">📝</span>テスト</button>
-  <button class="tab" data-view="stats"><span class="tab-icon">📊</span>記録</button>
+  <button class="tab is-active" data-view="home"><span class="tab-icon">⏱</span>セッション</button>
+  <button class="tab" data-view="all"><span class="tab-icon">☰</span>ぜんぶ</button>
+  <button class="tab" data-view="stats"><span class="tab-icon">▦</span>きろく</button>
 </nav>
 
 <div class="toast" id="toast" hidden></div>

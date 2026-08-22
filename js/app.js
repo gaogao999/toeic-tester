@@ -176,28 +176,38 @@
   // 画面切り替え
   // ============================================================
 
-  // 下タブは4つだけなので、その中の画面（単語カード・単語一覧など）は親タブを光らせる
+  // 下タブは3つだけなので、その中の画面（単語カード・模擬試験など）は親タブを光らせる。
+  // セッション中と結果は「セッション」タブに属する
   const TAB_GROUP = {
     home: 'home',
-    quiz: 'quiz',
-    flashcard: 'quiz',
-    reading: 'quiz',
-    grammar: 'quiz',
-    math: 'quiz',
-    list: 'quiz',
-    mock: 'mock',
+    session: 'home',
+    'session-result': 'home',
+    all: 'all',
+    quiz: 'all',
+    flashcard: 'all',
+    reading: 'all',
+    grammar: 'all',
+    math: 'all',
+    list: 'all',
+    mock: 'all',
     stats: 'stats',
     settings: null // 設定はどのタブにも属さない
   };
 
   function showView(name) {
     stopTempo(); // 別の画面へ移ったらサクサク4択のタイマーを止める
+    // セッションから抜けるときは、そこまでを控えて時計を止める（戻れば続きから）
+    if (name !== 'session' && $('#view-session').classList.contains('is-active')) suspendSession();
     $$('.view').forEach((v) => v.classList.toggle('is-active', v.id === `view-${name}`));
+    // セッション中は下タブを消す（途中で別の画面へ行かせない）。
+    // 画面は main の中にあるので、CSS の兄弟セレクタでは下タブに届かない
+    document.body.classList.toggle('in-session', name === 'session');
     const group = TAB_GROUP[name] !== undefined ? TAB_GROUP[name] : name;
     $$('.tab').forEach((t) => t.classList.toggle('is-active', t.dataset.view === group));
     window.scrollTo(0, 0);
 
     if (name === 'home') renderHome();
+    if (name === 'all') renderAll();
     if (name === 'flashcard') startFlashcards();
     if (name === 'quiz') resetQuizToSetup();
     if (name === 'math') resetMathToSetup();
@@ -221,7 +231,8 @@
         mathScope: 'all'
       });
     }
-    // 「今日の学習」の行は、レベル判定で出た段に絞って開く
+    // 「ぜんぶ」の科目の行は、レベル判定で出た段に絞って開く。
+    // 何も指定しないと B1 も B2 も混ざるので、測った段だけを練習できるようにする
     if (target.dataset.lvkind && target.dataset.lv) {
       Storage.updateSettings({ [LEVEL_SETTING_KEY[target.dataset.lvkind]]: target.dataset.lv });
     }
@@ -319,24 +330,65 @@
   // ============================================================
 
   function renderHome() {
-    // ホームは「試験日までの残り日数」「今日の学習メニュー」「カレンダー」の3つだけ
-    if (cal.year === null) {
-      const today = startOfToday();
-      cal.year = today.getFullYear();
-      cal.month = today.getMonth();
-    }
+    // ホームは「残り日数」「やりかけの続き」「何分やる？」の3つだけ。
+    // **献立を自分で組ませない。**分を選べば中身はこちらで決める
     renderCountdown();
-    renderTodayMenu();
-    renderCalendar();
-    renderHeaderStreak();
-    renderWeakSpot();
+    renderWeekGrid();
+    renderResumeCard();
+    renderPlanCard();
+    renderHeaderToday();
   }
 
-  function renderHeaderStreak() {
+  /** ヘッダの「8/22（土）・連続6日」 */
+  function renderHeaderToday() {
+    const now = new Date();
+    $('#header-date').textContent =
+      `${now.getMonth() + 1}/${now.getDate()}（${WEEKDAYS[now.getDay()]}）`;
     const streak = Storage.getStreak();
     const badge = $('#header-streak');
     badge.hidden = streak === 0;
     badge.querySelector('b').textContent = streak;
+  }
+
+  /**
+   * 残りを1マス＝1週で並べる。
+   *
+   * 日で数えると140マスになって、残りの実感がかえって湧かない。
+   * 週なら20マスで、**画面に一度に収まる**ぶん「あとこれだけ」が目で分かる。
+   * 左端が今週、右端が入試の週。
+   */
+  function renderWeekGrid() {
+    const box = $('#weekgrid');
+    const days = daysUntilExam();
+    if (days <= 0) {
+      box.innerHTML = '';
+      $('#weekgrid-mid').textContent = '';
+      return;
+    }
+    const weeks = Math.max(1, Math.ceil(days / 7));
+    const studied = Storage.getStudiedDates();
+    const today = startOfToday();
+    const cells = [];
+    for (let i = 0; i < weeks; i++) {
+      const from = new Date(today);
+      from.setDate(from.getDate() + i * 7);
+      const to = new Date(from);
+      to.setDate(to.getDate() + 6);
+      const label = `${from.getMonth() + 1}/${from.getDate()}〜${to.getMonth() + 1}/${to.getDate()}`;
+      const cls =
+        i === weeks - 1 ? 'wk-exam' : i === 0 ? 'wk-now' : 'wk-todo';
+      cells.push(`<i class="wk ${cls}" title="${escapeHtml(label)}"></i>`);
+    }
+    box.innerHTML = cells.join('');
+    // 今週すでに座った日数を添える（マスの意味が分かるように）
+    const doneThisWeek = [0, 1, 2, 3, 4, 5, 6]
+      .map((d) => {
+        const x = new Date(today);
+        x.setDate(x.getDate() - d);
+        return dateKeyOf(x);
+      })
+      .filter((k) => studied.has(k)).length;
+    $('#weekgrid-mid').textContent = `1マス＝1週 ・ 直近7日で ${doneThisWeek}日`;
   }
 
   /**
@@ -372,13 +424,6 @@
       <span class="row-solve">解く</span>
     </button>`;
 
-  function renderWeakSpot() {
-    const rows = weakRows(4);
-    const w = rows[0];
-    $('#weak-spot').hidden = !w;
-    if (w) $('#weak-spot-row').innerHTML = weakRowHtml(w);
-  }
-
   function updateFilterCount() {
     $('#filter-count').textContent = `対象: ${getFilteredWords().length} 語`;
     renderFilterSummary();
@@ -395,141 +440,831 @@
   }
 
   // ============================================================
-  // 今日の学習メニュー
+  // セッション（「20分だけ座る」）
   // ============================================================
+  //
+  // **献立を自分で組ませない。**分だけを選ばせ、中身はこちらで決める。
+  //
+  // 以前は「今日の学習」として単語20語・算数15問…と曜日ごとのノルマを出していた。
+  // ノルマは、達成できなかった日に「今日はもう無理だ」と手を止めさせる。
+  // 分で区切れば**途中でやめても座ったこと自体は残る**ので、連続日数が途切れない。
+  //
+  // 1回のセッションは 科目ブロックの列（単語 → 長文 → 文法 → 算数）で、
+  // 科目の切れ目に緑の帯を出す。ブロックにするのは、単語と算数が交互に来ると
+  // 頭の切り替えばかりで疲れるため。
 
-  // 1日のノルマ。曜日で決め打ちにしてある（残り日数からは計算しない）
-  const DAILY_GOALS = {
-    weekday: { word: 20, math: 15, grammar: 10 },
-    weekend: { word: 25, math: 20, grammar: 15 }
-  };
-
-  function isWeekend(date = new Date()) {
-    const d = date.getDay();
-    return d === 0 || d === 6; // 日曜と土曜
-  }
-
-  function todayGoals() {
-    const quota = isWeekend() ? DAILY_GOALS.weekend : DAILY_GOALS.weekday;
-
-    const wordsLeft = WORDS.filter((w) => !Storage.isLearned(w.id)).length;
-    const mathLeft = MATH_DATA.filter((p) => !Storage.isLearned(p.id)).length;
-    const readingLeft = PASSAGES.filter(
-      (r) => r.questions.some((q, i) => !Storage.isLearned(`${r.id}-${i + 1}`))
-    ).length;
-    const grammarLeft = GRAMMAR.filter((q) => !Storage.isLearned(q.id)).length;
-
-    // データが無い科目は献立に出さない。達成できないノルマを残すと
-    // 「今日の分は達成」に一生ならず、続ける気を削ぐため
-    return [
-      {
-        key: 'word',
-        icon: '📖',
-        name: '単語',
-        goal: quota.word,
-        unit: '語',
-        left: wordsLeft,
-        view: 'quiz',
-        available: WORDS.length > 0
-      },
-      {
-        key: 'math',
-        icon: '🔢',
-        name: '算数',
-        goal: quota.math,
-        unit: '問',
-        left: mathLeft,
-        view: 'math',
-        available: MATH_DATA.length > 0
-      },
-      {
-        key: 'grammar',
-        icon: '✏️',
-        name: '文法',
-        goal: quota.grammar,
-        unit: '問',
-        left: grammarLeft,
-        view: 'grammar',
-        available: GRAMMAR.length > 0
-      },
-      {
-        key: 'passages',
-        icon: '📕',
-        name: '長文読解',
-        // 本文は最後まで読んで初めて練習になる。設問の数で数えると、
-        // 2問しかない本文を解いただけで達成になってしまう
-        goal: 1,
-        unit: '本',
-        left: readingLeft,
-        view: 'reading',
-        available: PASSAGES.length > 0
-      }
-    ].filter((g) => g.available);
-  }
+  /** セッションで回す科目。**模擬試験の階段と同じ4つ。** 順番がそのまま出題順になる */
+  const SESSION_KINDS = ['word', 'reading', 'grammar', 'math'];
 
   /**
-   * レベル判定で出た段。**「今日の学習」はここで測った段に絞って開く。**
+   * 1問あたりのおよその時間（秒）。分から問題数を出すのに使う。
    *
-   * 何も指定しないと「すべて」になり、B1 も B2 も混ざって出る。
-   * 測った段に絞れば、いま伸ばすところだけを練習できる。まだ受けていなければ null
+   * 科目でまるで違う。単語の4択は読んで押すだけ、長文は本文を読む時間が要る。
+   * **総問題数ではなく時間で配るのはこのため。**「30問」と決めると、
+   * 長文が多い回だけ倍の時間がかかる。
+   *
+   * 長文の90秒は「本文を読む時間を設問数で割ってならしたもの」。
+   * 300語を3分で読み、設問1問30秒 ≒ 4問なら (180+120)/4 = 75 秒。
+   * 実際には読み返すので、少し多めに取ってある。
    */
-  function judgedLevelOf(key) {
+  const SESSION_SECONDS = { word: 20, reading: 90, grammar: 40, math: 60 };
+
+  /** 選べる長さ。20分を真ん中に置く（5分でも連続は途切れない、と伝えるため） */
+  const SESSION_MINUTES = [5, 10, 20, 40];
+  const DEFAULT_SESSION_MINUTES = 20;
+
+  /** 長文は本文の単位でしか出せない。**これに満たない配分の回は長文を出さない** */
+  const MIN_READING_QUESTIONS = 2;
+
+  /**
+   * レベル判定で出た段。**セッションはここで測った段から出す。**
+   *
+   * 何も指定しないと B1 も B2 も混ざって出る。測った段に絞れば、
+   * いま伸ばすところだけを練習できる。まだ受けていなければ null（＝全部から出す）
+   */
+  function judgedLevelOf(kind) {
     const j = Storage.getSettings().judged;
-    // 献立の key と階段の kind は「長文」だけ名前が違う（passages / reading）
-    const kind = key === 'passages' ? 'reading' : key;
     const lv = j && j[kind];
     if (!lv || !MIN_LEVEL[kind]) return null;
     // 段を伏せたあとに古い判定が残っていることがある。出せる範囲へ寄せる
     return Math.min(Math.max(lv, MIN_LEVEL[kind]), MAX_LEVEL[kind]);
   }
 
-  function renderTodayMenu() {
-    const counts = Storage.getTodayCounts();
-    const goals = todayGoals();
-    const doneCount = goals.filter((g) => counts[g.key] >= g.goal).length;
+  /** 科目ごとの「解ける対象ぜんぶ」。長文だけ本文ではなく設問の単位で数える */
+  function kindItems(kind) {
+    if (kind === 'word') return WORDS;
+    if (kind === 'math') return MATH_DATA;
+    if (kind === 'grammar') return GRAMMAR;
+    return PASSAGES.flatMap((r) => r.questions.map((q, i) => ({ id: `${r.id}-${i + 1}` })));
+  }
 
-    $('#today-status').textContent =
-      doneCount === goals.length ? '✓ 今日の分は達成' : `${doneCount} / ${goals.length} 達成`;
-    $('#today-status').classList.toggle('is-done', doneCount === goals.length);
+  /** その科目のこれまでの正答率（0〜1）。解答が少なすぎるうちは null */
+  function kindRate(kind) {
+    let correct = 0;
+    let answered = 0;
+    for (const item of kindItems(kind)) {
+      const rec = Storage.getRecord(item.id);
+      correct += rec.correct;
+      answered += rec.correct + rec.wrong;
+    }
+    return answered >= 10 ? correct / answered : null;
+  }
 
-    $('#today-list').innerHTML = goals
-      .map((g) => {
-        const done = counts[g.key];
-        const complete = done >= g.goal;
-        const percent = Math.min((done / g.goal) * 100, 100);
-        const kind = g.key === 'passages' ? 'reading' : g.key;
-        const lv = judgedLevelOf(g.key);
-        const badge = lv
-          ? `<span class="today-level">${escapeHtml(ladderLabel(kind, lv))}</span>`
-          : '';
-        // 段が決まっていれば、押したときにその段へ絞ってから画面を開く
-        const setLv = lv ? ` data-lvkind="${kind}" data-lv="${lv}"` : '';
-        return `<button class="today-item ${complete ? 'is-complete' : ''}" data-view="${g.view}"${setLv}>
-            <span class="today-icon">${complete ? '✓' : g.icon}</span>
-            <span class="today-main">
-              <span class="today-name">${g.name}${badge}</span>
-              <span class="progress-bar slim"><span class="progress-fill" style="width:${percent}%"></span></span>
-            </span>
-            <span class="today-count">${done} / ${g.goal} ${g.unit}</span>
-          </button>`;
+  /**
+   * 時間の配り方。**均等割りから最大 ±30% までしか動かさない。**
+   *
+   * 弱いところを厚くしたいが、全部を弱点科目に寄せると
+   * 得意な科目に一度も触れない日ができる。入試では4科目とも出るので、
+   * どれも毎回少しは触る。7割は AI 診断・階段法と同じ線
+   */
+  function sessionWeights(kinds) {
+    const w = {};
+    for (const k of kinds) {
+      const rate = kindRate(k);
+      w[k] = rate === null ? 1 : 1 + Math.max(-0.3, Math.min(0.3, REACHED_RATE - rate));
+    }
+    return w;
+  }
+
+  /** 学習記録から見た優先度。小さいほど先に出す */
+  function itemPriority(id) {
+    const rec = Storage.getRecord(id);
+    const answered = rec.correct + rec.wrong;
+    if (answered > 0 && (rec.box <= 1 || rec.correct / answered < REACHED_RATE)) return 0; // 苦手
+    if (answered === 0) return 1;                                                          // まだ
+    if (Storage.isDue(id)) return 2;                                                        // 復習期限
+    return 3;
+  }
+
+  /**
+   * その科目の在庫を、**出す順**に並べて返す。
+   *
+   * 段の絞り込みは「出題の重心」（settings.focus）で決める。
+   *   judged … レベル判定で出た段だけ（既定）
+   *   top    … 一番上の段だけ
+   *   weak   … 段は問わず、間違えたまま・まだのものだけ
+   *
+   * 絞りすぎて空になったら**絞りを外して返す。**
+   * 「今日は出せる問題がありません」で終わらせない
+   */
+  function sessionPool(kind) {
+    const focus = Storage.getSettings().focus || 'judged';
+    const base = kind === 'reading' ? PASSAGES : kindItems(kind);
+    const idOf = (x) => x.id;
+
+    let items = base;
+    if (focus === 'top') {
+      items = base.filter((x) => x.level === MAX_LEVEL[kind]);
+    } else if (focus === 'judged') {
+      const lv = judgedLevelOf(kind);
+      if (lv) items = base.filter((x) => x.level === lv);
+    } else if (focus === 'weak') {
+      // 長文は本文の中に1問でも落としたものがあれば対象
+      items = base.filter((x) =>
+        kind === 'reading'
+          ? x.questions.some((q, i) => itemPriority(`${x.id}-${i + 1}`) === 0)
+          : itemPriority(idOf(x)) === 0
+      );
+    }
+    if (!items.length) items = base;
+
+    // 苦手 → まだ → 復習期限 → その他 の順に。同じ組の中はそのつど混ぜる
+    const rank = (x) =>
+      kind === 'reading'
+        ? Math.min(...x.questions.map((q, i) => itemPriority(`${x.id}-${i + 1}`)))
+        : itemPriority(idOf(x));
+    return shuffle(items).sort((a, b) => rank(a) - rank(b));
+  }
+
+  /**
+   * 分から中身を決める。
+   * 返すのは { minutes, counts: { 科目: 問題数 }, total }
+   */
+  function planFor(minutes) {
+    let kinds = SESSION_KINDS.filter((k) => sessionPool(k).length > 0);
+    const budget = minutes * 60;
+
+    const share = (list) => {
+      const w = sessionWeights(list);
+      const sum = list.reduce((a, k) => a + w[k], 0) || 1;
+      const out = {};
+      for (const k of list) out[k] = (budget * w[k]) / sum;
+      return out;
+    };
+
+    // 長文が1本ぶんに満たない配分なら外して、そのぶんを他の科目へ回す。
+    // 5分のセッションに長文を混ぜると、本文を読んだところで時間が終わる
+    let sec = share(kinds);
+    if (kinds.includes('reading') && sec.reading / SESSION_SECONDS.reading < MIN_READING_QUESTIONS) {
+      kinds = kinds.filter((k) => k !== 'reading');
+      sec = share(kinds);
+    }
+
+    const counts = {};
+    for (const k of kinds) counts[k] = Math.max(1, Math.round(sec[k] / SESSION_SECONDS[k]));
+
+    // **長文は本文の単位でしか出せない。**設問3問ぶんの時間を配っても、
+    // 実際には4問の本文が丸ごと1本入る。画面には本数を出し、
+    // 問題数は「およそ」と言う（数を約束すると必ずずれる）
+    let passages = 0;
+    if (counts.reading) {
+      const per = PASSAGES.reduce((a, r) => a + r.questions.length, 0) / (PASSAGES.length || 1);
+      passages = Math.max(1, Math.round(counts.reading / per));
+      counts.reading = Math.round(passages * per);
+    }
+
+    return {
+      minutes,
+      counts,
+      passages,
+      total: Object.values(counts).reduce((a, b) => a + b, 0)
+    };
+  }
+
+  /** 問題1つを id から組み立て直す。中断したセッションを開き直すときに使う */
+  function rebuildQuestion(kind, id) {
+    if (kind === 'word') {
+      const w = WORD_DATA.find((x) => String(x.id) === String(id));
+      return w ? buildWordChoice(w) : null;
+    }
+    if (kind === 'math') {
+      const p = MATH_DATA.find((x) => x.id === id);
+      return p ? buildMathQuestion(p) : null;
+    }
+    if (kind === 'grammar') {
+      const g = GRAMMAR_DATA.find((x) => x.id === id);
+      return g ? buildGrammarMockQuestion(g) : null;
+    }
+    const m = String(id).match(/^(r\d+)-(\d+)$/);
+    if (!m) return null;
+    const passage = READING_DATA.find((r) => r.id === m[1]);
+    const i = Number(m[2]) - 1;
+    return passage && passage.questions[i] ? buildReadingQuestion(passage, passage.questions[i], i) : null;
+  }
+
+  /**
+   * 献立から実際の問題を並べる。
+   * **科目ごとのブロックにする。**単語と算数が交互に来ると頭の切り替えで疲れる
+   */
+  function buildSessionQueue(plan) {
+    const queue = [];
+    for (const kind of SESSION_KINDS) {
+      const want = plan.counts[kind];
+      if (!want) continue;
+      const pool = sessionPool(kind);
+
+      if (kind === 'reading') {
+        // 長文は本文ごと出す。**途中で切らない**（設問だけ解いても読む練習にならない）
+        let got = 0;
+        for (const passage of pool) {
+          if (got >= want) break;
+          passage.questions.forEach((q, i) => queue.push(buildReadingQuestion(passage, q, i)));
+          got += passage.questions.length;
+        }
+        continue;
+      }
+
+      pool.slice(0, want).forEach((item) => {
+        queue.push(
+          kind === 'word'
+            ? buildWordChoice(item)
+            : kind === 'math'
+              ? buildMathQuestion(item)
+              : buildGrammarMockQuestion(item)
+        );
+      });
+    }
+    return queue;
+  }
+
+  // ---------- セッションの進行 ----------
+
+  const sess = {
+    minutes: 0,
+    queue: [],
+    index: 0,
+    results: [],      // 各問の正誤（まだ答えていなければ null）
+    // **1問にかけた時間（ミリ秒）。**結果の「長文は1問あたり◯秒」はこれで出す。
+    // 目安から逆算した数を出すと、実際より速い・遅いが分からない
+    times: [],
+    shownAt: 0,       // いまの問題を出した時刻
+    startedAt: 0,     // 今この画面を開いた時刻
+    elapsed: 0,       // 中断をまたいだ、これまでの経過（ミリ秒）
+    credited: 0,      // すでに記録に足した分（中断のたびに足すので、二重に数えないため）
+    timer: null,
+    answered: false,  // いまの問題に答えたか（答えてから「次へ」）
+    over: false       // 時間切れ
+  };
+
+  const sessTotalMs = () => sess.minutes * 60 * 1000;
+  const sessSpentMs = () => sess.elapsed + (sess.startedAt ? Date.now() - sess.startedAt : 0);
+
+  /**
+   * 座った分を記録に足す。**中断のたびに足す。**
+   *
+   * 終わったときだけ足していたら、いつも中断して終える人の記録が
+   * ずっと 0 分のままだった（実際には座っている）。二重に数えないよう、
+   * すでに足したぶん（`sess.credited`）との差だけを足す
+   */
+  function creditMinutes() {
+    if (!sess.results.some((r) => r !== null)) return; // 1問も答えていない回は数えない
+    const spent = Math.max(1, Math.round(sessSpentMs() / 60000));
+    const add = spent - (sess.credited || 0);
+    if (add <= 0) return;
+    Storage.addMinutes(add);
+    sess.credited = spent;
+  }
+
+  /** 保存できる形に落とす。**問題そのものではなく id だけ**を控える */
+  function sessionSnapshot() {
+    return {
+      minutes: sess.minutes,
+      elapsed: sessSpentMs(),
+      credited: sess.credited || 0,
+      index: sess.index,
+      results: sess.results,
+      times: sess.times,
+      items: sess.queue.map((q) => ({ kind: q.kind, id: q.id }))
+    };
+  }
+
+  /** いまのセッションを控えて時計を止める。画面を離れるたびに呼ぶ */
+  function suspendSession() {
+    if (!sess.queue.length) return;
+    stopSessionTimer();
+    creditMinutes();
+    sess.elapsed = sessSpentMs();
+    sess.startedAt = 0;
+    Storage.updateSettings({ session: sessionSnapshot() });
+  }
+
+  function clearSavedSession() {
+    Storage.updateSettings({ session: null });
+  }
+
+  /** 中断したセッションを開き直す。問題が消えていたら（データ更新など）諦めて捨てる */
+  function resumeSession() {
+    const saved = Storage.getSettings().session;
+    if (!saved || !Array.isArray(saved.items) || !saved.items.length) {
+      clearSavedSession();
+      toast('続きが見つかりませんでした');
+      showView('home');
+      return;
+    }
+    const queue = saved.items.map((x) => rebuildQuestion(x.kind, x.id)).filter(Boolean);
+    if (queue.length !== saved.items.length) {
+      clearSavedSession();
+      toast('問題が入れ替わっていたので、はじめから組み直します');
+      startSession(saved.minutes || DEFAULT_SESSION_MINUTES);
+      return;
+    }
+    sess.minutes = saved.minutes || DEFAULT_SESSION_MINUTES;
+    sess.queue = queue;
+    sess.results = Array.isArray(saved.results) ? saved.results.slice(0, queue.length) : [];
+    while (sess.results.length < queue.length) sess.results.push(null);
+    sess.times = Array.isArray(saved.times) ? saved.times.slice(0, queue.length) : [];
+    while (sess.times.length < queue.length) sess.times.push(0);
+    sess.index = Math.min(Math.max(0, saved.index | 0), queue.length - 1);
+    sess.elapsed = Math.max(0, saved.elapsed | 0);
+    sess.credited = Math.max(0, saved.credited | 0);
+    sess.startedAt = Date.now();
+    sess.over = false;
+    openSession();
+  }
+
+  function startSession(minutes) {
+    const plan = planFor(minutes);
+    const queue = buildSessionQueue(plan);
+    if (!queue.length) {
+      toast('出題できる問題がありません');
+      return;
+    }
+    sess.minutes = minutes;
+    sess.queue = queue;
+    sess.results = new Array(queue.length).fill(null);
+    sess.times = new Array(queue.length).fill(0);
+    sess.index = 0;
+    sess.elapsed = 0;
+    sess.credited = 0;
+    sess.startedAt = Date.now();
+    sess.over = false;
+    Storage.incrementSessions();
+    Storage.updateSettings({ sessionMinutes: minutes });
+    openSession();
+  }
+
+  function openSession() {
+    showView('session');
+    startSessionTimer();
+    renderSessionQuestion();
+  }
+
+  function startSessionTimer() {
+    stopSessionTimer();
+    const tick = () => {
+      const left = Math.max(0, sessTotalMs() - sessSpentMs());
+      const total = Math.round(left / 1000);
+      $('#sess-clock').textContent =
+        `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+      $('#sess-clock').classList.toggle('is-low', total <= 60);
+      if (left === 0 && !sess.over) {
+        sess.over = true;
+        stopSessionTimer();
+        // **その場で打ち切らない。**解いている途中の問題を消すと、
+        // 「座れた」感覚ごと取り上げることになる。いまの1問を終えてから閉じる
+        showSessionChip('20分たちました。いまの問題を終えたら閉じます', true);
+        $('#sess-next').textContent = 'ここで終わる';
+      }
+    };
+    tick();
+    sess.timer = setInterval(tick, 1000);
+  }
+
+  function stopSessionTimer() {
+    if (sess.timer) clearInterval(sess.timer);
+    sess.timer = null;
+  }
+
+  function showSessionChip(text, warn) {
+    const chip = $('#sess-chip');
+    chip.textContent = text;
+    chip.classList.toggle('is-warn', !!warn);
+    chip.hidden = false;
+  }
+
+  /** 科目ごとの進み具合の帯。**いまどこにいるか**が一目で分かるようにする */
+  function renderSessionTrack() {
+    const done = {};
+    const total = {};
+    sess.queue.forEach((q, i) => {
+      total[q.kind] = (total[q.kind] || 0) + 1;
+      if (sess.results[i] !== null) done[q.kind] = (done[q.kind] || 0) + 1;
+    });
+    const kinds = SESSION_KINDS.filter((k) => total[k]);
+    const now = sess.queue[sess.index].kind;
+
+    $('#sess-track').innerHTML = kinds
+      .map((k) => {
+        const pct = ((done[k] || 0) / total[k]) * 100;
+        return `<span class="sess-seg" style="flex:${total[k]}">
+            <span class="sess-seg-fill" style="width:${pct}%"></span>
+          </span>`;
+      })
+      .join('');
+
+    $('#sess-legend').innerHTML = kinds
+      .map((k) => {
+        const d = done[k] || 0;
+        const state = d >= total[k] ? '✓' : k === now ? `${d + 1}/${total[k]}` : '';
+        return `<span class="sess-kind ${k === now ? 'is-now' : d >= total[k] ? 'is-done' : ''}">
+            ${escapeHtml(KIND_LABELS[k])}${state ? ` <b>${state}</b>` : ''}
+          </span>`;
       })
       .join('');
 
     const days = daysUntilExam();
-    const word = goals.find((g) => g.key === 'word');
-    const quota = isWeekend() ? '土日' : '平日';
-    const base =
-      days > 0
-        ? word
-          ? `${quota}のノルマです。未習得の単語はあと ${word.left} 語、試験まで ${days} 日。`
-          : `${quota}のノルマです。試験まで ${days} 日。単語データがまだありません。`
-        : '試験日を過ぎました。';
+    $('#sess-days').textContent = days > 0 ? `入試まで${days}日` : '';
+  }
 
-    // 段が出ていない科目があるなら、レベル判定を受ければ絞れることを伝える
-    const judgedAny = goals.some((g) => judgedLevelOf(g.key));
-    $('#today-note').innerHTML = judgedAny
-      ? `${escapeHtml(base)} 各行の段は<b>レベル判定の結果</b>です。押すとその段に絞って開きます。`
-      : `${escapeHtml(base)} <button class="linkish" data-view="mock">レベル判定</button>を受けると、ここが測った段に絞られます。`;
+  function renderSessionQuestion() {
+    const q = sess.queue[sess.index];
+    sess.answered = false;
+    sess.shownAt = Date.now();
+
+    const answeredCount = sess.results.filter((r) => r !== null).length;
+    $('#sess-count').textContent = `${answeredCount} / ${sess.queue.length}問`;
+    renderSessionTrack();
+
+    // 科目が切り替わる境目で帯を出す。ここで頭を切り替えてもらう
+    const prev = sess.index > 0 ? sess.queue[sess.index - 1] : null;
+    if (sess.over) {
+      // 時間切れの知らせは消さない
+    } else if (prev && prev.kind !== q.kind) {
+      const n = sess.queue.filter((x) => x.kind === prev.kind).length;
+      showSessionChip(`${KIND_LABELS[prev.kind]}${n}問おわり ・ ここから${KIND_LABELS[q.kind]}`, false);
+    } else {
+      $('#sess-chip').hidden = true;
+    }
+
+    $('#sess-tag').textContent = q.tag;
+
+    if (q.kind === 'reading') {
+      $('#sess-passage').hidden = false;
+      // 語注は畳んで置く。**練習画面と同じものを出す。**
+      // セッションのほうにだけ無いと、同じ本文が難しくなったり易しくなったりする
+      const glossary = (q.passage.glossary || []).length
+        ? `<details class="glossary"><summary>語注を見る</summary><dl>${q.passage.glossary
+            .map((g) => `<dt>${escapeHtml(g.w)}</dt><dd>${escapeHtml(g.m)}</dd>`)
+            .join('')}</dl></details>`
+        : '';
+      $('#sess-passage').innerHTML =
+        `<p class="sess-passage-meta">${escapeHtml(ladderLabel('reading', q.passage.level))} ・ ${q.passage.words}語</p>` +
+        `<p class="sess-passage-title">${escapeHtml(q.passage.title)}</p>` +
+        q.passage.passage.split('\n').map((line) => `<p>${escapeHtml(line)}</p>`).join('') +
+        glossary;
+    } else {
+      $('#sess-passage').hidden = true;
+    }
+
+    $('#sess-question').textContent = q.question;
+    // 単語は設問文が語ひとつ。ほかの科目と同じ大きさだと小さすぎる
+    $('#sess-question').className = `sess-question ${q.kind === 'word' ? 'is-word' : ''}`;
+    showFigure($('#sess-figure'), q.figure);
+    $('#sess-feedback').hidden = true;
+    $('#sess-foot').hidden = true;
+    $('#sess-top').hidden = q.kind !== 'reading';
+
+    // 算数で4択が作れなかった問題だけ自由入力。ほかはすべて4択
+    const freeInput = q.kind === 'math' && !q.choice;
+    $('#sess-form').hidden = !freeInput;
+    $('#sess-choices').hidden = freeInput;
+    if (freeInput) {
+      $('#sess-input').value = '';
+      $('#sess-unit').textContent = q.unit || '';
+      $('#sess-unit').hidden = !q.unit;
+      $('#sess-choices').innerHTML = '';
+    } else {
+      const box = $('#sess-choices');
+      box.innerHTML = '';
+      (q.kind === 'math' ? q.choice.choices : q.choices).forEach((choice, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice';
+        btn.innerHTML =
+          `<span class="choice-key">${'ABCD'[i]}</span>` +
+          `<span class="choice-text">${escapeHtml(String(choice))}${q.kind === 'math' && q.unit ? ' ' + escapeHtml(q.unit) : ''}</span>`;
+        btn.addEventListener('click', () => answerSession(i));
+        box.appendChild(btn);
+      });
+    }
+    window.scrollTo(0, 0);
+  }
+
+  function answerSession(given) {
+    if (sess.answered) return;
+    const q = sess.queue[sess.index];
+    const isCorrect = isAnswerCorrect(q, given);
+    sess.answered = true;
+    sess.results[sess.index] = isCorrect;
+    // 5分を超えたぶんは切り捨てる。**席を立っていた時間を「読む速さ」に混ぜない**ため
+    sess.times[sess.index] = Math.min(Date.now() - sess.shownAt, 300000);
+
+    Storage.recordAnswer(q.id, isCorrect);
+    if (isCorrect) Storage.setLearned(q.id, true);
+
+    const freeInput = q.kind === 'math' && !q.choice;
+    const rightIndex = q.kind === 'math' && q.choice ? q.choice.answer : q.answer;
+
+    if (!freeInput) {
+      // 押せなくしてから、正解を緑・選んだ誤答を赤で示す
+      [...$('#sess-choices').children].forEach((btn, i) => {
+        btn.disabled = true;
+        if (i === rightIndex) btn.classList.add('is-correct');
+        if (i === given && !isCorrect) btn.classList.add('is-wrong');
+      });
+    } else {
+      $('#sess-form').hidden = true;
+    }
+
+    const right = freeInput
+      ? `${q.answer}${q.unit ? ' ' + q.unit : ''}`
+      : `${(q.kind === 'math' ? q.choice.choices : q.choices)[rightIndex]}${q.kind === 'math' && q.unit ? ' ' + q.unit : ''}`;
+    $('#sess-feedback-title').textContent = isCorrect ? `正解 ・ ${right}` : `正解は ${right}`;
+    $('#sess-feedback-title').className = `feedback-title ${isCorrect ? 'is-correct' : 'is-wrong'}`;
+    $('#sess-explanation').textContent = q.explanation || '';
+    $('#sess-feedback').hidden = false;
+    $('#sess-foot').hidden = false;
+
+    renderSessionTrack();
+    $('#sess-count').textContent = `${sess.results.filter((r) => r !== null).length} / ${sess.queue.length}問`;
+    // 1問ごとに控える。アプリを閉じられても、そこまでは残る
+    Storage.updateSettings({ session: sessionSnapshot() });
+  }
+
+  function nextSessionQuestion() {
+    if (sess.over || sess.index + 1 >= sess.queue.length) {
+      finishSession();
+      return;
+    }
+    sess.index += 1;
+    renderSessionQuestion();
+  }
+
+  /**
+   * セッションを閉じる。
+   * **座っていた分を記録する。**問題数ではなく分が、この画面が守らせたい約束なので
+   */
+  function finishSession() {
+    stopSessionTimer();
+    const spentMinutes = Math.max(1, Math.round(sessSpentMs() / 60000));
+    const correct = sess.results.filter((r) => r === true).length;
+    const answered = sess.results.filter((r) => r !== null).length;
+
+    const perKind = {};
+    sess.queue.forEach((q, i) => {
+      if (sess.results[i] === null) return;
+      perKind[q.kind] = perKind[q.kind] || { correct: 0, answered: 0, ms: 0 };
+      perKind[q.kind].answered += 1;
+      perKind[q.kind].ms += sess.times[i] || 0;
+      if (sess.results[i]) perKind[q.kind].correct += 1;
+    });
+
+    // 長文は「本文を最後まで読んだ本数」を別に数える（設問数だと2問の本文で達成になる）
+    const donePassages = new Set();
+    sess.queue.forEach((q, i) => {
+      if (q.kind !== 'reading' || sess.results[i] === null) return;
+      const all = sess.queue.every((x, j) => x.kind !== 'reading' || x.passage.id !== q.passage.id || sess.results[j] !== null);
+      if (all) donePassages.add(q.passage.id);
+    });
+    donePassages.forEach(() => Storage.completePassage());
+
+    creditMinutes();
+    saveSessionHistory({
+      date: new Date().toISOString(),
+      minutes: spentMinutes,
+      answered,
+      correct,
+      perKind
+    });
+    clearSavedSession();
+
+    renderSessionResult({ spentMinutes, answered, correct, perKind });
+    // **showView より先に空にする。**showView はセッション画面から離れるときに
+    // suspendSession を呼ぶので、残したままだと終わったセッションが
+    // 「やりかけ」として保存し直され、ホームに続きのカードが出てしまう
+    sess.queue = [];
+    showView('session-result');
+  }
+
+  function saveSessionHistory(entry) {
+    const s = Storage.getSettings();
+    Storage.updateSettings({ sessionHistory: [entry, ...(s.sessionHistory || [])].slice(0, 20) });
+  }
+
+  /** 「まちがいN問」でもう一度出すための控え。結果画面を離れると消える */
+  let sessionWrong = [];
+
+  function renderSessionResult(r) {
+    const rate = r.answered ? Math.round((r.correct / r.answered) * 100) : 0;
+    const streak = Storage.getStreak();
+    const best = Storage.getBestStreak();
+
+    // 連続日数の帯。**最長に近いことが分かると、もう1日続けたくなる**
+    const chase =
+      best > streak
+        ? `最長${best}日まであと${best - streak}日`
+        : streak > 1
+          ? `自己最長を更新中`
+          : '';
+    $('#sr-streak').innerHTML =
+      `<span>連続 <b>${streak}</b>日目</span><span>${escapeHtml(chase)}</span>`;
+    $('#sr-streak').hidden = streak === 0;
+
+    const now = new Date();
+    $('#sr-meta').textContent =
+      `${now.getMonth() + 1}/${now.getDate()} ・ ${r.spentMinutes}分 ・ ${r.answered}問`;
+    // 途中でやめた回も「座れた」と言う。**問題数ではなく座ったことを褒める**
+    $('#sr-headline').textContent =
+      r.answered === 0 ? '今日はここまで。' : `${r.spentMinutes}分、座れた。`;
+
+    $('#sr-correct').textContent = r.correct;
+    $('#sr-total').textContent = r.answered;
+    $('#sr-rate').textContent = `${rate}%`;
+    // 7割は AI 診断・階段法と同じ線。ここだけ緑のままだと「取れている」と読まれる
+    $('#sr-rate').classList.toggle('is-low', rate < WEAK_LINE);
+    $('#sr-fill').style.width = `${rate}%`;
+
+    $('#sr-kinds').innerHTML = SESSION_KINDS.filter((k) => r.perKind[k])
+      .map((k) => {
+        const v = r.perKind[k];
+        const pct = Math.round((v.correct / v.answered) * 100);
+        const low = pct < WEAK_LINE;
+        return `<div class="sr-kind ${low ? 'is-low' : ''}">
+            <span class="sr-kind-name">${escapeHtml(KIND_LABELS[k])}</span>
+            <span class="sr-kind-track"><span class="sr-kind-fill" style="width:${pct}%"></span></span>
+            <span class="sr-kind-num">${v.correct} / ${v.answered}</span>
+          </div>`;
+      })
+      .join('');
+
+    $('#sr-comment').textContent = sessionComment(r);
+
+    // 次の回。**この回の出来をそのまま反映した献立**を先に見せる
+    const nextPlan = planFor(Storage.getSettings().sessionMinutes || DEFAULT_SESSION_MINUTES);
+    $('#sr-next-title').textContent = `次の${nextPlan.minutes}分（自動で調整しました）`;
+    $('#sr-next-kinds').innerHTML = planChipsHtml(nextPlan);
+    const days = daysUntilExam();
+    $('#sr-next-note').textContent =
+      (nextPlan.passages ? `長文${nextPlan.passages}本を含めておよそ${nextPlan.total}問 ・ ` : '') +
+      (days > 0 ? `のこり${days}日` : '');
+
+    sessionWrong = [];
+    sess.queue.forEach((q, i) => {
+      if (sess.results[i] === false) sessionWrong.push(q);
+    });
+    $('#sr-wrong').hidden = sessionWrong.length === 0;
+    $('#sr-wrong').textContent = `まちがい${sessionWrong.length}問`;
+    $('#sr-again').textContent = `もう${nextPlan.minutes}分やる`;
+    window.scrollTo(0, 0);
+  }
+
+  /**
+   * 結果への一言。**数字をなぞらない。**
+   * 「84%でした」は画面に出ている。読む速さや、どの科目が落ちたかを言う
+   */
+  function sessionComment(r) {
+    const parts = [];
+    const rd = r.perKind.reading;
+    // 1問3秒を切る回は測れていない（読まずに押している）。速さの話をしない
+    if (rd && rd.answered >= 2 && rd.ms / rd.answered >= 3000) {
+      // **実際にかかった時間を出す。**目安から逆算した数を出しても、
+      // 自分が速くなったのか遅いのかが分からない
+      const sec = Math.round(rd.ms / rd.answered / 1000);
+      const before = previousReadingSeconds();
+      parts.push(
+        before && Math.abs(before - sec) >= 3
+          ? `長文は1問${sec}秒（前は${before}秒）`
+          : `長文は1問${sec}秒でした`
+      );
+    }
+    const worst = SESSION_KINDS.filter((k) => r.perKind[k] && r.perKind[k].answered >= 3)
+      .map((k) => ({ k, rate: (r.perKind[k].correct / r.perKind[k].answered) * 100 }))
+      .sort((a, b) => a.rate - b.rate)[0];
+    if (worst && worst.rate < WEAK_LINE) {
+      const weak = weakRows(3).find((x) => x.subject === KIND_LABELS[worst.k]);
+      parts.push(
+        weak
+          ? `${KIND_LABELS[worst.k]}は「${weak.category}」でつまずいています`
+          : `${KIND_LABELS[worst.k]}が落ちています。次の回で厚くします`
+      );
+    }
+    if (!parts.length) parts.push('落としている科目はありません。この調子で積んでいきましょう');
+    return parts.join('。') + '。';
+  }
+
+  /**
+   * これまでの回の、長文1問あたりの秒数。**今回を除く直近3回**の平均。
+   * 1回だけと比べるとぶれるので、少し均してから比べる
+   */
+  function previousReadingSeconds() {
+    const past = (Storage.getSettings().sessionHistory || [])
+      .slice(1, 4)
+      .map((h) => h.perKind && h.perKind.reading)
+      .filter((x) => x && x.answered >= 2 && x.ms > 0);
+    if (!past.length) return null;
+    const ms = past.reduce((a, x) => a + x.ms, 0);
+    const n = past.reduce((a, x) => a + x.answered, 0);
+    return Math.round(ms / n / 1000);
+  }
+
+  /**
+   * 献立のチップ（15 単語 ／ 1 長文 …）。ホームと結果の両方で使う。
+   * **長文だけ「本」で数える**（設問数で出すと、本文を丸ごと読む重さが伝わらない）
+   */
+  function planChipsHtml(plan) {
+    return SESSION_KINDS.filter((k) => plan.counts[k])
+      .map(
+        (k) => `<span class="plan-kind">
+          <b>${k === 'reading' ? plan.passages : plan.counts[k]}</b>
+          <span>${escapeHtml(SESSION_SHORT[k])}</span>
+        </span>`
+      )
+      .join('');
+  }
+
+  /** チップに入れる短い呼び名。「長文読解」は4文字で、4つ並べると折り返す */
+  const SESSION_SHORT = { word: '単語', reading: '長文', grammar: '文法', math: '算数' };
+
+  // ---------- ホームの3つ ----------
+
+  function renderResumeCard() {
+    const saved = Storage.getSettings().session;
+    const card = $('#resume-card');
+    if (!saved || !saved.items || !saved.items.length) {
+      card.hidden = true;
+      return;
+    }
+    const left = saved.items.length - (saved.results || []).filter((x) => x !== null).length;
+    if (left <= 0) {
+      card.hidden = true;
+      return;
+    }
+    const kind = saved.items[Math.min(saved.index | 0, saved.items.length - 1)].kind;
+    const leftMin = Math.max(1, Math.round(((saved.minutes * 60000 - (saved.elapsed || 0)) / 60000)));
+    $('#resume-sub').textContent = `${KIND_LABELS[kind]}が${left}問のこっています ・ ${leftMin}分`;
+    card.hidden = false;
+  }
+
+  function renderPlanCard() {
+    const minutes = Storage.getSettings().sessionMinutes || DEFAULT_SESSION_MINUTES;
+    const plan = planFor(minutes);
+
+    $('#plan-minutes').textContent = minutes;
+    $('#plan-kinds').innerHTML = planChipsHtml(plan);
+
+    // 今日すでに何回座ったか
+    const doneToday = (Storage.getSettings().sessionHistory || []).filter(
+      (h) => h.date.slice(0, 10) === Storage.todayKey()
+    ).length;
+    $('#pick-count').textContent = `今日 ${doneToday + 1}回目`;
+
+    $('#minute-row').innerHTML = SESSION_MINUTES.filter((m) => m !== minutes)
+      .map((m) => `<button class="minute-btn" data-minutes="${m}">${m}分</button>`)
+      .join('');
+
+    const focus = Storage.getSettings().focus || 'judged';
+    const focusText = {
+      judged: 'いま弱いところから自動で組みます',
+      top: '一番上の段だけを出します',
+      weak: '間違えたままの問題だけを出します'
+    }[focus];
+    // **長文だけ本数**なので、そのことをここで言う（チップの数字の意味が変わる）
+    const reading = plan.passages ? `長文${plan.passages}本を含めて` : '';
+    $('#plan-note').textContent =
+      `${focusText}。${reading}およそ${plan.total}問です。5分でも連続は途切れません。`;
+  }
+
+  function initSession() {
+    $('#plan-card').addEventListener('click', () =>
+      startSession(Storage.getSettings().sessionMinutes || DEFAULT_SESSION_MINUTES)
+    );
+    $('#minute-row').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-minutes]');
+      if (!btn) return;
+      Storage.updateSettings({ sessionMinutes: Number(btn.dataset.minutes) });
+      renderPlanCard();
+    });
+    $('#resume-card').addEventListener('click', resumeSession);
+
+    $('#sess-next').addEventListener('click', nextSessionQuestion);
+    $('#sess-top').addEventListener('click', () => window.scrollTo(0, 0));
+    $('#sess-skip').addEventListener('click', () => answerSession(null));
+    $('#sess-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      answerSession($('#sess-input').value.trim());
+    });
+    $('#sess-quit').addEventListener('click', () => {
+      // 中断しても記録は残る。**「やめる」と言わない**のはそのため
+      suspendSession();
+      toast('ここまでを控えました。続きから始められます');
+      showView('home');
+    });
+
+    $('#sr-again').addEventListener('click', () =>
+      startSession(Storage.getSettings().sessionMinutes || DEFAULT_SESSION_MINUTES)
+    );
+    $('#sr-wrong').addEventListener('click', () => {
+      if (!sessionWrong.length) return;
+      sess.minutes = Math.max(5, Math.round((sessionWrong.length * 40) / 60));
+      sess.queue = sessionWrong.map((q) => rebuildQuestion(q.kind, q.id)).filter(Boolean);
+      sess.results = new Array(sess.queue.length).fill(null);
+      sess.times = new Array(sess.queue.length).fill(0);
+      sess.index = 0;
+      sess.elapsed = 0;
+      sess.credited = 0;
+      sess.startedAt = Date.now();
+      sess.over = false;
+      openSession();
+    });
   }
 
   /** 保存済みの設定を各入力欄に反映する */
@@ -583,6 +1318,105 @@
   }
 
   // ============================================================
+  // ぜんぶ（科目ごとの練習への入口）
+  // ============================================================
+  //
+  // **ふだんは使わなくていい画面。**セッションに任せないときだけ開く。
+  // 以前は下タブの「学習」がここで、毎回ここから科目を選んでいた。
+  // 選ぶこと自体が続かない原因だったので、既定の道からは外してある。
+
+  /** 科目ごとの1行。数字は「いま何がどれだけ済んでいるか」を1つだけ出す */
+  function allRows() {
+    const learnedWords = WORDS.filter((w) => Storage.isLearned(w.id)).length;
+    const donePassages = PASSAGES.filter((r) =>
+      r.questions.every((q, i) => Storage.isLearned(`${r.id}-${i + 1}`))
+    ).length;
+    const rate = (items) => {
+      let c = 0;
+      let n = 0;
+      for (const x of items) {
+        const rec = Storage.getRecord(x.id);
+        c += rec.correct;
+        n += rec.correct + rec.wrong;
+      }
+      return n ? `${Math.round((c / n) * 100)}%` : '—';
+    };
+
+    // 弱点は科目ごとに1つだけ添える。**赤い1行が次にやることになる**
+    const weak = {};
+    for (const w of weakRows(4)) if (!weak[w.subject]) weak[w.subject] = w;
+
+    return [
+      { view: 'quiz', kind: 'word', name: '単語', sub: '4択 ／ カード ／ 意味→英単語',
+        num: `${learnedWords.toLocaleString()} / ${WORDS.length.toLocaleString()}`, subject: '単語' },
+      { view: 'reading', kind: 'reading', name: '長文読解', sub: `${PASSAGES.length}本 ・ ${PASSAGES.reduce((a, r) => a + r.questions.length, 0)}問`,
+        num: `${donePassages}本 済`, subject: '長文読解' },
+      { view: 'grammar', kind: 'grammar', name: '文法', sub: '空所に入るものを選ぶ',
+        num: rate(GRAMMAR), subject: '文法' },
+      { view: 'math', kind: 'math', name: '算数', sub: '問題文は英語・解説は日本語',
+        num: rate(MATH_DATA), subject: '算数' }
+    ].map((r) => ({ ...r, weak: weak[r.subject], level: judgedLevelOf(r.kind) }));
+  }
+
+  function renderAll() {
+    $('#all-rows').innerHTML =
+      allRows()
+        .map((r) => {
+          // 段が決まっていれば、押したときにその段へ絞ってから画面を開く
+          const setLv = r.level ? ` data-lvkind="${r.kind}" data-lv="${r.level}"` : '';
+          const badge = r.level
+            ? `<span class="row-level">${escapeHtml(ladderLabel(r.kind, r.level))}</span>`
+            : '';
+          return `<button class="row-line" data-view="${r.view}"${setLv}>
+            <span class="row-main">
+              <span class="row-name">${escapeHtml(r.name)}${badge}</span>
+              <span class="row-sub ${r.weak ? 'is-weak' : ''}">${escapeHtml(
+                r.weak ? `${r.weak.category}に赤い点が残っている` : r.sub
+              )}</span>
+            </span>
+            <span class="row-rate">${escapeHtml(r.num)}</span>
+            <span class="row-chevron">›</span>
+          </button>`;
+        })
+        .join('') +
+      `<button class="row-line row-mock" data-view="mock">
+        <span class="row-main">
+          <span class="row-name">模擬試験</span>
+          <span class="row-sub">本番形式 ／ レベル判定で段を測る</span>
+        </span>
+        <span class="row-chevron">›</span>
+      </button>`;
+
+    const focus = Storage.getSettings().focus || 'judged';
+    $$('#focus-chips .focus-chip').forEach((b) =>
+      b.classList.toggle('is-active', b.dataset.focus === focus)
+    );
+
+    // いま何段が出ているのかを、科目ごとに言う（判定を受けていなければそう言う）
+    const judged = SESSION_KINDS.map((k) => {
+      const lv = judgedLevelOf(k);
+      return lv ? `${KIND_LABELS[k]} ${ladderLabel(k, lv)}` : null;
+    }).filter(Boolean);
+    $('#focus-note').innerHTML =
+      focus === 'top'
+        ? `一番上の段（${escapeHtml(LEVEL_LABELS[MAX_LEVEL.word])}・${escapeHtml(MATH_LEVEL_LABELS[MAX_LEVEL.math])}）だけを出します。`
+        : focus === 'weak'
+          ? '間違えたまま・まだ解いていない問題だけを出します。段は問いません。'
+          : judged.length
+            ? `レベル判定で出た段に絞ります（${escapeHtml(judged.join(' ／ '))}）。`
+            : `まだ<button class="linkish" data-view="mock">レベル判定</button>を受けていないので、全部の段から出しています。`;
+  }
+
+  function initAll() {
+    $('#focus-chips').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-focus]');
+      if (!btn) return;
+      Storage.updateSettings({ focus: btn.dataset.focus });
+      renderAll();
+    });
+  }
+
+  // ============================================================
   // 受験までのカウントダウンとカレンダー
   // ============================================================
 
@@ -593,7 +1427,7 @@
    * tools/stamp-version.mjs で書き換える。
    * スマホで開いたときに、手元のものが最新かを確かめるためのもの。
    */
-  const APP_VERSION = '2026-08-20 (546161c)';
+  const APP_VERSION = '2026-08-20 (904763d)';
 
   const EXAM_DATE = '2027-01-07';
 
@@ -635,42 +1469,23 @@
     const number = $('#countdown-number');
     const unit = $('.countdown-unit');
 
-    if (days > 0) {
-      label.textContent = 'EIS入試まで';
-      number.textContent = days;
-      unit.hidden = false;
-    } else if (days === 0) {
-      label.textContent = '今日が試験日です';
-      number.textContent = '🎯';
-      unit.hidden = true;
-    } else {
-      label.textContent = '試験日から';
-      number.textContent = Math.abs(days);
-      unit.hidden = false;
-      label.textContent = '試験日を過ぎました';
-    }
+    number.textContent = days > 0 ? days : days === 0 ? '🎯' : Math.abs(days);
+    unit.hidden = days === 0;
 
+    // 日付は span の中に入れる。**label ごと書き換えない**（span が消える）
+    label.firstChild.textContent =
+      days > 0 ? 'EIS入試 ' : days === 0 ? '今日が試験日です ' : '試験日を過ぎました ';
     $('#countdown-date').textContent =
-      `${examDate.getFullYear()}年${examDate.getMonth() + 1}月${examDate.getDate()}日（${WEEKDAYS[examDate.getDay()]}）`;
+      `${examDate.getFullYear()}年${examDate.getMonth() + 1}月${examDate.getDate()}日`;
 
-    // 残り週数と、間に合わせるための1日あたりの語数
+    // 残り週数と、これまでに座った回数。**日ではなく週で言う**（週マスと揃える）
     if (days > 0) {
-      const weeks = Math.floor(days / 7);
-      const rest = days % 7;
+      const weeks = Math.ceil(days / 7);
+      const sessions = (Storage.getSettings().sessionHistory || []).length;
       $('#countdown-weeks').textContent =
-        weeks > 0 ? `あと ${weeks} 週間と ${rest} 日` : `あと ${rest} 日`;
-
-      const remaining = WORDS.filter((w) => !Storage.isLearned(w.id)).length;
-      const perDay = Math.ceil(remaining / days);
-      // 単語データが空のときに「全て覚えました」と出ると嘘になるので分ける
-      $('#countdown-pace').textContent = WORDS.length === 0
-        ? '単語データがありません'
-        : remaining > 0
-          ? `未習得 ${remaining} 語 → 1日 ${perDay} 語のペース`
-          : '全ての単語を覚えました';
+        sessions > 0 ? `のこり${weeks}週 ・ ${sessions}回` : `のこり${weeks}週`;
     } else {
       $('#countdown-weeks').textContent = '';
-      $('#countdown-pace').textContent = '';
     }
   }
 
@@ -3202,7 +4017,197 @@
   // 学習記録
   // ============================================================
 
+  /**
+   * 単語ぜんたいを1本の帯で見せる。**3つにしか割らない。**
+   *
+   * 習得段階は5つあるが（覚えた／ほぼ／うろ覚え／苦手／まだ）、
+   * 一番上に置くのは「あと何語あるか」を掴むための帯なので、
+   *   覚えた（覚えた＋ほぼ）／ あやしい（うろ覚え＋苦手）／ のこり（まだ）
+   * の3つに寄せる。細かい内訳は下の「レベルごとの覚え具合」に出ている
+   */
+  const VOCAB_SPLIT = [
+    { key: 'done', name: '覚えた', stages: ['mastered', 'almost'] },
+    { key: 'shaky', name: 'あやしい', stages: ['vague', 'weak'] },
+    { key: 'todo', name: 'のこり', stages: ['new'] }
+  ];
+
+  function renderVocabBar() {
+    const counts = { done: 0, shaky: 0, todo: 0 };
+    for (const w of WORDS) {
+      const stage = masteryStage(Storage.getRecord(w.id));
+      const group = VOCAB_SPLIT.find((g) => g.stages.includes(stage));
+      counts[group.key] += 1;
+    }
+    const total = WORDS.length || 1;
+
+    // 見出しは「いま出している段の語数」。伏せた段を含めると数が合わない
+    const levels = [...new Set(WORDS.map((w) => w.level))].sort();
+    $('#vocab-head').textContent =
+      `${levels.map((lv) => LEVEL_LABELS[lv]).join('・')}の ${WORDS.length.toLocaleString()}語`;
+
+    $('#vocab-bar').innerHTML = VOCAB_SPLIT.filter((g) => counts[g.key])
+      .map(
+        (g) => `<span class="vocab-seg is-${g.key}" style="width:${(counts[g.key] / total) * 100}%"
+                      title="${g.name} ${counts[g.key]}語"></span>`
+      )
+      .join('');
+    $('#vocab-legend').innerHTML = VOCAB_SPLIT.map(
+      (g) => `<span class="vocab-key is-${g.key}">${g.name} <b>${counts[g.key].toLocaleString()}</b></span>`
+    ).join('');
+
+    // 直近7日のペースで、のこりが何日で終わるか。**間に合うかどうかを先に言う**
+    const days = Math.max(daysUntilExam(), 1);
+    const need = Math.ceil(counts.todo / days);
+    const history = Storage.getHistory(7);
+    // **数日ぶんの記録でペースを語らない。**始めた翌日に「625日足りません」と出て、
+    // 間に合わないと言い渡された。7日のうち3日以上さわっていて初めて平均に意味が出る
+    const activeDays = history.filter((h) => (h.word || 0) > 0).length;
+    // 見せる数と計算に使う数をそろえる。1.7語を「2語」と出しつつ 1.7 で割ると辻褄が合わない
+    const perDay = Math.max(1, Math.round(history.reduce((a, h) => a + (h.word || 0), 0) / 7));
+
+    if (counts.todo === 0) {
+      $('#vocab-pace').textContent = 'ぜんぶの単語に手が付いています。';
+    } else if (activeDays < 3) {
+      $('#vocab-pace').innerHTML =
+        `のこり ${counts.todo.toLocaleString()}語。試験日までに一周するには<b>1日${need}語</b>です。`;
+    } else {
+      const slack = days - Math.ceil(counts.todo / perDay);
+      $('#vocab-pace').innerHTML =
+        `1日${perDay}語のペースで、` +
+        (slack >= 0
+          ? `試験の<b>${slack}日前</b>に一周おわります。`
+          : `一周には<b>${-slack}日</b>足りません。1日${need}語に上げると間に合います。`);
+    }
+  }
+
+  /** 今週どれだけ座れたか。**問題数ではなく分**（「20分だけ座る」の約束と揃える） */
+  function renderWeekBars() {
+    const days = Storage.getMinutes(7);
+    const max = Math.max(20, ...days.map((d) => d.minutes));
+    const total = days.reduce((a, d) => a + d.minutes, 0);
+    $('#week-head').textContent =
+      total > 0
+        ? `今週のセッション ・ 合計${total}分`
+        : '今週のセッション ・ まだありません。5分でもここに積み上がります';
+    // 空のグラフに 96px 取ると、下の内容が押し下がるだけで何も伝わらない
+    $('#weekbars').hidden = total === 0;
+    if (total === 0) return;
+
+    $('#weekbars').innerHTML = days
+      .map((d, i) => {
+        const date = parseDateKey(d.date);
+        const today = i === days.length - 1;
+        const label = today ? '今日' : WEEKDAYS[date.getDay()];
+        return `<div class="weekbar-col" title="${d.date}: ${d.minutes}分">
+            <div class="weekbar ${today ? 'is-today' : ''} ${d.minutes ? '' : 'is-empty'}"
+                 style="height:${Math.max((d.minutes / max) * 100, 3)}%"></div>
+            <span class="weekbar-label">${label}</span>
+          </div>`;
+      })
+      .join('');
+  }
+
+  /**
+   * 長文の設問タイプ別の正答率。
+   *
+   * 「長文 72%」だけでは次にやることが決まらない。**主題は取れているのに
+   * 文脈中の語義だけ落ちている**のなら、直す場所は語彙であって読解ではない。
+   * type は tools/reading-types.mjs が付けている
+   */
+  const QUESTION_TYPE_NAMES = {
+    main: '主題をつかむ',
+    detail: '細部を探す',
+    vocab: '文脈中の語義',
+    ref: '指示語',
+    infer: '推測する'
+  };
+
+  function renderQuestionTypes() {
+    const totals = {};
+    PASSAGES.forEach((r) =>
+      r.questions.forEach((q, i) => {
+        const type = q.type || 'detail';
+        const rec = Storage.getRecord(`${r.id}-${i + 1}`);
+        const answered = rec.correct + rec.wrong;
+        if (!answered) return;
+        const t = (totals[type] = totals[type] || { correct: 0, answered: 0 });
+        t.correct += rec.correct;
+        t.answered += answered;
+      })
+    );
+
+    const rows = Object.keys(QUESTION_TYPE_NAMES)
+      .filter((k) => totals[k])
+      .map((k) => ({ key: k, ...totals[k], rate: Math.round((totals[k].correct / totals[k].answered) * 100) }))
+      .sort((a, b) => a.rate - b.rate);
+
+    if (!rows.length) {
+      $('#qtypes').innerHTML = '<p class="hint">長文をまだ解いていません。解くとここに出ます。</p>';
+      return;
+    }
+
+    const worst = rows[0];
+    $('#qtypes').innerHTML =
+      rows
+        .map(
+          (r) => `<div class="qtype-row ${r.rate < WEAK_LINE ? 'is-low' : ''}">
+            <span class="qtype-name">${escapeHtml(QUESTION_TYPE_NAMES[r.key])}</span>
+            <span class="qtype-track"><span class="qtype-fill" style="width:${r.rate}%"></span></span>
+            <span class="qtype-rate">${r.rate}%</span>
+          </div>`
+        )
+        .join('') +
+      (worst.rate < WEAK_LINE
+        ? `<button class="btn btn-secondary qtype-go" data-qtype="${worst.key}">
+             ${escapeHtml(QUESTION_TYPE_NAMES[worst.key])}だけ 10問
+           </button>`
+        : '');
+  }
+
+  /**
+   * 設問タイプを1つに絞ってセッションを始める。
+   * **長文だけ**の短いセッションにする（弱点を狙って埋めるための道）
+   */
+  function startTypeDrill(type) {
+    const items = [];
+    for (const passage of shuffle(PASSAGES)) {
+      passage.questions.forEach((q, i) => {
+        if ((q.type || 'detail') === type) items.push({ passage, q, i });
+      });
+      if (items.length >= 10) break;
+    }
+    if (!items.length) {
+      toast('その設問がありません');
+      return;
+    }
+    // 本文をまたぐので、同じ本文の設問が続くように並べ直す
+    items.sort((a, b) => a.passage.id.localeCompare(b.passage.id) || a.i - b.i);
+    sess.queue = items.slice(0, 10).map((x) => buildReadingQuestion(x.passage, x.q, x.i));
+    // 出す数を決めてから時間を決める。逆にすると、10問に切ったあとも
+    // 切る前の問題数で時計を回すことになる
+    sess.minutes = Math.max(5, Math.round((sess.queue.length * SESSION_SECONDS.reading) / 60));
+    sess.results = new Array(sess.queue.length).fill(null);
+    sess.times = new Array(sess.queue.length).fill(0);
+    sess.index = 0;
+    sess.elapsed = 0;
+    sess.credited = 0;
+    sess.startedAt = Date.now();
+    sess.over = false;
+    openSession();
+  }
+
   function renderStats() {
+    $('#stats-days').textContent = Math.max(0, daysUntilExam());
+    renderVocabBar();
+    renderWeekBars();
+    renderQuestionTypes();
+    if (cal.year === null) {
+      const today = startOfToday();
+      cal.year = today.getFullYear();
+      cal.month = today.getMonth();
+    }
+    renderCalendar();
+
     const stats = Storage.getStats();
     const rate = stats.totalAnswers
       ? Math.round((stats.totalCorrect / stats.totalAnswers) * 100)
@@ -3474,6 +4479,11 @@
   }
 
   function initStats() {
+    $('#qtypes').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-qtype]');
+      if (btn) startTypeDrill(btn.dataset.qtype);
+    });
+
     $('#export-btn')?.addEventListener('click', () => {
       const blob = new Blob([Storage.exportJSON()], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -3549,6 +4559,8 @@
     });
     initFilters();
     initCountdown();
+    initSession();
+    initAll();
     initMath();
     initReading();
     initGrammar();

@@ -17,7 +17,13 @@
  *   words     : 語数の目安
  *   passage   : 本文（段落は \n で区切る）
  *   glossary  : 語注 [{ w: 語, m: 意味 }]
- *   questions : 設問 [{ q: 設問文, choices: [4択], answer: 正解の番号(0始まり), explanation: 日本語の解説 }]
+ *   questions : 設問 [{ q: 設問文, type: 設問タイプ, choices: [4択], answer: 正解の番号(0始まり), explanation: 日本語の解説 }]
+ *
+ * 設問タイプ（type）は記録タブの「設問タイプ別の正答率」に使う。
+ *   main   主題をつかむ ／ detail 細部を探す ／ vocab 文脈中の語義
+ *   ref    指示語       ／ infer  推測する
+ * **付け直しは `node tools/reading-types.mjs --emit`**（type だけを書き換える。id は触らない）。
+ * 手で書き換えず、判定の規則のほうを直すこと。設問を足したら必ず走らせる
  */
 const READING_DATA = [
   {
@@ -40,6 +46,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Why could Mina not eat breakfast?',
+        type: 'detail',
         choices: [
           'She woke up too late.',
           'She was nervous about her first day.',
@@ -51,6 +58,7 @@ const READING_DATA = [
       },
       {
         q: 'What did Mina do when Pim spoke to her?',
+        type: 'detail',
         choices: [
           'She only nodded.',
           'She answered in English.',
@@ -62,6 +70,7 @@ const READING_DATA = [
       },
       {
         q: 'What did Pim draw in Mina\'s notebook?',
+        type: 'detail',
         choices: [
           'A picture of the classroom',
           'A list of English words',
@@ -73,6 +82,7 @@ const READING_DATA = [
       },
       {
         q: 'What does Mina\'s mother mean at the end?',
+        type: 'detail',
         choices: [
           'Mina should make more friends tomorrow.',
           'Making one friend on the first day is a real achievement.',
@@ -108,18 +118,21 @@ const READING_DATA = [
     questions: [
       {
         q: 'What time must students arrive?',
+        type: 'detail',
         choices: ['By 7:00 a.m.', 'By 8:00 a.m.', 'By 8:30 a.m.', 'By 12:15 p.m.'],
         answer: 1,
         explanation: '第2段落に「Students must arrive by 8:00 a.m.」とあります。8:30は競技の開始時刻なので混同しないこと。'
       },
       {
         q: 'What should students NOT wear on Sports Day?',
+        type: 'detail',
         choices: ['Running shoes', 'A hat', 'Their school uniform', 'Their PE uniform'],
         answer: 2,
         explanation: '「Do not wear your school uniform on this day」とあります。設問の NOT に注意。'
       },
       {
         q: 'What will happen if it rains?',
+        type: 'detail',
         choices: [
           'Sports Day will be canceled.',
           'Sports Day will move to Monday.',
@@ -131,6 +144,7 @@ const READING_DATA = [
       },
       {
         q: 'Students who cannot join must',
+        type: 'detail',
         choices: [
           'call the school on Friday morning.',
           'speak to the Sports Committee.',
@@ -163,6 +177,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the main idea of this passage?',
+        type: 'main',
         choices: [
           'Bees are dangerous animals that people should avoid.',
           'Bees are important to our food supply and need protection.',
@@ -174,12 +189,14 @@ const READING_DATA = [
       },
       {
         q: 'According to the passage, how much of our food depends on animals that move pollen?',
+        type: 'detail',
         choices: ['About one tenth', 'About one third', 'About one half', 'Almost all of it'],
         answer: 1,
         explanation: '第2段落に「About one third of the food we eat」とあります。'
       },
       {
         q: 'Why have bee numbers fallen?',
+        type: 'detail',
         choices: [
           'There is one clear cause.',
           'Bees have moved to other countries.',
@@ -191,12 +208,14 @@ const READING_DATA = [
       },
       {
         q: 'The word "rare" in paragraph 2 is closest in meaning to',
+        type: 'vocab',
         choices: ['common', 'hard to find', 'delicious', 'healthy'],
         answer: 1,
         explanation: 'rare は「まれな、見つけにくい」。expensive と並んでいることからも、手に入りにくくなる意味だと分かります。'
       },
       {
         q: 'What can be inferred about moving pollen by hand?',
+        type: 'infer',
         choices: [
           'It is a better method than using bees.',
           'It is not a practical replacement on a large scale.',
@@ -229,12 +248,14 @@ const READING_DATA = [
     questions: [
       {
         q: 'Where does most ocean plastic come from?',
+        type: 'detail',
         choices: ['Ships', 'Land', 'Fishing nets', 'The air'],
         answer: 1,
         explanation: '第1段落に「most of it comes from land」とあります。ships は「some」なので誤りです。'
       },
       {
         q: 'Why do sea turtles eat plastic bags?',
+        type: 'detail',
         choices: [
           'The bags smell like food.',
           'The bags look like jellyfish.',
@@ -246,6 +267,7 @@ const READING_DATA = [
       },
       {
         q: 'What are microplastics?',
+        type: 'detail',
         choices: [
           'Plastic made in factories for medicine',
           'Bags that break down safely in water',
@@ -257,6 +279,7 @@ const READING_DATA = [
       },
       {
         q: 'Why is cleaning the ocean so difficult?',
+        type: 'detail',
         choices: [
           'The ocean is too cold for machines.',
           'Microplastics are spread widely and are very small.',
@@ -268,6 +291,7 @@ const READING_DATA = [
       },
       {
         q: 'What does the writer suggest is the best approach?',
+        type: 'infer',
         choices: [
           'Building better cleaning machines',
           'Preventing plastic from reaching the ocean',
@@ -300,6 +324,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Why did William leave school?',
+        type: 'detail',
         choices: [
           'He was not interested in studying.',
           'His family could not pay the fees.',
@@ -311,6 +336,7 @@ const READING_DATA = [
       },
       {
         q: 'How did William learn about windmills?',
+        type: 'detail',
         choices: [
           'A teacher explained them to him.',
           'He saw one in another village.',
@@ -322,12 +348,14 @@ const READING_DATA = [
       },
       {
         q: 'What does "them" refer to in the last sentence?',
+        type: 'ref',
         choices: ['The neighbors', 'The pictures', 'The fields', 'The universities'],
         answer: 1,
         explanation: '直前の「he had looked at the pictures」を受けています。指示語は直前の名詞を探すのが基本です。'
       },
       {
         q: 'How did the villagers react at first?',
+        type: 'detail',
         choices: [
           'They helped him find materials.',
           'They laughed at him.',
@@ -339,6 +367,7 @@ const READING_DATA = [
       },
       {
         q: 'What can be inferred about William?',
+        type: 'infer',
         choices: [
           'He gave up easily when others doubted him.',
           'He continued learning without a school.',
@@ -371,6 +400,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the best title for this passage?',
+        type: 'main',
         choices: [
           'How to Stay Safe During Songkran',
           'A Festival with Two Faces',
@@ -382,6 +412,7 @@ const READING_DATA = [
       },
       {
         q: 'What was the original meaning of pouring water?',
+        type: 'detail',
         choices: [
           'To cool people down in hot weather',
           'To show respect and wash away past troubles',
@@ -393,6 +424,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the government give warnings every year?',
+        type: 'detail',
         choices: [
           'Because the festival is too quiet',
           'Because throwing water at motorcycles causes accidents',
@@ -404,6 +436,7 @@ const READING_DATA = [
       },
       {
         q: 'What does the writer mean by "there is no contradiction"?',
+        type: 'detail',
         choices: [
           'Thai families cannot decide which tradition to follow.',
           'The two ways of celebrating do not conflict for them.',
@@ -415,6 +448,7 @@ const READING_DATA = [
       },
       {
         q: 'The word "gentle" in paragraph 3 is closest in meaning to',
+        type: 'vocab',
         choices: ['noisy', 'quiet and soft', 'expensive', 'religious'],
         answer: 1,
         explanation: 'gentle は「穏やかな」。第2段落の静かな儀式を指し、第3段落の激しい水かけと対比されています。'
@@ -442,6 +476,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'According to the passage, what does blue light do?',
+        type: 'detail',
         choices: [
           'It helps the body produce melatonin.',
           'It delays the process that makes us sleepy.',
@@ -453,12 +488,14 @@ const READING_DATA = [
       },
       {
         q: 'In the study, how much longer did tablet readers take to fall asleep?',
+        type: 'detail',
         choices: ['Two hours', 'One hour', 'Ten minutes', 'Five minutes'],
         answer: 2,
         explanation: '「an average of ten minutes longer」とあります。two hours は読書時間、five minutes は別の話です。'
       },
       {
         q: 'Why does the writer say the ten minutes is not the main problem?',
+        type: 'detail',
         choices: [
           'Because students can sleep later in the morning',
           'Because the losses build up over a week while wake-up time stays the same',
@@ -470,6 +507,7 @@ const READING_DATA = [
       },
       {
         q: 'What is the writer\'s attitude toward devices?',
+        type: 'detail',
         choices: [
           'Students should stop using them completely.',
           'Devices have no connection with sleep.',
@@ -481,6 +519,7 @@ const READING_DATA = [
       },
       {
         q: 'Besides light, what other factor is mentioned?',
+        type: 'detail',
         choices: [
           'The temperature of the room',
           'The design of messages and videos that holds attention',
@@ -513,6 +552,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What puzzled observers about elephant groups?',
+        type: 'detail',
         choices: [
           'They ate at unusual times.',
           'They reacted together although no sound was heard.',
@@ -524,6 +564,7 @@ const READING_DATA = [
       },
       {
         q: 'How did Katy Payne find the sounds?',
+        type: 'detail',
         choices: [
           'She used a special microphone underwater.',
           'She played her recording at a faster speed.',
@@ -535,6 +576,7 @@ const READING_DATA = [
       },
       {
         q: 'Why do low sounds suit elephants?',
+        type: 'detail',
         choices: [
           'They are easier for humans to record.',
           'They travel farther than high sounds.',
@@ -546,6 +588,7 @@ const READING_DATA = [
       },
       {
         q: 'What practical change did the discovery bring?',
+        type: 'detail',
         choices: [
           'Scientists now keep elephants in smaller groups.',
           'Protection now includes keeping areas quiet.',
@@ -557,6 +600,7 @@ const READING_DATA = [
       },
       {
         q: 'The final question suggests that',
+        type: 'infer',
         choices: [
           'elephants are the only animals worth studying.',
           'science has already explained animal communication.',
@@ -596,6 +640,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'How does Yuto usually go to school?',
+        type: 'detail',
         choices: [
           'By the number 8 bus.',
           'On foot with Emma.',
@@ -607,6 +652,7 @@ const READING_DATA = [
       },
       {
         q: 'What does Sarah ask Yuto to do before he arrives?',
+        type: 'detail',
         choices: [
           'Learn how to say Tom\'s name.',
           'Tell her about food he cannot eat.',
@@ -618,6 +664,7 @@ const READING_DATA = [
       },
       {
         q: 'What will happen if Yuto does not want to meet the dog immediately?',
+        type: 'detail',
         choices: [
           'Coco will be given to another family.',
           'Yuto will stay in a different room.',
@@ -629,6 +676,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does Sarah tell Yuto to bring a warm jacket?',
+        type: 'detail',
         choices: [
           'The school requires a jacket as a uniform.',
           'The bus in the morning is air-conditioned.',
@@ -640,6 +688,7 @@ const READING_DATA = [
       },
       {
         q: 'What is the main purpose of this message?',
+        type: 'main',
         choices: [
           'To give practical information before the visit.',
           'To ask Yuto to change the date of his stay.',
@@ -672,6 +721,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'How did Ken learn who owned the wallet?',
+        type: 'detail',
         choices: [
           'The bus driver told him.',
           'He read the student card inside it.',
@@ -683,6 +733,7 @@ const READING_DATA = [
       },
       {
         q: 'In the fourth paragraph, the word "matter" is closest in meaning to',
+        type: 'vocab',
         choices: [
           'be missing',
           'be expensive',
@@ -694,6 +745,7 @@ const READING_DATA = [
       },
       {
         q: 'What did Nina do first when she got the wallet back?',
+        type: 'detail',
         choices: [
           'She counted the money.',
           'She thanked Ken\'s sister.',
@@ -705,6 +757,7 @@ const READING_DATA = [
       },
       {
         q: 'Why did Ken refuse the money?',
+        type: 'detail',
         choices: [
           'Returning the photo was enough for him.',
           'He thought the amount was too small.',
@@ -716,6 +769,7 @@ const READING_DATA = [
       },
       {
         q: 'What is the main point of this story?',
+        type: 'detail',
         choices: [
           'Buses are dangerous places to leave belongings.',
           'Something can be worth much more than its price.',
@@ -751,6 +805,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'How did the Aztecs use cacao beans besides making a drink?',
+        type: 'detail',
         choices: [
           'They planted them as decoration.',
           'They burned them for heat.',
@@ -762,6 +817,7 @@ const READING_DATA = [
       },
       {
         q: 'Why was solid chocolate difficult to produce at first?',
+        type: 'detail',
         choices: [
           'Cacao trees could not be grown in Europe.',
           'Sugar was too expensive to add.',
@@ -773,6 +829,7 @@ const READING_DATA = [
       },
       {
         q: 'Why did Europeans add sugar and honey to the drink?',
+        type: 'detail',
         choices: [
           'They did not like the bitter taste.',
           'Sugar made the drink last longer.',
@@ -784,6 +841,7 @@ const READING_DATA = [
       },
       {
         q: 'In the last paragraph, "the technology built around it" refers to',
+        type: 'ref',
         choices: [
           'the ships that carried cacao to Europe',
           'the machines that pressed beans and controlled the fat',
@@ -795,6 +853,7 @@ const READING_DATA = [
       },
       {
         q: 'What is the main idea of the passage?',
+        type: 'main',
         choices: [
           'The Aztecs invented the chocolate bar.',
           'Chocolate was healthier before sugar was added.',
@@ -826,6 +885,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What happens to the body clock during the teenage years?',
+        type: 'detail',
         choices: [
           'Teenagers need fewer hours of sleep than adults.',
           'Teenagers sleep more deeply in the afternoon.',
@@ -837,6 +897,7 @@ const READING_DATA = [
       },
       {
         q: 'What results did schools with a later start report?',
+        type: 'detail',
         choices: [
           'Fewer absences and slightly higher test scores.',
           'Shorter lessons and longer holidays.',
@@ -848,6 +909,7 @@ const READING_DATA = [
       },
       {
         q: 'Which problem with a later start does the passage mention?',
+        type: 'detail',
         choices: [
           'Teachers refuse to work in the afternoon.',
           'The same buses and drivers serve two kinds of school.',
@@ -859,6 +921,7 @@ const READING_DATA = [
       },
       {
         q: 'In the third paragraph, "encouraging" is closest in meaning to',
+        type: 'vocab',
         choices: [
           'difficult to believe',
           'expensive to obtain',
@@ -870,6 +933,7 @@ const READING_DATA = [
       },
       {
         q: 'What does the writer suggest at the end of the passage?',
+        type: 'infer',
         choices: [
           'More research on teenage sleep is still needed.',
           'Teenagers should simply go to bed earlier.',
@@ -905,6 +969,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What do interviews with people who remember almost everything reveal?',
+        type: 'detail',
         choices: [
           'Painful memories stay sharp and choosing what matters becomes harder.',
           'They perform better than others in examinations.',
@@ -916,6 +981,7 @@ const READING_DATA = [
       },
       {
         q: 'Why is weekly review more effective than five readings in one evening?',
+        type: 'detail',
         choices: [
           'Students concentrate better in the morning than at night.',
           'The brain strengthens what is needed often, not what is looked at long.',
@@ -927,6 +993,7 @@ const READING_DATA = [
       },
       {
         q: 'In the third paragraph, "retrieved" is closest in meaning to',
+        type: 'vocab',
         choices: [
           'written down carefully',
           'explained to others',
@@ -938,6 +1005,7 @@ const READING_DATA = [
       },
       {
         q: 'What point does the writer make with the mathematics example?',
+        type: 'detail',
         choices: [
           'Mathematics is harder to remember than other subjects.',
           'Students should memorise several problems word for word.',
@@ -949,6 +1017,7 @@ const READING_DATA = [
       },
       {
         q: 'Which statement best expresses the main argument of the passage?',
+        type: 'detail',
         choices: [
           'Forgetting is not a defect but a useful feature of memory.',
           'Memory can be improved by training every day.',
@@ -980,6 +1049,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Which judgement does the writer say a translation tool does NOT make for you?',
+        type: 'detail',
         choices: [
           'Which word in a menu means fish.',
           'How direct it is appropriate to be.',
@@ -991,6 +1061,7 @@ const READING_DATA = [
       },
       {
         q: 'What does the writer mean by "They cannot close the gap"?',
+        type: 'detail',
         choices: [
           'Machines still make too many translation mistakes.',
           'Machines cannot work without an internet connection.',
@@ -1002,6 +1073,7 @@ const READING_DATA = [
       },
       {
         q: 'Which reason for learning a language does the writer admit has weakened?',
+        type: 'detail',
         choices: [
           'The cultural one, such as understanding how others think.',
           'The social one, such as building trust with people.',
@@ -1013,6 +1085,7 @@ const READING_DATA = [
       },
       {
         q: 'What does the writer imply about teachers who focus on ordering food and booking rooms?',
+        type: 'infer',
         choices: [
           'They are defending a purpose that machines have already taken over.',
           'They are preparing students for the most common situations.',
@@ -1024,6 +1097,7 @@ const READING_DATA = [
       },
       {
         q: 'Which statement best expresses the writer\'s position?',
+        type: 'detail',
         choices: [
           'Machine translation will soon replace language teachers completely.',
           'Language learning is still worthwhile, but for different reasons than before.',
@@ -1055,6 +1129,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'How have design cycles in the clothing industry changed?',
+        type: 'detail',
         choices: [
           'They have grown from a few weeks to six months.',
           'They now follow the four seasons exactly.',
@@ -1066,6 +1141,7 @@ const READING_DATA = [
       },
       {
         q: 'According to the passage, why do shoppers buy immediately?',
+        type: 'detail',
         choices: [
           'Prices rise steadily throughout the season.',
           'Shops refuse to hold items for customers.',
@@ -1077,6 +1153,7 @@ const READING_DATA = [
       },
       {
         q: 'Why is recycling textiles technically difficult?',
+        type: 'detail',
         choices: [
           'Most garments mix several materials that are costly to separate.',
           'Recycling machines are not yet invented.',
@@ -1088,6 +1165,7 @@ const READING_DATA = [
       },
       {
         q: 'In the second paragraph, "abundance" is closest in meaning to',
+        type: 'vocab',
         choices: [
           'a careful selection',
           'a very large quantity',
@@ -1099,6 +1177,7 @@ const READING_DATA = [
       },
       {
         q: 'What does the final question suggest about the writer\'s view?',
+        type: 'infer',
         choices: [
           'Consumers should compare brands more carefully before buying.',
           'Governments alone can solve the problem through regulation.',
@@ -1130,6 +1209,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What does the fungus receive from the tree?',
+        type: 'detail',
         choices: [
           'Water drawn up from deep in the soil.',
           'Minerals collected by its fine threads.',
@@ -1141,6 +1221,7 @@ const READING_DATA = [
       },
       {
         q: 'What did the experiments using labelled carbon show?',
+        type: 'detail',
         choices: [
           'Sugars can move from one tree to another.',
           'Fungi grow faster in warm soil.',
@@ -1152,6 +1233,7 @@ const READING_DATA = [
       },
       {
         q: 'What do some researchers say against the idea of cooperation?',
+        type: 'detail',
         choices: [
           'The threads are too thin to carry sugar.',
           'The fungi may simply be managing their own supply.',
@@ -1163,6 +1245,7 @@ const READING_DATA = [
       },
       {
         q: 'In the first paragraph, "complicated that picture" means that the research has',
+        type: 'detail',
         choices: [
           'proved that the earlier view was completely correct',
           'made the forest more difficult to photograph',
@@ -1174,6 +1257,7 @@ const READING_DATA = [
       },
       {
         q: 'Which statement best expresses the conclusion of the passage?',
+        type: 'detail',
         choices: [
           'Trees cooperate deliberately to help their neighbours.',
           'The idea of the wood wide web has been shown to be false.',
@@ -1212,6 +1296,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Why did Ms. Porter write this e-mail?',
+        type: 'detail',
         choices: [
           'To ask students to cook lunch every Friday.',
           'To give information about International Food Day.',
@@ -1223,6 +1308,7 @@ const READING_DATA = [
       },
       {
         q: 'What must students do by Monday?',
+        type: 'detail',
         choices: [
           'Bring a small dish to school.',
           'Cook something at home.',
@@ -1234,12 +1320,14 @@ const READING_DATA = [
       },
       {
         q: 'In the fourth paragraph, the word "them" refers to',
+        type: 'ref',
         choices: ['nuts', 'students', 'rules', 'cards'],
         answer: 0,
         explanation: '「some students are allergic to them」の them は、直前の「food with nuts」の nuts を指します。ナッツにアレルギーのある生徒がいる、という意味です。'
       },
       {
         q: 'Why should students check the list before choosing a dish?',
+        type: 'detail',
         choices: [
           'Because the teacher chooses the dishes.',
           'Because some dishes are too difficult to cook.',
@@ -1275,6 +1363,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'When is the library open on Saturdays?',
+        type: 'detail',
         choices: [
           'From 7:30 a.m. to 5:30 p.m.',
           'It is closed on Saturdays.',
@@ -1286,6 +1375,7 @@ const READING_DATA = [
       },
       {
         q: 'What is true about the new study rooms?',
+        type: 'detail',
         choices: [
           'Groups of three or more can book them at the front desk.',
           'One student can use a room alone.',
@@ -1297,6 +1387,7 @@ const READING_DATA = [
       },
       {
         q: 'The notice says water in a closed bottle is "the only exception." This means that water is',
+        type: 'detail',
         choices: [
           'not allowed anywhere in the library',
           'sold at the front desk',
@@ -1308,6 +1399,7 @@ const READING_DATA = [
       },
       {
         q: 'What can we guess about the Book Week volunteers?',
+        type: 'detail',
         choices: [
           'They must work every day in November.',
           'Any student can join, even without experience.',
@@ -1339,6 +1431,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is this article mainly about?',
+        type: 'main',
         choices: [
           'How to become a volunteer at an aquarium.',
           'The dangers of keeping sharks in tanks.',
@@ -1350,6 +1443,7 @@ const READING_DATA = [
       },
       {
         q: 'Why do new animals stay in the quarantine tanks?',
+        type: 'detail',
         choices: [
           'Because the main tanks are too crowded.',
           'To protect the other animals from disease.',
@@ -1361,18 +1455,21 @@ const READING_DATA = [
       },
       {
         q: 'In the third paragraph, the word "aggressive" is closest in meaning to',
+        type: 'vocab',
         choices: ['ready to attack', 'very hungry', 'fast and playful', 'shy and quiet'],
         answer: 0,
         explanation: '「攻撃的だと思っていたが、実際はゆっくり穏やかに動いた」という対比から、aggressive は「攻撃してきそうな」という意味だと分かります。'
       },
       {
         q: 'In the third paragraph, the word "them" in "fed them by hand" refers to',
+        type: 'ref',
         choices: ['the students', 'the staff', 'the sharks', 'the vegetables'],
         answer: 2,
         explanation: '「A diver entered the huge tank and fed them by hand」の them は、直前の文の the sharks を指します。ダイバーがサメに手で餌をやったのです。'
       },
       {
         q: 'What can we guess from the last paragraph?',
+        type: 'detail',
         choices: [
           'The teacher thought the trip was too long.',
           'Some students want to go back to the aquarium.',
@@ -1404,6 +1501,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the main topic of this passage?',
+        type: 'main',
         choices: [
           'How octopuses hide by changing their skin.',
           'Why octopuses have no shell.',
@@ -1415,6 +1513,7 @@ const READING_DATA = [
       },
       {
         q: 'What happens when the small muscles pull the bag of color?',
+        type: 'detail',
         choices: [
           'The bag moves to another part of the body.',
           'The color almost disappears.',
@@ -1426,6 +1525,7 @@ const READING_DATA = [
       },
       {
         q: 'In the third paragraph, "the trick" refers to the octopus\'s ability to',
+        type: 'ref',
         choices: [
           'swim faster than its enemies',
           'make itself hard to see',
@@ -1437,12 +1537,14 @@ const READING_DATA = [
       },
       {
         q: 'In the second paragraph, the word "they" in "when they relax" refers to',
+        type: 'ref',
         choices: ['the colors', 'the bags', 'the octopuses', 'the muscles'],
         answer: 3,
         explanation: '「When the muscles pull ... when they relax」と対になっているので、they は the muscles を指します。'
       },
       {
         q: 'What evidence supports the idea that octopus skin can sense light?',
+        type: 'detail',
         choices: [
           'Octopuses always change color at night.',
           'Octopus eyes are larger than human eyes.',
@@ -1474,6 +1576,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is this article mainly about?',
+        type: 'main',
         choices: [
           'The history of a school in Melbourne.',
           'A one-month student exchange program in Australia.',
@@ -1485,6 +1588,7 @@ const READING_DATA = [
       },
       {
         q: 'What problem did Natcha have at first?',
+        type: 'detail',
         choices: [
           'She understood only about half of what her teachers said.',
           'Her host family spoke too quickly at dinner.',
@@ -1496,12 +1600,14 @@ const READING_DATA = [
       },
       {
         q: 'In the third paragraph, the word "accompanied" is closest in meaning to',
+        type: 'vocab',
         choices: ['taught', 'chose', 'photographed', 'went with'],
         answer: 3,
         explanation: 'accompany は「〜に同行する」。引率としてグループと一緒にオーストラリアへ行った先生、という文脈です。'
       },
       {
         q: 'Why does Ms. Suda think host families are better than hotels?',
+        type: 'detail',
         choices: [
           'Host families cook better food than hotels.',
           'Hotels near Westbrook are too expensive.',
@@ -1513,6 +1619,7 @@ const READING_DATA = [
       },
       {
         q: 'The writer says the application forms "will disappear quickly." This suggests that',
+        type: 'infer',
         choices: [
           'the exchange program is very popular',
           'the school prints very few forms',
@@ -1545,6 +1652,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is this passage mainly about?',
+        type: 'main',
         choices: [
           'Why elderly people should leave large cities.',
           'How air conditioners are designed.',
@@ -1556,6 +1664,7 @@ const READING_DATA = [
       },
       {
         q: 'According to the passage, what do tall buildings do?',
+        type: 'detail',
         choices: [
           'They store cool air during the night.',
           'They reflect sunlight back into the sky.',
@@ -1567,6 +1676,7 @@ const READING_DATA = [
       },
       {
         q: 'The writer calls the demand for air conditioning "a circle that feeds itself" because',
+        type: 'detail',
         choices: [
           'air conditioners use water as well as electricity',
           'cooling buildings creates more heat, which increases the need for cooling',
@@ -1578,6 +1688,7 @@ const READING_DATA = [
       },
       {
         q: 'According to studies, which solution is among the cheapest?',
+        type: 'detail',
         choices: [
           'Planting street trees.',
           'Painting roads with special coatings.',
@@ -1589,6 +1700,7 @@ const READING_DATA = [
       },
       {
         q: 'Which statement best expresses the conclusion of the passage?',
+        type: 'detail',
         choices: [
           'The heat island effect can now be completely removed.',
           'Cities will always be unpleasant places in summer.',
@@ -1616,6 +1728,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the e-mail mostly about?',
+        type: 'main',
         choices: [
           'Show & Tell" objects from last year',
           'Mrs. Crandell\'s "Show & Tell" object',
@@ -1627,6 +1740,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does Mrs. Crandell say that students should not bring pets?',
+        type: 'detail',
         choices: [
           'They are distracting.',
           'They are noisy and dirty.',
@@ -1638,6 +1752,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word they refers to',
+        type: 'ref',
         choices: [
           'you',
           'pets',
@@ -1649,6 +1764,7 @@ const READING_DATA = [
       },
       {
         q: 'What does Mrs. Crandell suggest about someone bringing an old movie ticket?',
+        type: 'infer',
         choices: [
           'It was an accident.',
           'It was a good idea.',
@@ -1677,6 +1793,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the most suitable headline for the article?',
+        type: 'detail',
         choices: [
           'It Was a Big Deal',
           'Zookeepers Are Worried',
@@ -1688,6 +1805,7 @@ const READING_DATA = [
       },
       {
         q: 'Why were the monkeys able to escape?',
+        type: 'detail',
         choices: [
           'Rachel Slater helped them get out.',
           'The monkeys are good with locks.',
@@ -1699,6 +1817,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word experts is closest in meaning to',
+        type: 'vocab',
         choices: [
           'animals',
           'workers',
@@ -1710,6 +1829,7 @@ const READING_DATA = [
       },
       {
         q: 'What does the author imply about the monkeys?',
+        type: 'infer',
         choices: [
           'They are evil.',
           'They smile a lot.',
@@ -1721,6 +1841,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word They refers to',
+        type: 'ref',
         choices: [
           'everyone',
           'the children',
@@ -1732,6 +1853,7 @@ const READING_DATA = [
       },
       {
         q: 'Which of the following is NOT true?',
+        type: 'detail',
         choices: [
           'A monkey stole Sarah\'s hot dog.',
           'The monkeys looked like experts.',
@@ -1761,6 +1883,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the most suitable title for the passage?',
+        type: 'main',
         choices: [
           'Id, Ego, and Superego',
           'Psychoanalysis in Austria',
@@ -1772,6 +1895,7 @@ const READING_DATA = [
       },
       {
         q: 'What can psychoanalysis do?',
+        type: 'detail',
         choices: [
           'Help a patient',
           'Scare doctors',
@@ -1783,6 +1907,7 @@ const READING_DATA = [
       },
       {
         q: 'What did Freud believe about people\'s personalities?',
+        type: 'detail',
         choices: [
           'They aren\'t very useful.',
           'They are based on individuals\' genetics.',
@@ -1794,6 +1919,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word grown is closest in meaning to',
+        type: 'vocab',
         choices: [
           'large',
           'mature',
@@ -1805,6 +1931,7 @@ const READING_DATA = [
       },
       {
         q: 'All of the following are true about Freud EXCEPT',
+        type: 'detail',
         choices: [
           'he had a very powerful id',
           'he had ideas about personality',
@@ -1816,6 +1943,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word He refers to',
+        type: 'ref',
         choices: [
           'Freud',
           'a parent',
@@ -1827,6 +1955,7 @@ const READING_DATA = [
       },
       {
         q: 'What does the superego do for a person?',
+        type: 'detail',
         choices: [
           'Make their personality',
           'Balance their id and ego',
@@ -1838,6 +1967,7 @@ const READING_DATA = [
       },
       {
         q: 'What was probably true about Freud?',
+        type: 'infer',
         choices: [
           'He wrote many books.',
           'He enjoyed doing surgery.',
@@ -1865,6 +1995,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the notice mainly about?',
+        type: 'main',
         choices: [
           'Trick-or-treating',
           'New problems on Halloween',
@@ -1876,6 +2007,7 @@ const READING_DATA = [
       },
       {
         q: 'What is the youngest a child can be to trick-or-treat alone?',
+        type: 'detail',
         choices: [
           'Twelve',
           'Sixteen',
@@ -1887,6 +2019,7 @@ const READING_DATA = [
       },
       {
         q: 'Why did the town post the notice in advance?',
+        type: 'detail',
         choices: [
           'They wanted to tell children where to trick-or-treat.',
           'They wanted to make sure everyone has a costume.',
@@ -1915,6 +2048,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the e-mail mainly about?',
+        type: 'main',
         choices: [
           'The time of the try-outs',
           'Tomorrow\'s talent show try-outs',
@@ -1926,6 +2060,7 @@ const READING_DATA = [
       },
       {
         q: 'What can students do when they\'ve finished their performance?',
+        type: 'detail',
         choices: [
           'Go home',
           'Go to sleep',
@@ -1937,6 +2072,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does Mrs. Harrington send the students this e-mail?',
+        type: 'detail',
         choices: [
           'She won\'t be in class the next day.',
           'She forgot to give them information in class.',
@@ -1965,6 +2101,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the passage mainly about?',
+        type: 'main',
         choices: [
           'The heart\'s arteries',
           'Human heart attacks',
@@ -1976,6 +2113,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does a heart attack occur?',
+        type: 'detail',
         choices: [
           'Heart cells begin to die.',
           'The heart stops pumping.',
@@ -1987,6 +2125,7 @@ const READING_DATA = [
       },
       {
         q: 'According to the passage, how can people prevent heart attacks?',
+        type: 'detail',
         choices: [
           'They should take more vitamins.',
           'They should exercise twice a day.',
@@ -2015,6 +2154,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best title for the passage?',
+        type: 'main',
         choices: [
           'Fighting Photographers',
           'Photographs in the Civil War',
@@ -2026,6 +2166,7 @@ const READING_DATA = [
       },
       {
         q: 'What could people do for the first time because of photography?',
+        type: 'detail',
         choices: [
           'They could fight better in battle with better guns.',
           'They could have pictures of their family and president.',
@@ -2037,6 +2178,7 @@ const READING_DATA = [
       },
       {
         q: 'Why were photographers hired by army generals?',
+        type: 'detail',
         choices: [
           'To work as spies',
           'To take pictures to get information',
@@ -2069,6 +2211,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the announcement mainly about?',
+        type: 'main',
         choices: [
           'Thanksgiving at Sully School',
           'Sully School\'s Spooky Day',
@@ -2080,6 +2223,7 @@ const READING_DATA = [
       },
       {
         q: 'Which of the following is NOT true?',
+        type: 'detail',
         choices: [
           'Students should wear costumes.',
           'Spooky Day happens every year.',
@@ -2091,6 +2235,7 @@ const READING_DATA = [
       },
       {
         q: 'Which of the following is NOT mentioned?',
+        type: 'detail',
         choices: [
           'Wearing special clothes',
           'The date of Spooky Day',
@@ -2121,6 +2266,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best title for the story?',
+        type: 'main',
         choices: [
           'God Helping Me Climb',
           'High and Cold Mountains',
@@ -2132,6 +2278,7 @@ const READING_DATA = [
       },
       {
         q: 'The author mentions all of the following EXCEPT',
+        type: 'detail',
         choices: [
           'saying a prayer for her mother',
           'buying all the best equipment',
@@ -2143,6 +2290,7 @@ const READING_DATA = [
       },
       {
         q: 'Which of the following is NOT mentioned?',
+        type: 'detail',
         choices: [
           'Making it to the mountain top',
           'Being too tired to climb up again',
@@ -2172,6 +2320,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the passage mainly about?',
+        type: 'main',
         choices: [
           'Exercising to prevent disease',
           'How and why people should exercise',
@@ -2183,6 +2332,7 @@ const READING_DATA = [
       },
       {
         q: 'All of the following are true EXCEPT',
+        type: 'detail',
         choices: [
           'cardiovascular exercise is important',
           'lifting weights makes strong muscles',
@@ -2194,6 +2344,7 @@ const READING_DATA = [
       },
       {
         q: 'Which of the following is NOT true?',
+        type: 'detail',
         choices: [
           'Lifting weights is cardiovascular.',
           'Exercising is making your body work.',
@@ -2223,6 +2374,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be a good title for the passage?',
+        type: 'main',
         choices: [
           'Draco with His Slaves',
           'Laws in Ancient Athens',
@@ -2234,6 +2386,7 @@ const READING_DATA = [
       },
       {
         q: 'Which of the following is NOT mentioned in the passage?',
+        type: 'detail',
         choices: [
           'The time when Draco lived',
           'Draco\'s family and children',
@@ -2245,6 +2398,7 @@ const READING_DATA = [
       },
       {
         q: 'All of the following are true EXCEPT',
+        type: 'detail',
         choices: [
           'laws were written on wooden tablets',
           'many people supported Draco in Greece',
@@ -2274,6 +2428,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the e-mail mainly about?',
+        type: 'main',
         choices: [
           'Polly\'s family vacation',
           'What happened in school today',
@@ -2285,6 +2440,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word absent is closest in meaning to',
+        type: 'vocab',
         choices: [
           'sad',
           'at home',
@@ -2296,6 +2452,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word assigned is closest in meaning to',
+        type: 'vocab',
         choices: [
           'left',
           'gave',
@@ -2323,6 +2480,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best headline for the article?',
+        type: 'detail',
         choices: [
           'Michael and Susan, Our Students',
           'Manchester Students Lose Spelling Bee',
@@ -2334,6 +2492,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word attended is closest in meaning to',
+        type: 'vocab',
         choices: [
           'won',
           'liked',
@@ -2345,6 +2504,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word national is closest in meaning to',
+        type: 'vocab',
         choices: [
           'large',
           'official',
@@ -2374,6 +2534,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the passage mainly about?',
+        type: 'main',
         choices: [
           'Earhart\'s piloting skills',
           'Earhart\'s disappearance',
@@ -2385,6 +2546,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word solo is closest in meaning to',
+        type: 'vocab',
         choices: [
           'one',
           'group',
@@ -2396,6 +2558,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word vanished is closest in meaning to',
+        type: 'vocab',
         choices: [
           'landed',
           'got found',
@@ -2424,6 +2587,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the passage mostly about?',
+        type: 'main',
         choices: [
           'Fresco and plaster',
           'The art of the fresco',
@@ -2435,6 +2599,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word form is closest in meaning to',
+        type: 'vocab',
         choices: [
           'artist',
           'type',
@@ -2446,6 +2611,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word movement is closest in meaning to',
+        type: 'vocab',
         choices: [
           'art',
           'history',
@@ -2473,6 +2639,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best title for the announcement?',
+        type: 'main',
         choices: [
           'Bringing Food to Parties',
           'Tuesday\'s Potluck Party',
@@ -2484,6 +2651,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word them refers to',
+        type: 'ref',
         choices: [
           'potluck parties',
           'different countries',
@@ -2495,6 +2663,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word They refers to',
+        type: 'ref',
         choices: [
           'foods',
           'the schools',
@@ -2525,6 +2694,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best title for the story?',
+        type: 'main',
         choices: [
           'A Sunny Summer Day',
           'Scary Robbers with Knives',
@@ -2536,6 +2706,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word We in "We ran home and told our parents" refers to',
+        type: 'ref',
         choices: [
           'the sisters',
           'the parents',
@@ -2547,6 +2718,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word they refers to',
+        type: 'ref',
         choices: [
           'the police',
           'the robbers',
@@ -2574,6 +2746,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the passage mostly about?',
+        type: 'main',
         choices: [
           'Volcanoes in Iceland',
           'Mid-Atlantic volcanoes',
@@ -2585,6 +2758,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word they in "In the places where they are coming apart" refers to',
+        type: 'ref',
         choices: [
           'plates',
           'volcanoes',
@@ -2596,6 +2770,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word it in "The rest of it has resulted in the ridge rising" refers to',
+        type: 'ref',
         choices: [
           'mantle melting',
           'creation of crust',
@@ -2624,6 +2799,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best title for the passage?',
+        type: 'main',
         choices: [
           'Using Wind Energy',
           'The Biggest Wind Farms',
@@ -2635,6 +2811,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word They refers to',
+        type: 'ref',
         choices: [
           'energies',
           'scientists',
@@ -2646,6 +2823,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word It refers to',
+        type: 'ref',
         choices: [
           'the world',
           'the wind farm',
@@ -2676,6 +2854,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best title for the story?',
+        type: 'main',
         choices: [
           'Billy and the Frog',
           'A Long Day at School',
@@ -2687,6 +2866,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word amused is closest in meaning to',
+        type: 'vocab',
         choices: [
           'angry',
           'pleased',
@@ -2698,6 +2878,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word skip is closest in meaning to',
+        type: 'vocab',
         choices: [
           'need',
           'jump',
@@ -2709,6 +2890,7 @@ const READING_DATA = [
       },
       {
         q: 'What happens to Billy when he plays in the pond?',
+        type: 'detail',
         choices: [
           'He gets dirty.',
           'He skips school.',
@@ -2720,6 +2902,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word It refers to',
+        type: 'ref',
         choices: [
           'Billy',
           'a girl',
@@ -2731,6 +2914,7 @@ const READING_DATA = [
       },
       {
         q: 'Which of the following is NOT true in the story?',
+        type: 'detail',
         choices: [
           'It was a beautiful day.',
           'Billy got into a lot of trouble.',
@@ -2760,6 +2944,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the main idea of the passage?',
+        type: 'main',
         choices: [
           'Freak waves',
           'Ocean Tsunamis',
@@ -2771,6 +2956,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word freak is closest in meaning to',
+        type: 'vocab',
         choices: [
           'usual',
           'angry',
@@ -2782,6 +2968,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word suddenly is closest in meaning to',
+        type: 'vocab',
         choices: [
           'slowly',
           'quickly',
@@ -2793,6 +2980,7 @@ const READING_DATA = [
       },
       {
         q: 'What country was the Draupner oil rig in?',
+        type: 'detail',
         choices: [
           'It was in Korea.',
           'It was in England.',
@@ -2804,6 +2992,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word it refers to',
+        type: 'ref',
         choices: [
           'a sailor',
           'the oil rig',
@@ -2815,6 +3004,7 @@ const READING_DATA = [
       },
       {
         q: 'Which of the following does NOT happen because of a freak wave?',
+        type: 'detail',
         choices: [
           'Ships are hit and then sink.',
           'Scientists are proved wrong.',
@@ -2851,6 +3041,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the best title for the story?',
+        type: 'main',
         choices: [
           'The First Day in My Class',
           'Mom Never Packs Me Candy',
@@ -2862,6 +3053,7 @@ const READING_DATA = [
       },
       {
         q: 'What is suggested about the boy\'s mom?',
+        type: 'infer',
         choices: [
           'She doesn\'t wear nice shirts.',
           'She is older than the boy\'s teacher.',
@@ -2873,6 +3065,7 @@ const READING_DATA = [
       },
       {
         q: 'What does the author imply about the boy?',
+        type: 'infer',
         choices: [
           'He does not enjoy playing soccer.',
           'He doesn\'t have very many friends.',
@@ -2901,6 +3094,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the most suitable headline for the article?',
+        type: 'detail',
         choices: [
           'Billy Brady at Sadie\'s Hot Dog Shack',
           'Eating Hot Dogs at Lynch Park with Billy',
@@ -2912,6 +3106,7 @@ const READING_DATA = [
       },
       {
         q: 'What can be inferred about Billy Brady before the contest?',
+        type: 'infer',
         choices: [
           'He didn\'t like hot dogs very much.',
           'He often ate hot dogs with his family.',
@@ -2923,6 +3118,7 @@ const READING_DATA = [
       },
       {
         q: 'What does Billy suggest about hot dogs after the contest?',
+        type: 'infer',
         choices: [
           'He can make them.',
           'He is tired of them.',
@@ -2951,6 +3147,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the passage mostly about?',
+        type: 'main',
         choices: [
           'Acid rain being harmful',
           'Acid in rain, snow, and ice',
@@ -2962,6 +3159,7 @@ const READING_DATA = [
       },
       {
         q: 'What does the author imply when he say "These are dangerous too...\'?',
+        type: 'infer',
         choices: [
           'Bleach is not dangerous to humans.',
           'Water can be dangerous if it\'s neutral.',
@@ -2973,6 +3171,7 @@ const READING_DATA = [
       },
       {
         q: 'What does the author imply about rain?',
+        type: 'infer',
         choices: [
           'It should have a pH of 7.',
           'It smells like lemon juice and vinegar.',
@@ -3001,6 +3200,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Why is Lisa writing the e-mail?',
+        type: 'detail',
         choices: [
           'To ask about a museum',
           'To try and find out if Jamie knows Jenna',
@@ -3012,6 +3212,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does Lisa mention her cousin\'s opening a new restaurant?',
+        type: 'detail',
         choices: [
           'To say she wants to buy it',
           'To explain why she wants to go there',
@@ -3023,6 +3224,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does Lisa write "It\'s a once-in-a-lifetime chance"?',
+        type: 'detail',
         choices: [
           'To explain why it\'s expensive',
           'To strongly encourage Jamie to come',
@@ -3052,6 +3254,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best title for the passage?',
+        type: 'main',
         choices: [
           'Why Oldest Children Are Smart',
           'Why Birth Order Studies Are False',
@@ -3063,6 +3266,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author mention that middle children have at least one sibling older and younger than them?',
+        type: 'detail',
         choices: [
           'To explain why they often feel neglected',
           'To prove that birth order affects everyone',
@@ -3074,6 +3278,7 @@ const READING_DATA = [
       },
       {
         q: 'Why is it mentioned that the youngest child "has always had older brothers or sisters looking out for them"?',
+        type: 'detail',
         choices: [
           'To offer an example of caring',
           'To explain why the youngest child is so smart',
@@ -3102,6 +3307,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the passage mainly about?',
+        type: 'main',
         choices: [
           'Penguin movies',
           'Brown penguins',
@@ -3113,6 +3319,7 @@ const READING_DATA = [
       },
       {
         q: 'The author talks about "The Adventure of Scamper the Penguin, Happy Feet, and March of the Penguins" to',
+        type: 'detail',
         choices: [
           'discuss bird movies',
           'show that penguins are very well-known',
@@ -3124,6 +3331,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author say, "Some, like the Galapagos penguins, even live in a fairly warm part of the world"?',
+        type: 'detail',
         choices: [
           'To discuss strange penguins',
           'To prove penguins hate the cold',
@@ -3151,6 +3359,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the best title for the passage?',
+        type: 'main',
         choices: [
           'My Favorite State',
           'Animals of Alaska',
@@ -3162,6 +3371,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author say, "The lowest temperature recorded in Alaska was -62 degrees Celsius"?',
+        type: 'detail',
         choices: [
           'To give an example of how cold Alaska gets',
           'To inform readers how cold North America is',
@@ -3173,6 +3383,7 @@ const READING_DATA = [
       },
       {
         q: 'The author uses "foxes, bears, and caribou" as examples of',
+        type: 'detail',
         choices: [
           'water animals',
           'endangered animals',
@@ -3201,6 +3412,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Why did the author write the article?',
+        type: 'detail',
         choices: [
           'To talk about the soccer game',
           'To explain why the best team lost',
@@ -3212,6 +3424,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author talk about the field being white?',
+        type: 'detail',
         choices: [
           'To show how nice it was',
           'To show how cold it is getting',
@@ -3223,6 +3436,7 @@ const READING_DATA = [
       },
       {
         q: 'What does the author imply about the two teams?',
+        type: 'infer',
         choices: [
           'They were both bad.',
           'The home team was better.',
@@ -3234,6 +3448,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author mention penalty kicks?',
+        type: 'detail',
         choices: [
           'To tell about how they won',
           'To show how much the team likes them',
@@ -3263,6 +3478,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the main topic of the passage?',
+        type: 'main',
         choices: [
           'Burials in the 1000s',
           'Life of English royalty',
@@ -3274,6 +3490,7 @@ const READING_DATA = [
       },
       {
         q: 'What can be inferred about the tomb?',
+        type: 'infer',
         choices: [
           'It was much larger than William.',
           'It was in England instead of France.',
@@ -3285,6 +3502,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author mention that William the Conqueror\'s body got bigger?',
+        type: 'detail',
         choices: [
           'To argue that he should have lost weight',
           'To inform us exactly what he looked like',
@@ -3296,6 +3514,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author talk about William the Conqueror\'s falling off his horse?',
+        type: 'detail',
         choices: [
           'To explain how heavy he was',
           'To inform readers of the cause of his death',
@@ -3329,6 +3548,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'At what time will the sixth-graders do the speed reading activity?',
+        type: 'detail',
         choices: [
           '10:00 A.M.',
           '11:15 A.M.',
@@ -3340,6 +3560,7 @@ const READING_DATA = [
       },
       {
         q: 'Where will the special lunch take place?',
+        type: 'detail',
         choices: [
           'In the school theater',
           'In the school cafeteria',
@@ -3351,6 +3572,7 @@ const READING_DATA = [
       },
       {
         q: 'Who will get to do the Radio Bookblast activity?',
+        type: 'detail',
         choices: [
           'Sixth-graders',
           'Eighth-graders',
@@ -3362,6 +3584,7 @@ const READING_DATA = [
       },
       {
         q: 'Where will the activities happen?',
+        type: 'detail',
         choices: [
           'In the school theater',
           'In the school cafeteria',
@@ -3391,6 +3614,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Why did Coach McMahon write the e-mail?',
+        type: 'detail',
         choices: [
           'To help a player get into a good high school',
           'To find the best students for his soccer school',
@@ -3402,6 +3626,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word athletes is closest in meaning to',
+        type: 'vocab',
         choices: [
           'good students',
           'favorite teams',
@@ -3413,6 +3638,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word assist is closest in meaning to',
+        type: 'vocab',
         choices: [
           'give',
           'help',
@@ -3424,6 +3650,7 @@ const READING_DATA = [
       },
       {
         q: 'What does Coach McMahon say he does for his soccer players?',
+        type: 'detail',
         choices: [
           'He helps them get into good high schools.',
           'He assists them with their soccer techniques.',
@@ -3452,6 +3679,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the most suitable headline for the article?',
+        type: 'detail',
         choices: [
           'Ms. DeBow Likes Teaching History',
           'Studying the USA and Mesopotamia',
@@ -3463,6 +3691,7 @@ const READING_DATA = [
       },
       {
         q: 'What is suggested about Ms. DeBow?',
+        type: 'infer',
         choices: [
           'She always wins this award.',
           'She is a very good teacher.',
@@ -3474,6 +3703,7 @@ const READING_DATA = [
       },
       {
         q: 'Based on the article, who decided to give Ms. DeBow the award?',
+        type: 'detail',
         choices: [
           'Newark Middle School',
           'Carla Ross and Michael Hubbard',
@@ -3485,6 +3715,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word award is closest in meaning to',
+        type: 'vocab',
         choices: [
           'prize',
           'school',
@@ -3496,6 +3727,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word ancient is closest in meaning to',
+        type: 'vocab',
         choices: [
           'Asian',
           'modern',
@@ -3507,6 +3739,7 @@ const READING_DATA = [
       },
       {
         q: 'What is Ms. DeBow\'s favorite subject to teach?',
+        type: 'detail',
         choices: [
           'Ancient history',
           'American history',
@@ -3537,6 +3770,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the best title for the story?',
+        type: 'main',
         choices: [
           'Rainy Day Work',
           'A Rainy Day Hike',
@@ -3548,6 +3782,7 @@ const READING_DATA = [
       },
       {
         q: 'What was keeping Martha inside?',
+        type: 'detail',
         choices: [
           'The heat',
           'Her parents',
@@ -3559,6 +3794,7 @@ const READING_DATA = [
       },
       {
         q: 'What does Martha mean when she says "It meant that I would have to entertain myself\'?',
+        type: 'detail',
         choices: [
           'She was tired.',
           'She was feeling sick.',
@@ -3570,6 +3806,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word company is closest in meaning to',
+        type: 'vocab',
         choices: [
           'time',
           'space',
@@ -3581,6 +3818,7 @@ const READING_DATA = [
       },
       {
         q: 'What did Martha think about being outside?',
+        type: 'detail',
         choices: [
           'It was too hot.',
           'It was too cold.',
@@ -3592,6 +3830,7 @@ const READING_DATA = [
       },
       {
         q: 'What will Martha and Ellen probably do next time it rains?',
+        type: 'infer',
         choices: [
           'Stay inside',
           'Do homework',
@@ -3621,6 +3860,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best title for the passage?',
+        type: 'main',
         choices: [
           'The Sun',
           'Stars in the Sky',
@@ -3632,6 +3872,7 @@ const READING_DATA = [
       },
       {
         q: 'Why were stars useful to people?',
+        type: 'detail',
         choices: [
           'They kept people safe.',
           'They were beautiful.',
@@ -3643,6 +3884,7 @@ const READING_DATA = [
       },
       {
         q: 'Which of the following is NOT mentioned?',
+        type: 'detail',
         choices: [
           'Stars as fortune-tellers and maps',
           'Anaxagoras going to jail for his ideas',
@@ -3654,6 +3896,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word realized is closest in meaning to',
+        type: 'vocab',
         choices: [
           'found',
           'destroyed',
@@ -3665,6 +3908,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word unravel is closest in meaning to',
+        type: 'vocab',
         choices: [
           'dream',
           'solve',
@@ -3676,6 +3920,7 @@ const READING_DATA = [
       },
       {
         q: 'Why was Anaxagoras thrown in jail?',
+        type: 'detail',
         choices: [
           'He did not believe in God.',
           'He was not a good philosopher.',
@@ -3703,6 +3948,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best title for the passage?',
+        type: 'main',
         choices: [
           'A New Age of Writing',
           'Libraries Lost and Forgotten',
@@ -3714,6 +3960,7 @@ const READING_DATA = [
       },
       {
         q: 'The author mentions all of the following EXCEPT •',
+        type: 'detail',
         choices: [
           'carrying huge libraries everywhere',
           'the Internet making it easier for people to read',
@@ -3725,6 +3972,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author mention "the Kindle"?',
+        type: 'detail',
         choices: [
           'To imply that soon libraries will not exist',
           'To suggest that every book is now electronic',
@@ -3736,6 +3984,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word efficient is closest in meaning to',
+        type: 'vocab',
         choices: [
           'hard',
           'safe',
@@ -3747,6 +3996,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word inexpensive is closest in meaning to',
+        type: 'vocab',
         choices: [
           'cheap',
           'difficult',
@@ -3758,6 +4008,7 @@ const READING_DATA = [
       },
       {
         q: 'What do the Kindle and other e-book readers allow people to do?',
+        type: 'detail',
         choices: [
           'Read faster',
           'Read books with friends',
@@ -3769,6 +4020,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word They refers to',
+        type: 'ref',
         choices: [
           'books',
           'people',
@@ -3780,6 +4032,7 @@ const READING_DATA = [
       },
       {
         q: 'What are the Kindle and other reading devices going to do to reading?',
+        type: 'detail',
         choices: [
           'Destroy it',
           'Make it difficult',
@@ -3815,6 +4068,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Who will lead the English meetings?',
+        type: 'detail',
         choices: [
           'Mr. Magoo',
           'Mrs. Crowe',
@@ -3826,6 +4080,7 @@ const READING_DATA = [
       },
       {
         q: 'Which of the following is NOT mentioned in the announcement?',
+        type: 'detail',
         choices: [
           'English Activity',
           'Athletics Activity',
@@ -3837,6 +4092,7 @@ const READING_DATA = [
       },
       {
         q: 'Who is leading the last event of the day?',
+        type: 'detail',
         choices: [
           'Ms. Fox',
           'Coach Kay',
@@ -3848,6 +4104,7 @@ const READING_DATA = [
       },
       {
         q: 'What do the parents need to have for the final activity?',
+        type: 'detail',
         choices: [
           'A note from home',
           'A pair of sneakers',
@@ -3877,6 +4134,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best title for the article?',
+        type: 'main',
         choices: [
           'The Seventh Grade Goes to New York',
           'The Sixth Grade Goes to New York',
@@ -3888,6 +4146,7 @@ const READING_DATA = [
       },
       {
         q: 'What is suggested about The Phantom of the Opera?',
+        type: 'infer',
         choices: [
           'It was sad and scary.',
           'It was the trip\'s main event.',
@@ -3899,6 +4158,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word talented is closest in meaning to',
+        type: 'vocab',
         choices: [
           'quiet',
           'illegal',
@@ -3910,6 +4170,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word impressive is closest in meaning to',
+        type: 'vocab',
         choices: [
           'funny',
           'boring',
@@ -3921,6 +4182,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word they refers to',
+        type: 'ref',
         choices: [
           'the trips',
           'everyone',
@@ -3932,6 +4194,7 @@ const READING_DATA = [
       },
       {
         q: 'According to the article, what will the sixth-grade students do next year?',
+        type: 'infer',
         choices: [
           'They will go to a show in New York',
           'They will go to see The Phantom of the Opera.',
@@ -3961,6 +4224,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the main topic of the passage?',
+        type: 'main',
         choices: [
           'Life in the Arctic Ocean',
           'Ancient Inuits\' hunting habits',
@@ -3972,6 +4236,7 @@ const READING_DATA = [
       },
       {
         q: 'According to the passage, what do narwhal whales eat?',
+        type: 'detail',
         choices: [
           'Plants that grow near the ice',
           'Animals living on polar ice caps',
@@ -3983,6 +4248,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word it refers to',
+        type: 'ref',
         choices: [
           'the cold',
           'the polar area',
@@ -3994,6 +4260,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word native is closest in meaning to',
+        type: 'vocab',
         choices: [
           'local',
           'expert',
@@ -4005,6 +4272,7 @@ const READING_DATA = [
       },
       {
         q: 'What do narwhals NOT look like?',
+        type: 'detail',
         choices: [
           'Whales with long spears',
           'Animals with white and black skin',
@@ -4016,6 +4284,7 @@ const READING_DATA = [
       },
       {
         q: 'Why are "Inuits" mentioned in the passage?',
+        type: 'detail',
         choices: [
           'To show who use narwhals as food',
           'To explain how they like to use the narwhal tusks',
@@ -4027,6 +4296,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word chase is closest in meaning to',
+        type: 'vocab',
         choices: [
           'call',
           'cheat',
@@ -4038,6 +4308,7 @@ const READING_DATA = [
       },
       {
         q: 'What can be inferred about the narwhal\'s tusk?',
+        type: 'infer',
         choices: [
           'It is very heavy.',
           'It has special powers.',
@@ -4067,6 +4338,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the best title for the story?',
+        type: 'main',
         choices: [
           'A Beast Finds True Love',
           'The Prince Meets the Witch',
@@ -4078,6 +4350,7 @@ const READING_DATA = [
       },
       {
         q: 'When will the prince\'s curse end?',
+        type: 'detail',
         choices: [
           'When he finds true love',
           'When he learns to be kind',
@@ -4089,6 +4362,7 @@ const READING_DATA = [
       },
       {
         q: 'Why was the prince turned into a beast?',
+        type: 'detail',
         choices: [
           'He scared the girl.',
           'He put the girl in jail.',
@@ -4118,6 +4392,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best title for this essay?',
+        type: 'main',
         choices: [
           'My Visit to Paris',
           'The Foods of France',
@@ -4129,6 +4404,7 @@ const READING_DATA = [
       },
       {
         q: 'What does the author like best about French food?',
+        type: 'detail',
         choices: [
           'Desserts',
           'Big dinners',
@@ -4140,6 +4416,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author like the French language?',
+        type: 'detail',
         choices: [
           'It is easy to learn.',
           'It is pleasing to the ear.',
@@ -4168,6 +4445,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the passage mostly about?',
+        type: 'main',
         choices: [
           'Training dogs',
           'Dogs\' shapes and sizes',
@@ -4179,6 +4457,7 @@ const READING_DATA = [
       },
       {
         q: 'What is a major difference between a dog and a wolf?',
+        type: 'detail',
         choices: [
           'Wolves are bigger.',
           'Dogs are usually brown.',
@@ -4190,6 +4469,7 @@ const READING_DATA = [
       },
       {
         q: 'Why do so many different varieties of dogs exist?',
+        type: 'detail',
         choices: [
           'Dogs began working as hunters.',
           'Wolves naturally evolved into dogs.',
@@ -4219,6 +4499,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the most suitable title for the passage?',
+        type: 'main',
         choices: [
           'The Many Talents of Da Vinci',
           'Da Vinci as a Writer and Painter',
@@ -4230,6 +4511,7 @@ const READING_DATA = [
       },
       {
         q: 'According to the passage, what did Leonardo Da Vinci make plans for?',
+        type: 'detail',
         choices: [
           'Many scientific discoveries',
           'Books that he never published',
@@ -4241,6 +4523,7 @@ const READING_DATA = [
       },
       {
         q: 'Which of the following is true about Leonardo Da Vinci?',
+        type: 'detail',
         choices: [
           'He painted The Last Lunch.',
           'He married and had a family.',
@@ -4269,6 +4552,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is this e-mail mainly about?',
+        type: 'main',
         choices: [
           'Paying back Kim\'s money',
           'Choosing a science fair project',
@@ -4280,6 +4564,7 @@ const READING_DATA = [
       },
       {
         q: 'Which of the following is NOT mentioned?',
+        type: 'detail',
         choices: [
           'Sheri plays soccer on Friday.',
           'Kim\'s family eats dinner at 7:00 P.M.',
@@ -4291,6 +4576,7 @@ const READING_DATA = [
       },
       {
         q: 'Kim mentions all of the following EXCEPT',
+        type: 'detail',
         choices: [
           'the girls working in Kim\'s room',
           'Sheri paying Kim for the supplies',
@@ -4321,6 +4607,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is this announcement mainly about?',
+        type: 'main',
         choices: [
           'Monday\'s exam schedule for all students',
           'Monday\'s exam schedule for the eighth-grade students',
@@ -4332,6 +4619,7 @@ const READING_DATA = [
       },
       {
         q: 'The seventh-grade students have an exam at all times EXCEPT',
+        type: 'detail',
         choices: [
           '9:00 A.M.',
           '2:30 P.M.',
@@ -4343,6 +4631,7 @@ const READING_DATA = [
       },
       {
         q: 'Which of the following is NOT true?',
+        type: 'detail',
         choices: [
           'Each exam is one hour long.',
           'The seventh-grade students take exams in the gym.',
@@ -4372,6 +4661,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the passage mostly about?',
+        type: 'main',
         choices: [
           'Sleeping in tents and cabins',
           'Making friends at American camps',
@@ -4383,6 +4673,7 @@ const READING_DATA = [
       },
       {
         q: 'According to the passage, which of the following is NOT true of American summer camps?',
+        type: 'detail',
         choices: [
           'They never have horseback riding.',
           'They have many different activities.',
@@ -4394,6 +4685,7 @@ const READING_DATA = [
       },
       {
         q: 'The author mentions all of the following EXCEPT',
+        type: 'detail',
         choices: [
           'camps organizing color wars',
           'children learning water activities',
@@ -4421,6 +4713,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the best title for this passage?',
+        type: 'main',
         choices: [
           'Mozart on the Piano',
           'The Piano\'s Beginning',
@@ -4432,6 +4725,7 @@ const READING_DATA = [
       },
       {
         q: 'The author mentions all of the following EXCEPT',
+        type: 'detail',
         choices: [
           'the piano\'s loud and expressive sound',
           'Bach\'s opinion of the first piano he heard',
@@ -4443,6 +4737,7 @@ const READING_DATA = [
       },
       {
         q: 'According to the passage, which of the following is NOT true of Cristofori?',
+        type: 'detail',
         choices: [
           'He was Greek.',
           'He invented the piano.',
@@ -4471,6 +4766,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best headline for this article?',
+        type: 'detail',
         choices: [
           'Students Fail New Test',
           'Official Explains New Test',
@@ -4482,6 +4778,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word disappointed is closest in meaning to',
+        type: 'vocab',
         choices: [
           'delighted',
           'satisfied',
@@ -4493,6 +4790,7 @@ const READING_DATA = [
       },
       {
         q: 'The phrase held back in the passage is closest in meaning to',
+        type: 'vocab',
         choices: [
           'passed',
           'hugged',
@@ -4522,6 +4820,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the main idea of this story?',
+        type: 'main',
         choices: [
           'A boy wanting to get a video game',
           'A popular video game sold in stores',
@@ -4533,6 +4832,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the phrase put on a brave face is closest in meaning to',
+        type: 'vocab',
         choices: [
           'look sad',
           'pretend to be satisfied',
@@ -4544,6 +4844,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word tore is closest in meaning to',
+        type: 'vocab',
         choices: [
           'joined',
           'applied',
@@ -4571,6 +4872,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the best title for this passage?',
+        type: 'main',
         choices: [
           'The Y2K Problem',
           'Collecting Food in 1999',
@@ -4582,6 +4884,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word crash is closest in meaning to',
+        type: 'vocab',
         choices: [
           'hit',
           'close off',
@@ -4593,6 +4896,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word gathered is closest in meaning to',
+        type: 'vocab',
         choices: [
           'took',
           'found',
@@ -4620,6 +4924,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the passage mostly about?',
+        type: 'main',
         choices: [
           'Walt Disney\'s animations',
           'Mickey Mouse\'s first words',
@@ -4631,6 +4936,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word conveyed is closest in meaning to',
+        type: 'vocab',
         choices: [
           'loved',
           'carried',
@@ -4642,6 +4948,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word undergone is closest in meaning to',
+        type: 'vocab',
         choices: [
           'achieved',
           'understood',
@@ -4669,6 +4976,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is this letter mainly about?',
+        type: 'main',
         choices: [
           'A student who likes history',
           'A student introducing himself',
@@ -4680,6 +4988,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word he refers to',
+        type: 'ref',
         choices: [
           'Nebraska',
           'Allen\'s father',
@@ -4691,6 +5000,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word them refers to',
+        type: 'ref',
         choices: [
           'the lists',
           'the schools',
@@ -4720,6 +5030,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the most suitable headline for the article?',
+        type: 'detail',
         choices: [
           'The Pacific Ocean\'s Effect on Students',
           'Middle School Students Helping in Hawaii',
@@ -4731,6 +5042,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word they refers to',
+        type: 'ref',
         choices: [
           'Hawaii\'s waters',
           'Hawaiian people',
@@ -4742,6 +5054,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word she refers to',
+        type: 'ref',
         choices: [
           'a student',
           'the agency',
@@ -4770,6 +5083,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best title for the passage?',
+        type: 'main',
         choices: [
           'Melting Polar Ice Caps',
           'Mere 0.6 Degrees Celsius',
@@ -4781,6 +5095,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word This refers to',
+        type: 'ref',
         choices: [
           'Earth\'s history',
           'Global Warming',
@@ -4792,6 +5107,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word it refers to',
+        type: 'ref',
         choices: [
           'today',
           'the problem',
@@ -4820,6 +5136,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is this passage mainly about?',
+        type: 'main',
         choices: [
           'The main battles of the Civil War',
           'The South\'s control of the Charleston Harbor',
@@ -4831,6 +5148,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word they refers to',
+        type: 'ref',
         choices: [
           'the Union and its soldiers',
           'the country and its people',
@@ -4842,6 +5160,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word he refers to',
+        type: 'ref',
         choices: [
           'a soldier',
           'South Carolina',
@@ -4871,6 +5190,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is this passage mainly about?',
+        type: 'main',
         choices: [
           'The worst recorded tornadoes',
           'How and where tornadoes happen',
@@ -4882,6 +5202,7 @@ const READING_DATA = [
       },
       {
         q: 'Where do most tornadoes happen?',
+        type: 'detail',
         choices: [
           'In Bangladesh',
           'Everywhere in the world',
@@ -4893,6 +5214,7 @@ const READING_DATA = [
       },
       {
         q: 'What is NOT true about tornadoes?',
+        type: 'detail',
         choices: [
           'Most are very large.',
           'They come in many sizes.',
@@ -4904,6 +5226,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word varieties is closest in meaning to',
+        type: 'vocab',
         choices: [
           'sizes',
           'types',
@@ -4915,6 +5238,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word entire is closest in meaning to',
+        type: 'vocab',
         choices: [
           'half',
           'part',
@@ -4926,6 +5250,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word them refers to',
+        type: 'ref',
         choices: [
           'the people',
           'the tornadoes',
@@ -4957,6 +5282,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best title for this story?',
+        type: 'main',
         choices: [
           'A Surprise for Jacob',
           'Jacob\'s Kind Mother',
@@ -4968,6 +5294,7 @@ const READING_DATA = [
       },
       {
         q: 'What did Jacob NOT do in the morning before falling?',
+        type: 'detail',
         choices: [
           'Take a shower',
           'Brush his teeth',
@@ -4979,6 +5306,7 @@ const READING_DATA = [
       },
       {
         q: 'What body part did Jacob hurt in his fall?',
+        type: 'detail',
         choices: [
           'His arm',
           'His legs',
@@ -4990,6 +5318,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word whining is closest in meaning to',
+        type: 'vocab',
         choices: [
           'loud',
           'angry',
@@ -5001,6 +5330,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word motionless is closest in meaning to',
+        type: 'vocab',
         choices: [
           'still',
           'awake',
@@ -5012,6 +5342,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word it refers to',
+        type: 'ref',
         choices: [
           'day',
           'puppy',
@@ -5041,6 +5372,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the letter mostly about?',
+        type: 'main',
         choices: [
           'Students volunteering in Africa',
           'Sending letters via express mail',
@@ -5052,6 +5384,7 @@ const READING_DATA = [
       },
       {
         q: 'What is suggested about the giraffe\'s tongues?',
+        type: 'infer',
         choices: [
           'They are longer in the male giraffes.',
           'If they\'re not blue-black, they\'re brown.',
@@ -5063,6 +5396,7 @@ const READING_DATA = [
       },
       {
         q: 'What does Mrs. Lee imply about the student\'s behavior?',
+        type: 'infer',
         choices: [
           'Mr. Wilson doesn\'t tolerate bad behavior.',
           'She is worried that the students will behave badly.',
@@ -5091,6 +5425,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best title for this story?',
+        type: 'main',
         choices: [
           'The Big Pet Decision',
           'A New Year at School',
@@ -5102,6 +5437,7 @@ const READING_DATA = [
       },
       {
         q: 'What can be inferred about the students in the class?',
+        type: 'infer',
         choices: [
           'The class is all boys.',
           'There are more girls.',
@@ -5113,6 +5449,7 @@ const READING_DATA = [
       },
       {
         q: 'What is likely true about this year\'s class pet?',
+        type: 'infer',
         choices: [
           'It is a dog.',
           'It is a rabbit.',
@@ -5142,6 +5479,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Which title best summarizes the main idea of the passage?',
+        type: 'main',
         choices: [
           'The Origins of Dracula',
           'The History of the Boyars',
@@ -5153,6 +5491,7 @@ const READING_DATA = [
       },
       {
         q: 'What can you infer about Vlad III Dracula from the passage?',
+        type: 'infer',
         choices: [
           'He was feared.',
           'He was a great leader.',
@@ -5164,6 +5503,7 @@ const READING_DATA = [
       },
       {
         q: 'What does the author imply about vampire fiction today?',
+        type: 'infer',
         choices: [
           'It is related to Bram Stoker.',
           'It is based on the life of Vlad III Dracula.',
@@ -5191,6 +5531,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the best title for the passage?',
+        type: 'main',
         choices: [
           'National Anthems in America',
           'Defence of Fort McHenry in 1814',
@@ -5202,6 +5543,7 @@ const READING_DATA = [
       },
       {
         q: 'What does the author imply about the lyrics being paired with a drinking song?',
+        type: 'infer',
         choices: [
           'It was written at a bar.',
           'It is a strange combination.',
@@ -5213,6 +5555,7 @@ const READING_DATA = [
       },
       {
         q: 'What is suggested about The Star-Spangled Banner before 1931 when it became official?',
+        type: 'infer',
         choices: [
           'It was already very popular.',
           'It was only a drinking song.',
@@ -5241,6 +5584,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the letter mainly about?',
+        type: 'main',
         choices: [
           'Susan being sick',
           'An extra help plan for Susan',
@@ -5252,6 +5596,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does Principal Stockton talk about failing the upcoming exam?',
+        type: 'detail',
         choices: [
           'To explain that exams are usually failed',
           'To prove that Susan is already prepared',
@@ -5263,6 +5608,7 @@ const READING_DATA = [
       },
       {
         q: 'Why is Susan\'s having trouble getting to school early mentioned?',
+        type: 'detail',
         choices: [
           'To prove that Susan is a reliable student',
           'To explain that the school can change the plan if necessary',
@@ -5291,6 +5637,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best title for this passage?',
+        type: 'main',
         choices: [
           'Washington Irving\'s River',
           'The Biggest River in America',
@@ -5302,6 +5649,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author mention "Washington Irving" in paragraph 2?',
+        type: 'detail',
         choices: [
           'To give an example of an American writer',
           'To prove that many writers live in New York',
@@ -5313,6 +5661,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author talk about "the Erie Canal" in paragraph 3?',
+        type: 'detail',
         choices: [
           'To point out the need to build a railroad',
           'To explain why writers liked the Hudson',
@@ -5340,6 +5689,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the best title for the passage?',
+        type: 'main',
         choices: [
           '714 Home Runs',
           'The Career of Babe Ruth',
@@ -5351,6 +5701,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author talk about "St. Mary\'s"?',
+        type: 'detail',
         choices: [
           'To explain why Ruth wasn\'t very nice',
           'To give some background information about Ruth',
@@ -5362,6 +5713,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author mention that almost all American kids today grow up knowing Babe Ruth\'s name?',
+        type: 'detail',
         choices: [
           'To show how admired he is in the U.S.',
           'To explain the American kids\' wishes',
@@ -5389,6 +5741,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What title best expresses the main idea of the passage?',
+        type: 'main',
         choices: [
           'Mount Everest',
           'The Tallest Mountain in the World',
@@ -5400,6 +5753,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author talk about Mauna Kea\'s base?',
+        type: 'detail',
         choices: [
           'To explain why Mauna Kea is taller than Mount Everest',
           'To prove why Mauna Kea is higher than Mount Everest',
@@ -5411,6 +5765,7 @@ const READING_DATA = [
       },
       {
         q: 'Why are "mountain height and tallness" mentioned in the passage?',
+        type: 'detail',
         choices: [
           'To note Mount Everest and Mauna Kea are the same heights',
           'To clarify how they are irrelevant to mountains',
@@ -5441,6 +5796,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Why did Donald Doolittle write this e-mail?',
+        type: 'detail',
         choices: [
           'To ask for help from Mrs. Andrews',
           'To find out if Mrs. Andrews likes buffets',
@@ -5452,6 +5808,7 @@ const READING_DATA = [
       },
       {
         q: 'What is suggested about Mrs. Andrews?',
+        type: 'infer',
         choices: [
           'She used to be a member of the Boy Scouts.',
           'She is having a dinner party with her friends.',
@@ -5463,6 +5820,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does Donald Doolittle mention "a surprise guest speaker"?',
+        type: 'detail',
         choices: [
           'To tell Mrs. Andrews that she will have to speak',
           'To explain that he doesn\'t know about the dinner',
@@ -5474,6 +5832,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does Donald Doolittle mention that the party was the boys\' idea?',
+        type: 'detail',
         choices: [
           'To show the boys\' gratitude to Mrs. Andrews',
           'To prove how kind they are to senior citizens',
@@ -5502,6 +5861,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Why does the author write the passage?',
+        type: 'detail',
         choices: [
           'To give an example of a shark movie',
           'To talk about the biggest shark of all time',
@@ -5513,6 +5873,7 @@ const READING_DATA = [
       },
       {
         q: 'Based on the passage, what is probably true about a great white\'s teeth?',
+        type: 'infer',
         choices: [
           'They are sharper than any other animal\'s.',
           'They are bigger than the megalodon\'s teeth.',
@@ -5524,6 +5885,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author mention "early scientists"?',
+        type: 'detail',
         choices: [
           'To ask why people are interested in sharks and megalodons',
           'To show that they believed in ancient dragons and giant snakes',
@@ -5535,6 +5897,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author mention that "nearly 90 percent of the ocean remains unexplored"?',
+        type: 'detail',
         choices: [
           'To show why no one has found a big megalodon yet',
           'To imply that humans need to explore the depths of the ocean soon',
@@ -5568,6 +5931,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'How many times has there been a Global Warming Day?',
+        type: 'detail',
         choices: [
           'It has happened twice.',
           'This will be the first time ever.',
@@ -5579,6 +5943,7 @@ const READING_DATA = [
       },
       {
         q: 'Who will lead the lecture activity?',
+        type: 'detail',
         choices: [
           'Dr. Lynch',
           'Dr. Aaron',
@@ -5590,6 +5955,7 @@ const READING_DATA = [
       },
       {
         q: 'When does the demonstration activity finish?',
+        type: 'detail',
         choices: [
           'At lunch',
           '2:00 P.M.',
@@ -5601,6 +5967,7 @@ const READING_DATA = [
       },
       {
         q: 'Who will need to bring a bathing suit?',
+        type: 'detail',
         choices: [
           'Students doing the Melting Icebergs activity',
           'Students going swimming during the day',
@@ -5629,6 +5996,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Why did Erica Lee write this e-mail?',
+        type: 'detail',
         choices: [
           'To help the student with her application',
           'To inform the student about another program',
@@ -5640,6 +6008,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the phrase accepted into is closest in meaning to',
+        type: 'vocab',
         choices: [
           'given to',
           'chosen for',
@@ -5651,6 +6020,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word sample is closest in meaning to',
+        type: 'vocab',
         choices: [
           'a lot',
           'everything',
@@ -5662,6 +6032,7 @@ const READING_DATA = [
       },
       {
         q: 'According to the e-mail, what did Cathy apply for?',
+        type: 'detail',
         choices: [
           'A teaching program',
           'A young writers program',
@@ -5691,6 +6062,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best title for the article?',
+        type: 'main',
         choices: [
           'Natural Disasters',
           'Understanding Earthquakes',
@@ -5702,6 +6074,7 @@ const READING_DATA = [
       },
       {
         q: 'What is suggested about the students at the author\'s school?',
+        type: 'infer',
         choices: [
           'They are afraid of earthquakes.',
           'They are interested in earthquakes.',
@@ -5713,6 +6086,7 @@ const READING_DATA = [
       },
       {
         q: 'Based on the article, what is probably true about earthquakes?',
+        type: 'infer',
         choices: [
           'They are getting bigger as time goes on.',
           'They are happening more now than before.',
@@ -5724,6 +6098,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word pressing is closest in meaning to',
+        type: 'vocab',
         choices: [
           'moving',
           'pulling',
@@ -5735,6 +6110,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word release is closest in meaning to',
+        type: 'vocab',
         choices: [
           'bind',
           'let go',
@@ -5746,6 +6122,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author mention earthquakes creating mountains and tsunamis?',
+        type: 'detail',
         choices: [
           'To explain how our Earth was created',
           'To suggest that earthquakes happen often',
@@ -5775,6 +6152,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best title for this story?',
+        type: 'main',
         choices: [
           'Taco Day',
           'The Food Fight',
@@ -5786,6 +6164,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author throw his food?',
+        type: 'detail',
         choices: [
           'To do something funny',
           'To hit his friend who hit him first',
@@ -5797,6 +6176,7 @@ const READING_DATA = [
       },
       {
         q: 'What does the author mean by saying "the whole cafeteria was in chaos" in line 11?',
+        type: 'vocab',
         choices: [
           'The cafeteria was dirty.',
           'The cafeteria was out of control.',
@@ -5808,6 +6188,7 @@ const READING_DATA = [
       },
       {
         q: 'Which word best describes the cafeteria after the fight?',
+        type: 'detail',
         choices: [
           'cozy',
           'disgusting',
@@ -5819,6 +6200,7 @@ const READING_DATA = [
       },
       {
         q: 'What does the author decide after the food fight?',
+        type: 'detail',
         choices: [
           'It was a good idea not to tell.',
           'He will help clean the cafeteria often.',
@@ -5830,6 +6212,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word packed is closest in meaning to',
+        type: 'vocab',
         choices: [
           'closed',
           'heated',
@@ -5857,6 +6240,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Which title best summarizes the main idea of the passage?',
+        type: 'main',
         choices: [
           'Flight Competition',
           'The Wright Brothers',
@@ -5868,6 +6252,7 @@ const READING_DATA = [
       },
       {
         q: 'According to the passage, what is made possible because of flight?',
+        type: 'detail',
         choices: [
           'Remembering Leonardo Da Vinci',
           'Flying from South Korea to Mexico',
@@ -5879,6 +6264,7 @@ const READING_DATA = [
       },
       {
         q: 'What inspired Leonardo Da Vinci\'s inventions for flying?',
+        type: 'detail',
         choices: [
           'People\'s bodies',
           'The flight of birds',
@@ -5890,6 +6276,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the phrase credited with is closest in meaning to',
+        type: 'vocab',
         choices: [
           'declared as',
           'accepted as',
@@ -5901,6 +6288,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word modifying is closest in meaning to',
+        type: 'vocab',
         choices: [
           'improving',
           'discovering',
@@ -5912,6 +6300,7 @@ const READING_DATA = [
       },
       {
         q: 'Which of the following is NOT true about the Wright Brothers?',
+        type: 'detail',
         choices: [
           'They fought many times with Clement Ader.',
           'They worked for most of their lives on airplanes.',
@@ -5940,6 +6329,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the main topic of the passage?',
+        type: 'main',
         choices: [
           'The green anaconda\'s river life',
           'The weight of anaconda snakes',
@@ -5951,6 +6341,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author mention that most scientists think that the largest green anacondas are about 25 feet long?',
+        type: 'detail',
         choices: [
           'To prove that the Europeans were wrong',
           'To give an example of scientists not knowing the truth for sure',
@@ -5962,6 +6353,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word camouflaged is closest in meaning to',
+        type: 'vocab',
         choices: [
           'safe',
           'secret',
@@ -5973,6 +6365,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word poisonous is closest in meaning to',
+        type: 'vocab',
         choices: [
           'long',
           'heavy',
@@ -5984,6 +6377,7 @@ const READING_DATA = [
       },
       {
         q: 'According to the passage, all of the following can be threats in the Amazon River Basin EXCEPT',
+        type: 'detail',
         choices: [
           'local disease',
           'lack of roads',
@@ -5995,6 +6389,7 @@ const READING_DATA = [
       },
       {
         q: 'Which of the following is true about the Amazon River Basin?',
+        type: 'detail',
         choices: [
           'It often rains and floods.',
           'It is highly unexplored.',
@@ -6006,6 +6401,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word they refers to',
+        type: 'ref',
         choices: [
           'snakes',
           'scientists',
@@ -6017,6 +6413,7 @@ const READING_DATA = [
       },
       {
         q: 'According to the passage, why do green anacondas live in rivers?',
+        type: 'detail',
         choices: [
           'They can\'t move very quickly in rivers.',
           'They are better swimmers than crocodiles.',
@@ -6044,6 +6441,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the best title for this passage?',
+        type: 'main',
         choices: [
           'Visitors from Faraway Planets',
           'The Possibility of Life on Other Worlds',
@@ -6055,6 +6453,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author mention "reports of visitors from other planets"?',
+        type: 'detail',
         choices: [
           'To give an example of people who do not believe in science',
           'To explain why scientists are not interested in studying aliens',
@@ -6066,6 +6465,7 @@ const READING_DATA = [
       },
       {
         q: 'What can be inferred about finding aliens?',
+        type: 'infer',
         choices: [
           'It\'s not possible yet.',
           'It\'s already been done.',
@@ -6077,6 +6477,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word numerous is closest in meaning to',
+        type: 'vocab',
         choices: [
           'rare',
           'large',
@@ -6088,6 +6489,7 @@ const READING_DATA = [
       },
       {
         q: 'What have some people claimed about aliens?',
+        type: 'detail',
         choices: [
           'Aliens often appear in dreams.',
           'They have encountered aliens.',
@@ -6099,6 +6501,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word they refers to',
+        type: 'ref',
         choices: [
           'UFOs',
           'people',
@@ -6110,6 +6513,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word defining is closest in meaning to',
+        type: 'vocab',
         choices: [
           'wanting',
           'describing',
@@ -6121,6 +6525,7 @@ const READING_DATA = [
       },
       {
         q: 'According to the passage, what is NOT true about the night sky?',
+        type: 'detail',
         choices: [
           'It proves that aliens are real.',
           'We can see stars there.',
@@ -6150,6 +6555,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Why did Becky write this e-mail?',
+        type: 'detail',
         choices: [
           'To find out if she can work on the posters',
           'To tell Mrs. Simpson that she had an appointment',
@@ -6161,6 +6567,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word allow is closest in meaning to',
+        type: 'vocab',
         choices: [
           'loan',
           'give',
@@ -6172,6 +6579,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word others refers to',
+        type: 'ref',
         choices: [
           'events',
           'students',
@@ -6183,6 +6591,7 @@ const READING_DATA = [
       },
       {
         q: 'What would Becky likely do for the club?',
+        type: 'infer',
         choices: [
           'Make it a bigger club with more events',
           'Make sure Janet makes the posters for it',
@@ -6213,6 +6622,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the most suitable headline for this article?',
+        type: 'detail',
         choices: [
           'French Families Love America',
           'Student Tina Davis Lives in France',
@@ -6224,6 +6634,7 @@ const READING_DATA = [
       },
       {
         q: 'What is suggested about the culture in France?',
+        type: 'infer',
         choices: [
           'It scares the students.',
           'It requires fluency in French.',
@@ -6235,6 +6646,7 @@ const READING_DATA = [
       },
       {
         q: 'Based on the article, what does Mrs. Smith probably think about the French language?',
+        type: 'infer',
         choices: [
           'It\'s more beautiful than Spanish.',
           'It is very important for international communication.',
@@ -6246,6 +6658,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word vowed is closest in meaning to',
+        type: 'vocab',
         choices: [
           'saved',
           'received',
@@ -6257,6 +6670,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word acquisition is closest in meaning to',
+        type: 'vocab',
         choices: [
           'gaining',
           'speaking',
@@ -6268,6 +6682,7 @@ const READING_DATA = [
       },
       {
         q: 'According to the article, how will the students conclude their stay?',
+        type: 'detail',
         choices: [
           'They will take a French exam.',
           'They will have a party together.',
@@ -6296,6 +6711,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Which title best summarizes the main idea of the passage?',
+        type: 'main',
         choices: [
           'The Spread of HIV/AIDS',
           'Europeans Creating Pandemics',
@@ -6307,6 +6723,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word contagious is closest in meaning to',
+        type: 'vocab',
         choices: [
           'glowing',
           'catchable',
@@ -6318,6 +6735,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word them refers to',
+        type: 'ref',
         choices: [
           'strains of syphilis',
           'Columbus and his crew',
@@ -6329,6 +6747,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the words undying and pervasive are closest in meaning to',
+        type: 'vocab',
         choices: [
           'critical and illegal',
           'legitimate and affirming',
@@ -6340,6 +6759,7 @@ const READING_DATA = [
       },
       {
         q: 'Based on the passage, what was probably true about syphilis?',
+        type: 'infer',
         choices: [
           'It was easy to cure in its early stages.',
           'It hadn\'t been a European problem before Columbus.',
@@ -6351,6 +6771,7 @@ const READING_DATA = [
       },
       {
         q: 'The author mentions all of the following EXCEPT',
+        type: 'detail',
         choices: [
           'the Black Death in medieval Europe',
           'the problem of AIDS in Africa',
@@ -6362,6 +6783,7 @@ const READING_DATA = [
       },
       {
         q: 'What have people done to try to prevent AIDS in Africa?',
+        type: 'detail',
         choices: [
           'Set up hospitals',
           'Educated the people',
@@ -6373,6 +6795,7 @@ const READING_DATA = [
       },
       {
         q: 'Why did the Guanches in the Canary Islands disappear?',
+        type: 'detail',
         choices: [
           'The tribe caught a bad strain of syphilis.',
           'The tribe was uneducated about pandemics.',
@@ -6401,6 +6824,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Which of the following is true about Andrew?',
+        type: 'detail',
         choices: [
           'He scored all the points in the game.',
           'He played really well in the first quarter.',
@@ -6412,6 +6836,7 @@ const READING_DATA = [
       },
       {
         q: 'According to the e-mail, what did Andrew get after the game?',
+        type: 'detail',
         choices: [
           'The ball from the game',
           'An e-mail from his friend',
@@ -6440,6 +6865,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Based on the article, why are the Burmese pythons found in the Everglades?',
+        type: 'detail',
         choices: [
           'Their old environment changed.',
           'They were no longer being hunted by people.',
@@ -6451,6 +6877,7 @@ const READING_DATA = [
       },
       {
         q: 'What in particular creates a strain on Everglades ecosystem?',
+        type: 'detail',
         choices: [
           'The Burmese python\'s ability to swim',
           'The diet of Burmese pythons',
@@ -6480,6 +6907,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Based on the passage, which of the following is true about Abraham Lincoln?',
+        type: 'detail',
         choices: [
           'He started his career in Illinois as a lawyer.',
           'He and John Wilkes Booth knew each other.',
@@ -6491,6 +6919,7 @@ const READING_DATA = [
       },
       {
         q: 'What did Abraham Lincoln do before he went into politics?',
+        type: 'detail',
         choices: [
           'He worked on the western frontier.',
           'He worked as a lawyer in Kentucky.',
@@ -6520,6 +6949,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Which of the following is true of the Arts and Crafts Movement?',
+        type: 'detail',
         choices: [
           'It emphasized ornate and decorative pieces.',
           'It mainly affected the middle class in Britain.',
@@ -6531,6 +6961,7 @@ const READING_DATA = [
       },
       {
         q: 'What did the Americans believe about the Arts and Crafts Movement?',
+        type: 'detail',
         choices: [
           'The British were responsible for starting it.',
           'Simple homes no longer existed in America.',
@@ -6564,6 +6995,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'The students are allowed to eat at all of the following times EXCEPT',
+        type: 'detail',
         choices: [
           '3:00 P.M.',
           '12:00 P.M.',
@@ -6575,6 +7007,7 @@ const READING_DATA = [
       },
       {
         q: 'Which of the following is NOT true?',
+        type: 'detail',
         choices: [
           'Students are in an exam period.',
           'The cafeteria hours have been rescheduled.',
@@ -6605,6 +7038,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Adam mentions finishing all of the following activities EXCEPT',
+        type: 'detail',
         choices: [
           'scuba-diving',
           'going on a boat cruise',
@@ -6616,6 +7050,7 @@ const READING_DATA = [
       },
       {
         q: 'Adam and Jimmy did all of the following EXCEPT',
+        type: 'detail',
         choices: [
           'driving a boat',
           'eating fried shrimp and flounder',
@@ -6644,6 +7079,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Which of the following is NOT true about Benjamin Franklin?',
+        type: 'detail',
         choices: [
           'He worked in France.',
           'He was a famous inventor.',
@@ -6655,6 +7091,7 @@ const READING_DATA = [
       },
       {
         q: 'All of the following were jobs of Benjamin Franklin EXCEPT',
+        type: 'detail',
         choices: [
           'an author',
           'a scientist',
@@ -6683,6 +7120,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'According to the passage, which of the following is NOT true of the Neolithic Revolution?',
+        type: 'detail',
         choices: [
           'This revolution changed the ruling system of society.',
           'People at that time were satisfied with changes the revolution brought.',
@@ -6694,6 +7132,7 @@ const READING_DATA = [
       },
       {
         q: 'The author mentions all of the following EXCEPT',
+        type: 'detail',
         choices: [
           'people tamed pigs, chickens, and cows',
           'people began planting and harvesting crops',
@@ -6721,6 +7160,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is suggested about the cheat sheets?',
+        type: 'infer',
         choices: [
           'They weren\'t made by the students.',
           'The faculty is interested in making more.',
@@ -6732,6 +7172,7 @@ const READING_DATA = [
       },
       {
         q: 'What does the author imply about the students using cheat sheets?',
+        type: 'infer',
         choices: [
           'They are not prepared enough for their exams.',
           'They should have to leave school after the exams.',
@@ -6759,6 +7200,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What can be inferred from the notice about the location of the school?',
+        type: 'infer',
         choices: [
           'Snowstorms are fairly common in the region.',
           'The location usually gets rain instead of snow.',
@@ -6770,6 +7212,7 @@ const READING_DATA = [
       },
       {
         q: 'Based on the notice, what is probably true about the snowstorm?',
+        type: 'infer',
         choices: [
           'It won\'t be very strong.',
           'It will cause some car accidents.',
@@ -6798,6 +7241,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What does the author imply about Mars?',
+        type: 'infer',
         choices: [
           'Mars is covered with a vast ocean.',
           'Scientists will go to Mars very soon.',
@@ -6809,6 +7253,7 @@ const READING_DATA = [
       },
       {
         q: 'Which of the following can be inferred from the passage?',
+        type: 'infer',
         choices: [
           'Photographs of Mars have been taken.',
           'Almost all asteroids are round and bowl-shaped.',
@@ -6839,6 +7284,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Based on the passage, what is probably true about the people in the United States of America?',
+        type: 'infer',
         choices: [
           'They are all very religious.',
           'All the people came from England',
@@ -6850,6 +7296,7 @@ const READING_DATA = [
       },
       {
         q: 'Based on the passage, what is suggested about Thanksgiving?',
+        type: 'infer',
         choices: [
           'It celebrates the Pilgrims\' hard work.',
           'It is only celebrated by immigrant families.',
@@ -6885,6 +7332,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the best title for the story?',
+        type: 'main',
         choices: [
           'The Truth About Kepron 12',
           'A Difficult Astronomy Assignment',
@@ -6896,6 +7344,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does Adam invite Courtney to his house on Saturday?',
+        type: 'detail',
         choices: [
           'To meet his mom',
           'To do schoolwork',
@@ -6907,6 +7356,7 @@ const READING_DATA = [
       },
       {
         q: 'What is suggested about Mr. Anderson\'s opinion of the report?',
+        type: 'infer',
         choices: [
           'It is creatively made up but not acceptable as homework.',
           'It is similar to an assignment that he completed in high school.',
@@ -6918,6 +7368,7 @@ const READING_DATA = [
       },
       {
         q: 'According to the story, all of the following are true EXCEPT',
+        type: 'detail',
         choices: [
           'The shorter alien spoke with a strange accent.',
           'Adam and Courtney visited Kepron 12.',
@@ -6947,6 +7398,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the main topic of the passage?',
+        type: 'main',
         choices: [
           'The role of the female honeybee',
           'Preventing fermentation in honey',
@@ -6958,6 +7410,7 @@ const READING_DATA = [
       },
       {
         q: 'What can be inferred from the passage about honey?',
+        type: 'infer',
         choices: [
           'It\'s not always the same color.',
           'It is only liked by a minority of people.',
@@ -6969,6 +7422,7 @@ const READING_DATA = [
       },
       {
         q: 'What do honeybees do to prevent fermentation?',
+        type: 'detail',
         choices: [
           'Blow air on the honey by waving their wings',
           'Overproduce honey using their legs',
@@ -6980,6 +7434,7 @@ const READING_DATA = [
       },
       {
         q: 'According to the passage, which of the following is NOT true of honeybees?',
+        type: 'detail',
         choices: [
           'They work together in their colony.',
           'They produce honey through a complex process.',
@@ -7008,6 +7463,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'In the passage, the word represent is closest in meaning to',
+        type: 'vocab',
         choices: [
           'show',
           'enable',
@@ -7019,6 +7475,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word potential is closest in meaning to',
+        type: 'vocab',
         choices: [
           'choice',
           'power',
@@ -7048,6 +7505,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'In the passage, the word appreciated is closest in meaning to',
+        type: 'vocab',
         choices: [
           'unused',
           'insufficient',
@@ -7059,6 +7517,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word appetite is closest in meaning to',
+        type: 'vocab',
         choices: [
           'money',
           'hunger',
@@ -7088,6 +7547,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'In the passage, the word conflicts is closest in meaning to',
+        type: 'vocab',
         choices: [
           'truths',
           'powers',
@@ -7099,6 +7559,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word unstable is closest in meaning to',
+        type: 'vocab',
         choices: [
           'weak',
           'strong',
@@ -7126,6 +7587,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'In the passage, the word initial is closest in meaning to',
+        type: 'vocab',
         choices: [
           'basic',
           'earliest',
@@ -7137,6 +7599,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word isolated is closest in meaning to',
+        type: 'vocab',
         choices: [
           'condensed',
           'evolutionary',
@@ -7165,6 +7628,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'In the passage, the word They refers to',
+        type: 'ref',
         choices: [
           'movie actors',
           'film directors',
@@ -7176,6 +7640,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word He refers to',
+        type: 'ref',
         choices: [
           'a movie star',
           'his imagination',
@@ -7204,6 +7669,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'In the passage, the word they refers to',
+        type: 'ref',
         choices: [
           'some students',
           'students studying in the library',
@@ -7215,6 +7681,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word they refers to',
+        type: 'ref',
         choices: [
           'free periods',
           'new additions',
@@ -7243,6 +7710,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'In the passage, the word they refers to',
+        type: 'ref',
         choices: [
           'animals',
           'people',
@@ -7254,6 +7722,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word these refers to',
+        type: 'ref',
         choices: [
           'dry homes',
           'desert species',
@@ -7283,6 +7752,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'In the passage, the word Some refers to',
+        type: 'ref',
         choices: [
           'the rituals',
           'the purposes',
@@ -7294,6 +7764,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word it refers to',
+        type: 'ref',
         choices: [
           'a man',
           'a stone',
@@ -7322,6 +7793,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Why is Capone\'s causing violence at school mentioned in paragraph 1?',
+        type: 'detail',
         choices: [
           'To define the school rules in his time',
           'To explain why he owned a bulletproof car',
@@ -7333,6 +7805,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author talk about Capone\'s bringing alcohol from Canada in paragraph 2?',
+        type: 'detail',
         choices: [
           'To justify Capone\'s life of crime',
           'To explain how he became rich',
@@ -7361,6 +7834,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Why does the author mention the responsibility and the reward being divided in more ways?',
+        type: 'detail',
         choices: [
           'To clarify group work\'s effectiveness',
           'To explain the cause of social loafing',
@@ -7372,6 +7846,7 @@ const READING_DATA = [
       },
       {
         q: 'Why is someone in a group that loves the theater mentioned in the passage?',
+        type: 'detail',
         choices: [
           'To indicate people stick to their principles',
           'To describe the result of conformity pressure',
@@ -7400,6 +7875,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'The author mentions songs and calls in paragraph 2 in order to',
+        type: 'detail',
         choices: [
           'introduce the idea of long songs and short calls',
           'give an example of the different types of bird calls',
@@ -7411,6 +7887,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author mention the male bird in paragraph 2?',
+        type: 'detail',
         choices: [
           'To show that males are better at singing',
           'To give an example of what animals can do to mate',
@@ -7440,6 +7917,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Why does the author mention the two-stage life cycle in paragraph 2?',
+        type: 'detail',
         choices: [
           'To show that amphibians are complicated animals',
           'To draw a conclusion about how different animals live',
@@ -7451,6 +7929,7 @@ const READING_DATA = [
       },
       {
         q: 'The author discusses amphibian extinctions affecting other plants and animals in paragraph 3 in order to',
+        type: 'detail',
         choices: [
           'tell readers to worry about amphibians',
           'illustrate that the extinction of any kind of animal is bad',
@@ -7479,6 +7958,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the purpose of the passage?',
+        type: 'main',
         choices: [
           'To explain how the Jewish people of Masada perished',
           'To persuade readers to visit Mount Masada in the Israeli desert',
@@ -7490,6 +7970,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word They refers to',
+        type: 'ref',
         choices: [
           'the rebels',
           'the locations',
@@ -7501,6 +7982,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word excavating is closest in meaning to',
+        type: 'vocab',
         choices: [
           'studying',
           'digging',
@@ -7512,6 +7994,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author mention the desert fronting the Dead Sea?',
+        type: 'detail',
         choices: [
           'To prove that Masada is worth visiting',
           'To explain why Masada stayed hidden for a long time',
@@ -7539,6 +8022,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'The author\'s main purpose is to',
+        type: 'main',
         choices: [
           'give a brief history of contact lenses',
           'persuade readers of the convenience of contact lenses',
@@ -7550,6 +8034,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word alternative is closest in meaning to',
+        type: 'vocab',
         choices: [
           'option',
           'upgrade',
@@ -7561,6 +8046,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word They refers to',
+        type: 'ref',
         choices: [
           'the eyes',
           'the scientists',
@@ -7572,6 +8058,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author mention athletes in the passage?',
+        type: 'detail',
         choices: [
           'To explain that some sports do not allow glasses',
           'To show that athletes are concerned for their health',
@@ -7605,6 +8092,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What activities does Molly do more than once a week?',
+        type: 'detail',
         choices: [
           'Having a math tutoring session and volunteering',
           'Volunteering and having a clarinet lesson',
@@ -7616,6 +8104,7 @@ const READING_DATA = [
       },
       {
         q: 'What would Molly probably be doing on Tuesday at 4:45 P.M.?',
+        type: 'infer',
         choices: [
           'Going to math tutoring',
           'Volunteering at the shelter',
@@ -7627,6 +8116,7 @@ const READING_DATA = [
       },
       {
         q: 'At what time is Molly\'s musical activity?',
+        type: 'detail',
         choices: [
           '3:00 P.M. on Friday',
           '4:30 P.M. on Tuesday',
@@ -7638,6 +8128,7 @@ const READING_DATA = [
       },
       {
         q: 'What will happen every other week?',
+        type: 'detail',
         choices: [
           'Molly will go to soccer practice on Friday.',
           'Molly won\'t need math tutoring on Tuesday.',
@@ -7668,6 +8159,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Why did Jessica write this e-mail?',
+        type: 'detail',
         choices: [
           'To be friendly with her teacher',
           'To win a very important contest',
@@ -7679,6 +8171,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word specific is closest in meaning to',
+        type: 'vocab',
         choices: [
           'good',
           'exact',
@@ -7690,6 +8183,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word them refers to',
+        type: 'ref',
         choices: [
           'old teachers',
           'all teachers',
@@ -7701,6 +8195,7 @@ const READING_DATA = [
       },
       {
         q: 'According to the e-mail, which of the following is NOT true of Jessica?',
+        type: 'detail',
         choices: [
           'She changed school early this year.',
           'Her essay was written while she was in Waring.',
@@ -7729,6 +8224,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the most suitable headline for the article?',
+        type: 'detail',
         choices: [
           'Bromson Hill Star Leads Team to Win',
           'Coach Jessica Wallis Is Proud of Victory',
@@ -7740,6 +8236,7 @@ const READING_DATA = [
       },
       {
         q: 'What is suggested about Alison Levin in the article?',
+        type: 'infer',
         choices: [
           'She isn\'t a prideful person.',
           'She respects her coach, Jessica.',
@@ -7751,6 +8248,7 @@ const READING_DATA = [
       },
       {
         q: 'Based on her comments, what is Brittany Clark probably worried about?',
+        type: 'infer',
         choices: [
           'Alison doing poorly in college',
           'The coach getting angry at the team',
@@ -7762,6 +8260,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word ecstatic is closest in meaning to',
+        type: 'vocab',
         choices: [
           'joyful',
           'grateful',
@@ -7773,6 +8272,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word prospect is closest in meaning to',
+        type: 'vocab',
         choices: [
           'fear',
           'success',
@@ -7784,6 +8284,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author mention that Alison Levin\'s eyes teared up at the league awards ceremony?',
+        type: 'detail',
         choices: [
           'To show that she felt a lot of emotion',
           'To explain her anger that her team wasn\'t recognized',
@@ -7821,6 +8322,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What is the story mainly about?',
+        type: 'main',
         choices: [
           'The New York City dance championship',
           'The hardship of being dance team members',
@@ -7832,6 +8334,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does Sandy drag the author across the whole school?',
+        type: 'detail',
         choices: [
           'To meet the team coach',
           'To get to the daily dance practice',
@@ -7843,6 +8346,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, what does the author mean by go into our routines?',
+        type: 'detail',
         choices: [
           'Do hard exercises',
           'Practice for the championship',
@@ -7854,6 +8358,7 @@ const READING_DATA = [
       },
       {
         q: 'Which word best describes the girls\' reaction to being sent to New York City?',
+        type: 'detail',
         choices: [
           'Excited',
           'Nervous',
@@ -7865,6 +8370,7 @@ const READING_DATA = [
       },
       {
         q: 'Based on his comments, what does the coach think about the competition?',
+        type: 'detail',
         choices: [
           'If the girls work hard, they will win.',
           'Their losing the competition would be a big disappointment.',
@@ -7876,6 +8382,7 @@ const READING_DATA = [
       },
       {
         q: 'What will probably happen to Sandy and the author next year?',
+        type: 'infer',
         choices: [
           'They will win easily.',
           'They will stop dancing.',
@@ -7904,6 +8411,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Which title best summarizes the main idea of the passage?',
+        type: 'main',
         choices: [
           'A Place of Desert Flowers',
           'Cactus Blooms at Big Bend',
@@ -7915,6 +8423,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word lodge is closest in meaning to',
+        type: 'vocab',
         choices: [
           'bed',
           'inn',
@@ -7926,6 +8435,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word dissipate is closest in meaning to',
+        type: 'vocab',
         choices: [
           'destroy',
           'disturb',
@@ -7937,6 +8447,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does Big Bend get cold at night?',
+        type: 'detail',
         choices: [
           'Precipitation usually comes at night.',
           'It is too arid to hold the heat in the air.',
@@ -7948,6 +8459,7 @@ const READING_DATA = [
       },
       {
         q: 'Which of the following is NOT mentioned about staying overnight at Big Bend?',
+        type: 'detail',
         choices: [
           'It\'s better to stay in the lodge.',
           'There are generally two different ways to sleep.',
@@ -7959,6 +8471,7 @@ const READING_DATA = [
       },
       {
         q: 'Why don\'t people visit Big Bend more often?',
+        type: 'detail',
         choices: [
           'It is too cold for most visitors.',
           'A lot of people don\'t want to visit Texas.',
@@ -7987,6 +8500,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'What would be the most suitable title for the passage?',
+        type: 'main',
         choices: [
           'Intelligent Mammals in Captivity',
           'Complex Patterns in Dolphin Life',
@@ -7998,6 +8512,7 @@ const READING_DATA = [
       },
       {
         q: 'What are the common ways for a dolphin to communicate?',
+        type: 'detail',
         choices: [
           'Swimming speeds',
           'Human voice imitation',
@@ -8009,6 +8524,7 @@ const READING_DATA = [
       },
       {
         q: 'According to paragraph 4, what do some marine biologists think about captive dolphins?',
+        type: 'detail',
         choices: [
           'They can\'t be considered accurate subjects for biological studies.',
           'They can communicate exactly the same as humans do.',
@@ -8020,6 +8536,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word vocalization is closest in meaning to',
+        type: 'vocab',
         choices: [
           'closing eyes',
           'creating words',
@@ -8031,6 +8548,7 @@ const READING_DATA = [
       },
       {
         q: 'All of the following are true about dolphin communication EXCEPT',
+        type: 'detail',
         choices: [
           'dolphins\' clicking sounds are sometimes used to greet humans',
           'dolphins\' squeals and squeaks sound conversational to the human ear',
@@ -8042,6 +8560,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word most refers to',
+        type: 'ref',
         choices: [
           'a few bottlenose dolphins',
           'a lot of bottlenose dolphins',
@@ -8053,6 +8572,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word capacity is closest in meaning to',
+        type: 'vocab',
         choices: [
           'ability',
           'probability',
@@ -8064,6 +8584,7 @@ const READING_DATA = [
       },
       {
         q: 'Why do dolphins use their communication skills with each other?',
+        type: 'detail',
         choices: [
           'To prove that they are happy and useful in captivity',
           'To make beautiful music and to find food',
@@ -8093,6 +8614,7 @@ const READING_DATA = [
     questions: [
       {
         q: 'Which title best expresses the main idea of the passage?',
+        type: 'main',
         choices: [
           'Sacagawea\'s Devotion to the Shoshone Tribe',
           'Early American Feminism in the Sacagawea Legend',
@@ -8104,6 +8626,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word interpreter is closest in meaning to',
+        type: 'vocab',
         choices: [
           'doctor',
           'mother',
@@ -8115,6 +8638,7 @@ const READING_DATA = [
       },
       {
         q: 'Why did Lewis and Clark want a Shoshone-speaking guide?',
+        type: 'detail',
         choices: [
           'They were interested in making a profit from trading.',
           'They needed someone who had a relationship with the chief.',
@@ -8126,6 +8650,7 @@ const READING_DATA = [
       },
       {
         q: 'The author mentions all of the following EXCEPT',
+        type: 'detail',
         choices: [
           'Sacagawea becoming a mother',
           'the marriage of Charbonneau and Sacagawea',
@@ -8137,6 +8662,7 @@ const READING_DATA = [
       },
       {
         q: 'What does the author say about Sacagawea\'s death?',
+        type: 'detail',
         choices: [
           'It made her a heroine.',
           'It doesn\'t have a clear story.',
@@ -8148,6 +8674,7 @@ const READING_DATA = [
       },
       {
         q: 'In the passage, the word He refers to',
+        type: 'ref',
         choices: [
           'Shoshone chief',
           'Sacagawea\'s son',
@@ -8159,6 +8686,7 @@ const READING_DATA = [
       },
       {
         q: 'Why does the author mention Sacagawea\'s role in 20th-century feminism?',
+        type: 'detail',
         choices: [
           'To discuss Sacagawea\'s unique female abilities',
           'To show that Sacagawea inspired American women',
@@ -8170,6 +8698,7 @@ const READING_DATA = [
       },
       {
         q: 'Based on the passage, what is probably true about Lewis and Clark?',
+        type: 'infer',
         choices: [
           'They learned the Shoshone language.',
           'They never met with Thomas Jefferson.',
