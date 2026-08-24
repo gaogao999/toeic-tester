@@ -737,7 +737,9 @@ body {
   font-size: 0.68rem;
   color: var(--ink-sub);
 }
-.plan-kind b { font-size: 1.1rem; font-weight: 800; color: var(--ink-text); }
+.plan-kind b { font-size: 1.35rem; font-weight: 800; line-height: 1.2; color: var(--ink-text); }
+/* 単位まで書く。「20 単語」だけだと20問と読まれる */
+.plan-kind i { font-style: normal; font-size: 0.62rem; opacity: 0.75; }
 .plan-note { display: block; margin-top: 10px; font-size: 0.76rem; color: var(--ink-sub); }
 
 /* 見込み時間。**約束ではない**ので、セッションの文字より小さく添える */

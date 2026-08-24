@@ -679,9 +679,16 @@
     }
     if (sessionPool('math').length) counts.math = SESSION_TARGET.math;
 
+    // **画面に出すのは約束の数（targets）、問題を並べるのに使うのは見込み（counts）。**
+    // 単語は「20個正解」が約束で、そのために何問出すかは正答率しだい。
+    // カードに見込みのほう（29問・40問…）を出すと、約束と違う数字が顔になる
+    const targets = {};
+    for (const r of TARGET_ROWS) if (counts[r.kind]) targets[r.kind] = SESSION_TARGET[r.kind];
+
     const seconds = Object.entries(counts).reduce((a, [k, n]) => a + n * SESSION_SECONDS[k], 0);
     return {
       counts,
+      targets,
       passages,
       total: Object.values(counts).reduce((a, b) => a + b, 0),
       minutes: Math.max(1, Math.round(seconds / 60))
@@ -1317,22 +1324,23 @@
   }
 
   /**
-   * 献立のチップ（15 単語 ／ 1 長文 …）。ホームと結果の両方で使う。
-   * **長文だけ「本」で数える**（設問数で出すと、本文を丸ごと読む重さが伝わらない）
+   * 1回ぶんのチップ（20 単語 正解 ／ 1 長文 本 ／ 15 算数 問）。
+   *
+   * **出すのは約束の数で、見込みの出題数ではない。**単語は「20個正解」が約束なので、
+   * そこに 40 と出ていたら別の数字が顔になってしまう。
+   * **単位まで書く**（「20 単語」だけだと20問と読まれる）
    */
   function planChipsHtml(plan) {
-    return SESSION_KINDS.filter((k) => plan.counts[k])
+    return TARGET_ROWS.filter((r) => plan.targets[r.kind])
       .map(
-        (k) => `<span class="plan-kind">
-          <b>${k === 'reading' ? plan.passages : plan.counts[k]}</b>
-          <span>${escapeHtml(SESSION_SHORT[k])}</span>
+        (r) => `<span class="plan-kind">
+          <b>${plan.targets[r.kind]}</b>
+          <span>${escapeHtml(r.label)}</span>
+          <i>${escapeHtml(r.unit)}</i>
         </span>`
       )
       .join('');
   }
-
-  /** チップに入れる短い呼び名。「長文読解」は4文字で、4つ並べると折り返す */
-  const SESSION_SHORT = { word: '単語', reading: '長文', grammar: '文法', math: '算数' };
 
   // ---------- ホームの3つ ----------
 
