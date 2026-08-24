@@ -35,8 +35,8 @@
 
   <!-- ============ セッション（ホーム） ============ -->
   <!--
-    「何分やる？」を選んで座るだけの画面。**献立を自分で組ませない。**
-    残り日数 → やりかけの続き → 分を選ぶ、の3つだけを置く
+    押すだけで始まる画面。**献立を自分で組ませない。**
+    残り日数 → 今日の積み上げ → やりかけの続き → 1回ぶんのカード、を置く
   -->
   <section class="view is-active" id="view-home">
     <div class="countdown-card">
@@ -65,33 +65,31 @@
     </button>
 
     <!--
-      1日のミニマム。**その日に必ず超えたい床**で、セッションはここの残りから先に出す。
-      達成できなくてもセッションは成立する（達成しなかった日に手を止めさせないため）
+      今日の積み上げ。**目標ではなく、今日いくつ積んだか。**
+      セッション1回ぶんを目安に添えるが、2回やれば 40/20 になるし、それでいい
     -->
     <div class="minimum" id="minimum">
       <div class="minimum-head">
-        <span>今日のミニマム</span>
+        <span>今日の積み上げ</span>
         <span class="minimum-status" id="minimum-status"></span>
       </div>
       <div class="minimum-rows" id="minimum-rows"></div>
     </div>
 
     <div class="pick-head">
-      <span>何分やる？</span>
+      <span>1回ぶん</span>
       <span class="pick-count" id="pick-count"></span>
     </div>
 
-    <!-- 選んでいる長さの中身。押すとそのまま始まる -->
+    <!-- セッション1回の中身。**時間ではなく数で終わる。**押すとそのまま始まる -->
     <button class="plan-card" id="plan-card">
       <span class="plan-top">
-        <span class="plan-min"><b id="plan-minutes">20</b>分のセッション</span>
+        <span class="plan-min">セッション<span class="plan-est">およそ<b id="plan-minutes">30</b>分</span></span>
         <span class="plan-sub">中身はまかせる</span>
         <span class="plan-play">▶</span>
       </span>
       <span class="plan-kinds" id="plan-kinds"></span>
     </button>
-
-    <div class="minute-row" id="minute-row"></div>
 
     <p class="hint" id="plan-note"></p>
   </section>
@@ -100,8 +98,8 @@
   <section class="view" id="view-session">
     <div class="sess-bar">
       <span class="sess-clock" id="sess-clock">00:00</span>
-      <span class="sess-clock-unit">のこり</span>
-      <span class="sess-count" id="sess-count">0 / 0問</span>
+      <span class="sess-clock-unit">経過</span>
+      <span class="sess-count" id="sess-count">0問</span>
       <button class="btn btn-ghost sess-quit" id="sess-quit">中断</button>
     </div>
 
@@ -160,20 +158,23 @@
     </div>
     <div class="progress-bar sr-bar"><div class="progress-fill" id="sr-fill"></div></div>
 
+    <!-- この回で目標に届いたか。届かなかったぶんはそのまま出す -->
+    <div class="sr-target" id="sr-target" hidden></div>
+
     <div class="panel">
       <div class="sr-kinds" id="sr-kinds"></div>
       <p class="hint" id="sr-comment"></p>
     </div>
 
     <div class="plan-card plan-card-static" id="sr-next">
-      <span class="plan-top"><span class="plan-min" id="sr-next-title">次の20分</span></span>
+      <span class="plan-top"><span class="plan-min" id="sr-next-title">次の1回</span></span>
       <span class="plan-kinds" id="sr-next-kinds"></span>
       <span class="plan-note" id="sr-next-note"></span>
     </div>
 
     <div class="sr-actions">
       <button class="btn btn-secondary" id="sr-wrong" hidden>まちがい0問</button>
-      <button class="btn btn-primary" id="sr-again">もう20分やる</button>
+      <button class="btn btn-primary" id="sr-again">もう1回やる</button>
     </div>
     <button class="btn btn-ghost sr-home" data-view="home">ホームへ</button>
   </section>

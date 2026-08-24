@@ -740,20 +740,26 @@ body {
 .plan-kind b { font-size: 1.1rem; font-weight: 800; color: var(--ink-text); }
 .plan-note { display: block; margin-top: 10px; font-size: 0.76rem; color: var(--ink-sub); }
 
-.minute-row { display: flex; gap: 8px; margin-top: 10px; }
-.minute-btn {
+/* 見込み時間。**約束ではない**ので、セッションの文字より小さく添える */
+.plan-est { margin-left: 8px; font-size: 0.8rem; font-weight: 600; color: var(--ink-sub); }
+.plan-est b { font-size: 1.1rem; font-weight: 800; }
+
+/* この回で目標に届いたか。結果画面の上のほうに、横に並べて出す */
+.sr-target { display: flex; gap: 8px; margin-bottom: 16px; }
+.sr-target[hidden] { display: none; }
+.sr-target-item {
   flex: 1;
-  padding: 13px 4px;
+  padding: 8px 4px;
   border: 1px solid var(--border);
-  border-radius: 11px;
+  border-radius: 10px;
   background: var(--surface);
-  color: var(--text);
-  font-family: inherit;
-  font-size: 0.92rem;
-  font-weight: 700;
-  cursor: pointer;
+  text-align: center;
+  font-size: 0.76rem;
+  color: var(--text-muted);
 }
-.minute-btn:hover { border-color: var(--text); }
+.sr-target-item b { display: block; font-size: 1rem; color: var(--text); font-variant-numeric: tabular-nums; }
+.sr-target-item.is-ok { border-color: var(--green); }
+.sr-target-item.is-ok b { color: var(--green); }
 
 /* ---------- セッション中 ---------- */
 .sess-bar {

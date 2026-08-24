@@ -334,22 +334,24 @@
     // **献立を自分で組ませない。**分を選べば中身はこちらで決める
     renderCountdown();
     renderWeekGrid();
-    renderMinimum();
+    renderTally();
     renderResumeCard();
     renderPlanCard();
     renderHeaderToday();
   }
 
   /**
-   * 今日のミニマムの進み具合。
-   * **達成できていない日を責めない。**足りないぶんを数で出すだけにして、
-   * 「未達」のような言い方はしない。押せばそこから始まる
+   * 今日の積み上げ。**目標ではなく、今日いくつ積んだか。**
+   *
+   * セッション1回ぶん（単語20正解・長文1本・算数15問）を目安として添えるが、
+   * これは「ここまでやれ」ではない。2回やれば 40/20 になるし、それでいい。
+   * **1回ぶんに届いた科目には ✓ を出す**（1回はやり切ったという印）
    */
-  function renderMinimum() {
-    const rows = minimumProgress();
+  function renderTally() {
+    const rows = todayTally();
     const done = rows.filter((r) => r.ok).length;
 
-    $('#minimum-status').textContent = done === rows.length ? '✓ 達成' : `${done} / ${rows.length}`;
+    $('#minimum-status').textContent = done === rows.length ? '✓ 1回ぶん' : `${done} / ${rows.length}`;
     $('#minimum-status').classList.toggle('is-done', done === rows.length);
     $('#minimum').classList.toggle('is-done', done === rows.length);
 
@@ -359,9 +361,7 @@
           <span class="min-name">${escapeHtml(r.label)}</span>
           <span class="min-track"><span class="min-fill"
                 style="width:${Math.min(100, (r.done / r.goal) * 100)}%"></span></span>
-          <span class="min-num">${
-            r.ok ? '✓ 達成' : `${r.done} / ${r.goal}<i>${escapeHtml(r.unit)}</i>`
-          }</span>
+          <span class="min-num">${r.done} / ${r.goal}<i>${escapeHtml(r.unit)}</i></span>
         </div>`
       )
       .join('');
@@ -497,50 +497,47 @@
    */
   const SESSION_SECONDS = { word: 20, reading: 90, grammar: 40, math: 60 };
 
-  /** 選べる長さ。20分を真ん中に置く（5分でも連続は途切れない、と伝えるため） */
-  const SESSION_MINUTES = [5, 10, 20, 40];
-  const DEFAULT_SESSION_MINUTES = 20;
-
-  /** 長文は本文の単位でしか出せない。**これに満たない配分の回は長文を出さない** */
-  const MIN_READING_QUESTIONS = 2;
-
-  // ---------- 1日のミニマム ----------
+  // ---------- セッション1回の中身 ----------
   //
-  // **その日に必ず超えたい床。**セッションは、残っているミニマムから先に出す。
+  // **1回のセッションで出す量。時間ではなく、この数で終わる。**
   //
-  // 分だけで組むと、日によって中身が偏る（単語ばかりの日、算数ばかりの日）。
-  // 床を決めておけば、どの日も同じ土台は踏む。以前の「今日の学習」（曜日ごとのノルマ）
-  // と違うのは、**達成できなくてもセッション自体は成立する**こと。
-  // 足りないぶんは翌日に持ち越さず、その日の残りとしてだけ扱う。
+  // 以前は分（5/10/20/40）を選ばせ、そこから問題数を割り出していた。
+  // 分で決めると回ごとに中身が変わるので、「今日はどれだけやったか」が
+  // 回をまたいで比べられない。**数を固定すれば、1回が1回として同じ重みになる。**
   //
   // **単語だけ「正解した数」で数える。**答えた数だと、当てずっぽうで20回押せば
   // 終わってしまう。覚えたかどうかを見たいので、正解を数える。
-  // 長文は本数（設問の数だと、設問2問の本文で達成になる）。算数は解いた数。
-  const DAILY_MINIMUM = { word: 20, reading: 1, math: 15 };
+  // そのため**単語の出題数は決め打ちにできない**（何問当たるかは解いてみないと
+  // 分からない）。足りなければ回の途中で足す（`topUpWords()`）。
+  //
+  // 長文は本数（設問の数だと、設問2問の本文で1本ぶんになってしまう）。算数は解いた数。
+  const SESSION_TARGET = { word: 20, reading: 1, math: 15 };
 
-  /** ミニマムの科目と、数え方の呼び名。画面にそのまま出す */
-  const MINIMUM_ROWS = [
-    { kind: 'word', label: '単語', unit: '正解', done: (c) => c.wordC },
-    { kind: 'reading', label: '長文', unit: '本', done: (c) => c.passages },
-    { kind: 'math', label: '算数', unit: '問', done: (c) => c.math }
+  /** 目標の科目と、数え方の呼び名。順番がそのまま出題の順番になる */
+  const TARGET_ROWS = [
+    { kind: 'word', label: '単語', unit: '正解' },
+    { kind: 'reading', label: '長文', unit: '本' },
+    { kind: 'math', label: '算数', unit: '問' }
   ];
 
-  /** 今日のミニマムの進み具合。{ kind, label, unit, done, goal, left, ok } の配列 */
-  function minimumProgress(counts = Storage.getTodayCounts()) {
-    return MINIMUM_ROWS.map((r) => {
-      const goal = DAILY_MINIMUM[r.kind];
-      const done = r.done(counts);
-      return { ...r, done, goal, left: Math.max(0, goal - done), ok: done >= goal };
-    });
+  /** 今日ぶんの積み上げ。**目標ではなく、積んだ数**（1回ぶんを目安として添える） */
+  function todayTally(counts = Storage.getTodayCounts()) {
+    const done = { word: counts.wordC, reading: counts.passages, math: counts.math };
+    return TARGET_ROWS.map((r) => ({
+      ...r,
+      done: done[r.kind],
+      goal: SESSION_TARGET[r.kind],
+      ok: done[r.kind] >= SESSION_TARGET[r.kind]
+    }));
   }
 
-  /** ある日の記録がミニマムを満たしているか。きろくの週グラフが使う */
-  function metMinimum(day) {
+  /** ある日の記録が1回ぶんに届いているか。きろくの週グラフが使う */
+  function metSessionWorth(day) {
     if (!day) return false;
     return (
-      (day.wordC || 0) >= DAILY_MINIMUM.word &&
-      (day.passages || 0) >= DAILY_MINIMUM.reading &&
-      (day.math || 0) >= DAILY_MINIMUM.math
+      (day.wordC || 0) >= SESSION_TARGET.word &&
+      (day.passages || 0) >= SESSION_TARGET.reading &&
+      (day.math || 0) >= SESSION_TARGET.math
     );
   }
 
@@ -579,22 +576,12 @@
   }
 
   /**
-   * 時間の配り方。**均等割りから最大 ±30% までしか動かさない。**
+   * 学習記録から見た優先度。小さいほど先に出す。
    *
-   * 弱いところを厚くしたいが、全部を弱点科目に寄せると
-   * 得意な科目に一度も触れない日ができる。入試では4科目とも出るので、
-   * どれも毎回少しは触る。7割は AI 診断・階段法と同じ線
+   * **科目の配分は固定になった**（1回の中身は `SESSION_TARGET`）ので、
+   * 弱いところへ寄せるのは科目ではなく**科目の中の問題選び**でやる。
+   * 苦手を先に出すのがそれで、`sessionPool()` がこの順で並べ替える
    */
-  function sessionWeights(kinds) {
-    const w = {};
-    for (const k of kinds) {
-      const rate = kindRate(k);
-      w[k] = rate === null ? 1 : 1 + Math.max(-0.3, Math.min(0.3, REACHED_RATE - rate));
-    }
-    return w;
-  }
-
-  /** 学習記録から見た優先度。小さいほど先に出す */
   function itemPriority(id) {
     const rec = Storage.getRecord(id);
     const answered = rec.correct + rec.wrong;
@@ -662,104 +649,42 @@
   }
 
   /**
-   * 分から中身を決める。
-   * 返すのは { minutes, counts: { 科目: 問題数 }, passages, total, forMinimum }
+   * 単語の目標は「正解した数」なので、**何問出せば足りるかは正答率しだい。**
    *
-   * **残っているミニマムから先に埋める。**時間が余ったぶんだけ、
-   * 弱いところ重視の割り振り（文法もここで入る）に回す。
-   * ミニマムが残っているあいだ文法が後回しになるのは、床を先に踏むという意味では正しい。
-   * ミニマムを踏み終えた回からは、これまで通り4科目の割り振りになる。
+   * ちょうど20問出しても、16問しか当たらなければ4問足りない。
+   * これまでの正答率で割り増しておけば、たいてい足りる。
+   * 足りなければ回の途中で足すので（`topUpWords()`）、外れても壊れない。
+   * 割り増しが暴走しないよう、正答率は 0.5 を下限にする（最大2倍まで）。
    */
-  function planFor(minutes) {
-    const available = SESSION_KINDS.filter((k) => sessionPool(k).length > 0);
-    const budget = minutes * 60;
+  function wordQuestionsFor(correctNeeded) {
+    const rate = kindRate('word');
+    return Math.ceil(correctNeeded / Math.max(0.5, rate === null ? 0.7 : rate));
+  }
+
+  /**
+   * セッション1回ぶんの見積もり。
+   * 返すのは { counts: { 科目: 問題数 }, passages, total, minutes }
+   *
+   * **時間ではなく数で決まる。**minutes は「だいたい何分かかるか」の目安で、
+   * 打ち切りには使わない（`SESSION_SECONDS` から逆算しているだけ）。
+   */
+  function sessionPlan() {
     const counts = {};
     let passages = 0;
-    let spent = 0;
 
-    // ---- 1. 残っているミニマムを、時間の許すかぎり詰める ----
-    // 配る比は「その科目の残りを片づけるのにかかる時間」。
-    // どれか1つだけ先に終わらせるのではなく、3つを同じ歩調で減らしていく
-    const need = {};
-    for (const row of minimumProgress()) {
-      if (!row.left || !available.includes(row.kind)) continue;
-      need[row.kind] =
-        row.kind === 'word'
-          ? wordQuestionsFor(row.left) * SESSION_SECONDS.word
-          : row.kind === 'reading'
-            ? row.left * questionsPerPassage() * SESSION_SECONDS.reading
-            : row.left * SESSION_SECONDS.math;
+    if (sessionPool('word').length) counts.word = wordQuestionsFor(SESSION_TARGET.word);
+    if (sessionPool('reading').length) {
+      passages = SESSION_TARGET.reading;
+      counts.reading = Math.max(1, Math.round(passages * questionsPerPassage()));
     }
-    const needTotal = Object.values(need).reduce((a, b) => a + b, 0);
-    if (needTotal > 0) {
-      // 時間が足りていれば丸ごと、足りなければ同じ割合で縮める
-      const scale = Math.min(1, budget / needTotal);
-      for (const [kind, sec] of Object.entries(need)) {
-        const n = Math.round((sec * scale) / SESSION_SECONDS[kind]);
-        if (kind === 'reading') {
-          // 長文は本文の単位。1本ぶんに満たない配分なら、この回は出さない
-          if (n < MIN_READING_QUESTIONS) continue;
-          passages = Math.max(1, Math.round(n / questionsPerPassage()));
-          counts.reading = Math.round(passages * questionsPerPassage());
-        } else if (n > 0) {
-          counts[kind] = n;
-        }
-        spent += (counts[kind] || 0) * SESSION_SECONDS[kind];
-      }
-    }
+    if (sessionPool('math').length) counts.math = SESSION_TARGET.math;
 
-    // ---- 2. 余った時間を、弱いところ重視で配る ----
-    //
-    // **ミニマムを踏み切れない回では、ここへ来ない。**端数の時間が余っていても、
-    // それは文法ではなく残りのミニマムに使うべきもの。
-    // 「ミニマムから先に出します」と言いながら文法が1問混じるのも辻褄が合わない
-    const rest = budget - spent;
-    if (needTotal <= budget && rest > SESSION_SECONDS.math) {
-      let kinds = available;
-      const share = (list) => {
-        const w = sessionWeights(list);
-        const sum = list.reduce((a, k) => a + w[k], 0) || 1;
-        const out = {};
-        for (const k of list) out[k] = (rest * w[k]) / sum;
-        return out;
-      };
-      // 長文が1本ぶんに満たない配分なら外して、そのぶんを他の科目へ回す。
-      // 5分のセッションに長文を混ぜると、本文を読んだところで時間が終わる
-      let sec = share(kinds);
-      if (kinds.includes('reading') && sec.reading / SESSION_SECONDS.reading < MIN_READING_QUESTIONS) {
-        kinds = kinds.filter((k) => k !== 'reading');
-        sec = share(kinds);
-      }
-      for (const k of kinds) {
-        const n = Math.round(sec[k] / SESSION_SECONDS[k]);
-        if (k === 'reading') {
-          if (n < MIN_READING_QUESTIONS) continue;
-          // **長文は本文の単位でしか出せない。**設問3問ぶんの時間を配っても、
-          // 実際には4問の本文が丸ごと1本入る。画面には本数を出し、
-          // 問題数は「およそ」と言う（数を約束すると必ずずれる）
-          const add = Math.max(1, Math.round(n / questionsPerPassage()));
-          passages += add;
-          counts.reading = (counts.reading || 0) + Math.round(add * questionsPerPassage());
-        } else if (n > 0) {
-          counts[k] = (counts[k] || 0) + n;
-        }
-      }
-    }
-
-    // 1問も出ない献立にはしない（在庫があるのに空を返すと、押しても何も起きない）
-    if (!Object.keys(counts).length && available.length) {
-      counts[available[0]] = 1;
-      if (available[0] === 'reading') passages = 1;
-    }
-
+    const seconds = Object.entries(counts).reduce((a, [k, n]) => a + n * SESSION_SECONDS[k], 0);
     return {
-      minutes,
       counts,
       passages,
       total: Object.values(counts).reduce((a, b) => a + b, 0),
-      // この回でミニマムを踏み切れる見込みかどうか（ホームの注記に使う）
-      forMinimum: needTotal > 0,
-      coversMinimum: needTotal > 0 && needTotal <= budget
+      minutes: Math.max(1, Math.round(seconds / 60))
     };
   }
 
@@ -796,13 +721,11 @@
       const pool = sessionPool(kind);
 
       if (kind === 'reading') {
-        // 長文は本文ごと出す。**途中で切らない**（設問だけ解いても読む練習にならない）
-        let got = 0;
-        for (const passage of pool) {
-          if (got >= want) break;
-          passage.questions.forEach((q, i) => queue.push(buildReadingQuestion(passage, q, i)));
-          got += passage.questions.length;
-        }
+        // 長文は**本数**で出す。本文ごと出し、途中で切らない
+        // （設問だけ解いても読む練習にならない）
+        pool.slice(0, plan.passages).forEach((passage) =>
+          passage.questions.forEach((q, i) => queue.push(buildReadingQuestion(passage, q, i)))
+        );
         continue;
       }
 
@@ -822,7 +745,9 @@
   // ---------- セッションの進行 ----------
 
   const sess = {
-    minutes: 0,
+    // **この回で満たす数。**null なら「並べた問題を解き切ったら終わり」
+    // （まちがい直しと、設問タイプのドリルがそれ）
+    target: null,
     queue: [],
     index: 0,
     results: [],      // 各問の正誤（まだ答えていなければ null）
@@ -834,12 +759,70 @@
     elapsed: 0,       // 中断をまたいだ、これまでの経過（ミリ秒）
     credited: 0,      // すでに記録に足した分（中断のたびに足すので、二重に数えないため）
     timer: null,
-    answered: false,  // いまの問題に答えたか（答えてから「次へ」）
-    over: false       // 時間切れ
+    answered: false   // いまの問題に答えたか（答えてから「次へ」）
   };
 
-  const sessTotalMs = () => sess.minutes * 60 * 1000;
   const sessSpentMs = () => sess.elapsed + (sess.startedAt ? Date.now() - sess.startedAt : 0);
+
+  /**
+   * この回で、その科目がどこまで進んだか。
+   * **数え方は科目で違う**（単語は正解した数、長文は読み終えた本数、算数は解いた数）。
+   * 目標と同じ物差しで数えないと、進捗の帯が嘘になる
+   */
+  function sessionDone(kind) {
+    if (kind === 'reading') {
+      // 本文の設問がすべて答え終わったものだけを1本と数える
+      const byPassage = new Map();
+      sess.queue.forEach((q, i) => {
+        if (q.kind !== 'reading') return;
+        const done = byPassage.get(q.passage.id);
+        byPassage.set(q.passage.id, (done === undefined ? true : done) && sess.results[i] !== null);
+      });
+      return [...byPassage.values()].filter(Boolean).length;
+    }
+    let n = 0;
+    sess.queue.forEach((q, i) => {
+      if (q.kind !== kind || sess.results[i] === null) return;
+      if (kind === 'word' ? sess.results[i] === true : true) n += 1;
+    });
+    return n;
+  }
+
+  /** この回の残り。target が無い回（まちがい直し等）は空 */
+  function sessionRemaining() {
+    if (!sess.target) return [];
+    return TARGET_ROWS.filter((r) => sess.target[r.kind]).map((r) => {
+      const done = sessionDone(r.kind);
+      const goal = sess.target[r.kind];
+      return { ...r, done, goal, left: Math.max(0, goal - done), ok: done >= goal };
+    });
+  }
+
+  /**
+   * 単語が目標の正解数に届いていなければ、その場で足す。
+   *
+   * **単語だけ「正解した数」が目標**なので、出す数を先に決め切れない。
+   * 20問出して16問しか当たらなければ、4問ぶん足りない。
+   * 単語ブロックの最後まで来たところで数え直し、足りないぶんを後ろに差し込む。
+   * 在庫を使い切ったらそこで諦める（無限に足そうとして固まらないように）
+   */
+  function topUpWords() {
+    if (!sess.target || !sess.target.word) return false;
+    const short = sess.target.word - sessionDone('word');
+    if (short <= 0) return false;
+
+    const used = new Set(sess.queue.filter((q) => q.kind === 'word').map((q) => String(q.id)));
+    const pool = sessionPool('word').filter((w) => !used.has(String(w.id)));
+    if (!pool.length) return false;
+
+    // 足す数も正答率で割り増す。1問ずつ足すと、外すたびに帯が止まって見える
+    const add = pool.slice(0, Math.min(wordQuestionsFor(short), pool.length)).map(buildWordChoice);
+    const at = sess.index + 1;
+    sess.queue.splice(at, 0, ...add);
+    sess.results.splice(at, 0, ...add.map(() => null));
+    sess.times.splice(at, 0, ...add.map(() => 0));
+    return true;
+  }
 
   /**
    * **解いていた時間**（分）。1問ずつ、出してから答えるまでを足したもの。
@@ -872,9 +855,9 @@
   /** 保存できる形に落とす。**問題そのものではなく id だけ**を控える */
   function sessionSnapshot() {
     return {
-      minutes: sess.minutes,
       elapsed: sessSpentMs(),
       credited: sess.credited || 0,
+      target: sess.target,
       index: sess.index,
       results: sess.results,
       times: sess.times,
@@ -909,10 +892,12 @@
     if (queue.length !== saved.items.length) {
       clearSavedSession();
       toast('問題が入れ替わっていたので、はじめから組み直します');
-      startSession(saved.minutes || DEFAULT_SESSION_MINUTES);
+      startSession();
       return;
     }
-    sess.minutes = saved.minutes || DEFAULT_SESSION_MINUTES;
+    // 目標は控えたものをそのまま戻す。**いまの SESSION_TARGET を使わない**
+    // （途中で数を変えたとき、始めた回の約束が変わってしまう）
+    sess.target = saved.target || { ...SESSION_TARGET };
     sess.queue = queue;
     sess.results = Array.isArray(saved.results) ? saved.results.slice(0, queue.length) : [];
     while (sess.results.length < queue.length) sess.results.push(null);
@@ -922,18 +907,20 @@
     sess.elapsed = Math.max(0, saved.elapsed | 0);
     sess.credited = Math.max(0, saved.credited | 0);
     sess.startedAt = Date.now();
-    sess.over = false;
     openSession();
   }
 
-  function startSession(minutes) {
-    const plan = planFor(minutes);
+  /** セッションを1回始める。中身は SESSION_TARGET で決まる（時間では決まらない） */
+  function startSession() {
+    const plan = sessionPlan();
     const queue = buildSessionQueue(plan);
     if (!queue.length) {
       toast('出題できる問題がありません');
       return;
     }
-    sess.minutes = minutes;
+    // 出せない科目は目標からも外す（在庫が無いのに「あと1本」と出し続けないため）
+    sess.target = {};
+    for (const r of TARGET_ROWS) if (plan.counts[r.kind]) sess.target[r.kind] = SESSION_TARGET[r.kind];
     sess.queue = queue;
     sess.results = new Array(queue.length).fill(null);
     sess.times = new Array(queue.length).fill(0);
@@ -941,9 +928,7 @@
     sess.elapsed = 0;
     sess.credited = 0;
     sess.startedAt = Date.now();
-    sess.over = false;
     Storage.incrementSessions();
-    Storage.updateSettings({ sessionMinutes: minutes });
     openSession();
   }
 
@@ -953,22 +938,17 @@
     renderSessionQuestion();
   }
 
+  /**
+   * 時計は**数え上げ**。以前は分から数えて下げていたが、
+   * いまのセッションは**時間ではなく数で終わる**ので、残り時間というものが無い。
+   * 急かさないためにも、経過を見せるだけにする
+   */
   function startSessionTimer() {
     stopSessionTimer();
     const tick = () => {
-      const left = Math.max(0, sessTotalMs() - sessSpentMs());
-      const total = Math.round(left / 1000);
+      const total = Math.round(sessSpentMs() / 1000);
       $('#sess-clock').textContent =
         `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
-      $('#sess-clock').classList.toggle('is-low', total <= 60);
-      if (left === 0 && !sess.over) {
-        sess.over = true;
-        stopSessionTimer();
-        // **その場で打ち切らない。**解いている途中の問題を消すと、
-        // 「座れた」感覚ごと取り上げることになる。いまの1問を終えてから閉じる
-        showSessionChip('20分たちました。いまの問題を終えたら閉じます', true);
-        $('#sess-next').textContent = 'ここで終わる';
-      }
     };
     tick();
     sess.timer = setInterval(tick, 1000);
@@ -988,32 +968,32 @@
 
   /** 科目ごとの進み具合の帯。**いまどこにいるか**が一目で分かるようにする */
   function renderSessionTrack() {
-    const done = {};
-    const total = {};
-    sess.queue.forEach((q, i) => {
-      total[q.kind] = (total[q.kind] || 0) + 1;
-      if (sess.results[i] !== null) done[q.kind] = (done[q.kind] || 0) + 1;
-    });
-    const kinds = SESSION_KINDS.filter((k) => total[k]);
     const now = sess.queue[sess.index].kind;
 
-    $('#sess-track').innerHTML = kinds
-      .map((k) => {
-        const pct = ((done[k] || 0) / total[k]) * 100;
-        return `<span class="sess-seg" style="flex:${total[k]}">
-            <span class="sess-seg-fill" style="width:${pct}%"></span>
-          </span>`;
-      })
+    // **目標と同じ物差しで数える。**単語は正解した数、長文は本数、算数は解いた数。
+    // 出題数に対する進み具合を出すと、単語を外したときに帯だけ進んで見える
+    const rows = sess.target
+      ? sessionRemaining()
+      : SESSION_KINDS.filter((k) => sess.queue.some((q) => q.kind === k)).map((k) => {
+          const total = sess.queue.filter((q) => q.kind === k).length;
+          const done = sess.queue.filter((q, i) => q.kind === k && sess.results[i] !== null).length;
+          return { kind: k, label: KIND_LABELS[k], unit: '問', done, goal: total, ok: done >= total };
+        });
+
+    $('#sess-track').innerHTML = rows
+      .map(
+        (r) => `<span class="sess-seg" style="flex:${r.goal}">
+            <span class="sess-seg-fill" style="width:${Math.min(100, (r.done / r.goal) * 100)}%"></span>
+          </span>`
+      )
       .join('');
 
-    $('#sess-legend').innerHTML = kinds
-      .map((k) => {
-        const d = done[k] || 0;
-        const state = d >= total[k] ? '✓' : k === now ? `${d + 1}/${total[k]}` : '';
-        return `<span class="sess-kind ${k === now ? 'is-now' : d >= total[k] ? 'is-done' : ''}">
-            ${escapeHtml(KIND_LABELS[k])}${state ? ` <b>${state}</b>` : ''}
-          </span>`;
-      })
+    $('#sess-legend').innerHTML = rows
+      .map(
+        (r) => `<span class="sess-kind ${r.ok ? 'is-done' : r.kind === now ? 'is-now' : ''}">
+            ${escapeHtml(r.label)} <b>${r.ok ? '✓' : `${r.done}/${r.goal}`}</b>
+          </span>`
+      )
       .join('');
 
     const days = daysUntilExam();
@@ -1026,14 +1006,12 @@
     sess.shownAt = Date.now();
 
     const answeredCount = sess.results.filter((r) => r !== null).length;
-    $('#sess-count').textContent = `${answeredCount} / ${sess.queue.length}問`;
+    $('#sess-count').textContent = `${answeredCount}問`;
     renderSessionTrack();
 
     // 科目が切り替わる境目で帯を出す。ここで頭を切り替えてもらう
     const prev = sess.index > 0 ? sess.queue[sess.index - 1] : null;
-    if (sess.over) {
-      // 時間切れの知らせは消さない
-    } else if (prev && prev.kind !== q.kind) {
+    if (prev && prev.kind !== q.kind) {
       const n = sess.queue.filter((x) => x.kind === prev.kind).length;
       showSessionChip(`${KIND_LABELS[prev.kind]}${n}問おわり ・ ここから${KIND_LABELS[q.kind]}`, false);
     } else {
@@ -1135,7 +1113,15 @@
   }
 
   function nextSessionQuestion() {
-    if (sess.over || sess.index + 1 >= sess.queue.length) {
+    const q = sess.queue[sess.index];
+    const next = sess.queue[sess.index + 1];
+
+    // **単語ブロックの終わりで、正解数が目標に届いたかを見る。**
+    // 届いていなければその場で足す（単語だけ「正解した数」が目標なので、
+    // 出す数を先に決め切れない）
+    if (q.kind === 'word' && (!next || next.kind !== 'word')) topUpWords();
+
+    if (sess.index + 1 >= sess.queue.length) {
       finishSession();
       return;
     }
@@ -1249,15 +1235,27 @@
 
     $('#sr-comment').textContent = sessionComment(r);
 
-    // 次の回。**この回の出来をそのまま反映した献立**を先に見せる
-    const nextPlan = planFor(Storage.getSettings().sessionMinutes || DEFAULT_SESSION_MINUTES);
-    $('#sr-next-title').textContent = `次の${nextPlan.minutes}分（自動で調整しました）`;
+    // この回で目標に届いたか。**届かなかったぶんは、そのまま言う**
+    // （中断で閉じれば届かない。責めずに、何が残ったかだけを出す）
+    const short = sessionRemaining().filter((x) => !x.ok);
+    $('#sr-target').innerHTML = sess.target
+      ? sessionRemaining()
+          .map(
+            (x) => `<span class="sr-target-item ${x.ok ? 'is-ok' : ''}">
+              ${escapeHtml(x.label)} <b>${x.ok ? '✓' : `${x.done}/${x.goal}`}</b>
+            </span>`
+          )
+          .join('')
+      : '';
+    $('#sr-target').hidden = !sess.target;
+
+    // 次の回の中身。**毎回同じ数**なので「自動で調整しました」とは言わない
+    const nextPlan = sessionPlan();
+    $('#sr-next-title').textContent = '次の1回';
     $('#sr-next-kinds').innerHTML = planChipsHtml(nextPlan);
-    // **次にやることは、残っているミニマム。**日数より先に、そちらを言う
-    const left = minimumProgress().filter((x) => !x.ok);
-    $('#sr-next-note').textContent = left.length
-      ? `今日のミニマムはあと ${left.map((x) => `${x.label}${x.left}${x.unit}`).join('・')}`
-      : '今日のミニマムは踏み終えました。ここから先は積み増しです。';
+    $('#sr-next-note').textContent = short.length
+      ? `この回で届かなかったのは ${short.map((x) => `${x.label}あと${x.goal - x.done}${x.unit}`).join('・')}。次の回でやり直せます。`
+      : `およそ${nextPlan.minutes}分の見込みです。`;
 
     sessionWrong = [];
     sess.queue.forEach((q, i) => {
@@ -1265,7 +1263,7 @@
     });
     $('#sr-wrong').hidden = sessionWrong.length === 0;
     $('#sr-wrong').textContent = `まちがい${sessionWrong.length}問`;
-    $('#sr-again').textContent = `もう${nextPlan.minutes}分やる`;
+    $('#sr-again').textContent = 'もう1回やる';
     window.scrollTo(0, 0);
   }
 
@@ -1351,27 +1349,21 @@
       return;
     }
     const kind = saved.items[Math.min(saved.index | 0, saved.items.length - 1)].kind;
-    const leftMin = Math.max(1, Math.round(((saved.minutes * 60000 - (saved.elapsed || 0)) / 60000)));
-    $('#resume-sub').textContent = `${KIND_LABELS[kind]}が${left}問のこっています ・ ${leftMin}分`;
+    // 残り時間ではなく残りの数を出す。**セッションは時間ではなく数で終わる**
+    $('#resume-sub').textContent = `${KIND_LABELS[kind]}が${left}問のこっています`;
     card.hidden = false;
   }
 
   function renderPlanCard() {
-    const minutes = Storage.getSettings().sessionMinutes || DEFAULT_SESSION_MINUTES;
-    const plan = planFor(minutes);
-
-    $('#plan-minutes').textContent = minutes;
+    const plan = sessionPlan();
+    $('#plan-minutes').textContent = plan.minutes;
     $('#plan-kinds').innerHTML = planChipsHtml(plan);
 
-    // 今日すでに何回座ったか
+    // 今日すでに何回やったか
     const doneToday = (Storage.getSettings().sessionHistory || []).filter(
       (h) => h.date.slice(0, 10) === Storage.todayKey()
     ).length;
     $('#pick-count').textContent = `今日 ${doneToday + 1}回目`;
-
-    $('#minute-row').innerHTML = SESSION_MINUTES.filter((m) => m !== minutes)
-      .map((m) => `<button class="minute-btn" data-minutes="${m}">${m}分</button>`)
-      .join('');
 
     const focus = Storage.getSettings().focus || 'judged';
     const focusText = {
@@ -1379,29 +1371,15 @@
       top: '一番上の段だけを出します',
       weak: '間違えたままの問題だけを出します'
     }[focus];
-    // **長文だけ本数**なので、そのことをここで言う（チップの数字の意味が変わる）
-    const reading = plan.passages ? `長文${plan.passages}本を含めて` : '';
-    const size = `${reading}およそ${plan.total}問です。`;
-    // ミニマムが残っているあいだは、そこから出していることを先に言う
-    // 単語のミニマムは「正解した数」なので、**踏み終えると約束はできない**
-    // （何問当たるかは解いてみないと分からない）。見込みだとそのまま言う
-    $('#plan-note').textContent = plan.forMinimum
-      ? plan.coversMinimum
-        ? `${size}この回で今日のミニマムに届く見込みです。`
-        : `残っているミニマムから先に出します。${size}足りないぶんは次の回で拾います。`
-      : `${focusText}。${size}5分でも連続は途切れません。`;
+    // **数を約束するのは長文と算数だけ。**単語は「正解した数」が目標なので、
+    // 何問出るかは解いてみないと分からない（足りなければ回の途中で足す）
+    $('#plan-note').textContent =
+      `${focusText}。単語は正解が${SESSION_TARGET.word}個たまるまで出るので、` +
+      `問題数は変わります（およそ${plan.total}問・${plan.minutes}分の見込み）。`;
   }
 
   function initSession() {
-    $('#plan-card').addEventListener('click', () =>
-      startSession(Storage.getSettings().sessionMinutes || DEFAULT_SESSION_MINUTES)
-    );
-    $('#minute-row').addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-minutes]');
-      if (!btn) return;
-      Storage.updateSettings({ sessionMinutes: Number(btn.dataset.minutes) });
-      renderPlanCard();
-    });
+    $('#plan-card').addEventListener('click', () => startSession());
     $('#resume-card').addEventListener('click', resumeSession);
 
     $('#sess-next').addEventListener('click', nextSessionQuestion);
@@ -1418,12 +1396,11 @@
       showView('home');
     });
 
-    $('#sr-again').addEventListener('click', () =>
-      startSession(Storage.getSettings().sessionMinutes || DEFAULT_SESSION_MINUTES)
-    );
+    $('#sr-again').addEventListener('click', () => startSession());
     $('#sr-wrong').addEventListener('click', () => {
       if (!sessionWrong.length) return;
-      sess.minutes = Math.max(5, Math.round((sessionWrong.length * 40) / 60));
+      // 並べた問題を解き切ったら終わり。**目標は持たせない**
+      sess.target = null;
       sess.queue = sessionWrong.map((q) => rebuildQuestion(q.kind, q.id)).filter(Boolean);
       sess.results = new Array(sess.queue.length).fill(null);
       sess.times = new Array(sess.queue.length).fill(0);
@@ -1431,7 +1408,6 @@
       sess.elapsed = 0;
       sess.credited = 0;
       sess.startedAt = Date.now();
-      sess.over = false;
       openSession();
     });
   }
@@ -1596,7 +1572,7 @@
    * tools/stamp-version.mjs で書き換える。
    * スマホで開いたときに、手元のものが最新かを確かめるためのもの。
    */
-  const APP_VERSION = '2026-08-22 (56e8df0)';
+  const APP_VERSION = '2026-08-24 (e26e5b8)';
 
   const EXAM_DATE = '2027-01-07';
 
@@ -4274,7 +4250,7 @@
         const label = today ? '今日' : WEEKDAYS[date.getDay()];
         // ミニマムを踏んだ日に印を付ける。**この機能より前の記録には wordC が無い**ので、
         // 古い日は踏んでいても印が付かない（分からないものを「達成」とは言わない）
-        const met = metMinimum(Storage.getDay(d.date));
+        const met = metSessionWorth(Storage.getDay(d.date));
         return `<div class="weekbar-col" title="${d.date}: ${d.minutes}分${met ? '（ミニマム達成）' : ''}">
             <div class="weekbar ${today ? 'is-today' : ''} ${d.minutes ? '' : 'is-empty'}"
                  style="height:${Math.max((d.minutes / max) * 100, 3)}%"></div>
@@ -4359,17 +4335,15 @@
     }
     // 本文をまたぐので、同じ本文の設問が続くように並べ直す
     items.sort((a, b) => a.passage.id.localeCompare(b.passage.id) || a.i - b.i);
+    // 並べた問題を解き切ったら終わり。**目標は持たせない**（セッション本体とは別物）
+    sess.target = null;
     sess.queue = items.slice(0, 10).map((x) => buildReadingQuestion(x.passage, x.q, x.i));
-    // 出す数を決めてから時間を決める。逆にすると、10問に切ったあとも
-    // 切る前の問題数で時計を回すことになる
-    sess.minutes = Math.max(5, Math.round((sess.queue.length * SESSION_SECONDS.reading) / 60));
     sess.results = new Array(sess.queue.length).fill(null);
     sess.times = new Array(sess.queue.length).fill(0);
     sess.index = 0;
     sess.elapsed = 0;
     sess.credited = 0;
     sess.startedAt = Date.now();
-    sess.over = false;
     openSession();
   }
 
