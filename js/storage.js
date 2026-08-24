@@ -17,9 +17,13 @@ const Storage = (() => {
   const DEFAULT_STATE = {
     records: {}, // { [wordId]: { box, correct, wrong, lastStudied, nextDue, starred, learned } }
     stats: { totalAnswers: 0, totalCorrect: 0, sessions: 0 },
-    // [{ date, answered, correct, word, math, reading, grammar, minutes }]
-    // 真ん中の4つは科目別の解答数。minutes は**解いていた時間**
-    // （1問ずつ、出してから答えるまでの合計。画面を開いていた時間ではない）
+    // [{ date, answered, correct, word, math, reading, grammar,
+    //    wordC, mathC, readingC, grammarC, passages, minutes }]
+    //   word/math/…   科目別の**解答数**
+    //   wordC/mathC/… 科目別の**正解した数**（1日のミニマムが「単語20個正解」なので別に要る）
+    //   passages      読み終えた長文の本数
+    //   minutes       **解いていた時間**（1問ずつ、出してから答えるまでの合計。
+    //                 画面を開いていた時間ではない）
     history: [],
     settings: {
       level: 'all',
@@ -206,6 +210,9 @@ const Storage = (() => {
     // 科目別の解答数（古い記録には無いので、無ければ0から数え始める）
     const kind = kindOf(wordId);
     day[kind] = (day[kind] || 0) + 1;
+    // **科目別の「正解した数」も別に数える。**1日のミニマムが
+    // 「単語20個正解」なので、答えた数では判定できない
+    if (isCorrect) day[`${kind}C`] = (day[`${kind}C`] || 0) + 1;
 
     save();
     return rec;
@@ -308,7 +315,12 @@ const Storage = (() => {
       // 読み終えた長文の本数。献立はこちらで数える
       passages: (day && day.passages) || 0,
       answered: (day && day.answered) || 0,
-      minutes: (day && day.minutes) || 0
+      minutes: (day && day.minutes) || 0,
+      // 科目別の**正解した数**。1日のミニマム（単語20個正解）の判定に使う
+      wordC: (day && day.wordC) || 0,
+      mathC: (day && day.mathC) || 0,
+      readingC: (day && day.readingC) || 0,
+      grammarC: (day && day.grammarC) || 0
     };
   }
 
@@ -456,7 +468,11 @@ const Storage = (() => {
         reading: num(h.reading),
         grammar: num(h.grammar),
         passages: num(h.passages),
-        minutes: num(h.minutes)
+        minutes: num(h.minutes),
+        wordC: num(h.wordC),
+        mathC: num(h.mathC),
+        readingC: num(h.readingC),
+        grammarC: num(h.grammarC)
       }));
 
     // settings は既知の項目だけ受け取り、型が合わないものは初期値のままにする

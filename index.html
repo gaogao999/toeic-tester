@@ -64,6 +64,18 @@
       <span class="row-chevron">›</span>
     </button>
 
+    <!--
+      1日のミニマム。**その日に必ず超えたい床**で、セッションはここの残りから先に出す。
+      達成できなくてもセッションは成立する（達成しなかった日に手を止めさせないため）
+    -->
+    <div class="minimum" id="minimum">
+      <div class="minimum-head">
+        <span>今日のミニマム</span>
+        <span class="minimum-status" id="minimum-status"></span>
+      </div>
+      <div class="minimum-rows" id="minimum-rows"></div>
+    </div>
+
     <div class="pick-head">
       <span>何分やる？</span>
       <span class="pick-count" id="pick-count"></span>

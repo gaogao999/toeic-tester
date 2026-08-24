@@ -334,9 +334,37 @@
     // **献立を自分で組ませない。**分を選べば中身はこちらで決める
     renderCountdown();
     renderWeekGrid();
+    renderMinimum();
     renderResumeCard();
     renderPlanCard();
     renderHeaderToday();
+  }
+
+  /**
+   * 今日のミニマムの進み具合。
+   * **達成できていない日を責めない。**足りないぶんを数で出すだけにして、
+   * 「未達」のような言い方はしない。押せばそこから始まる
+   */
+  function renderMinimum() {
+    const rows = minimumProgress();
+    const done = rows.filter((r) => r.ok).length;
+
+    $('#minimum-status').textContent = done === rows.length ? '✓ 達成' : `${done} / ${rows.length}`;
+    $('#minimum-status').classList.toggle('is-done', done === rows.length);
+    $('#minimum').classList.toggle('is-done', done === rows.length);
+
+    $('#minimum-rows').innerHTML = rows
+      .map(
+        (r) => `<div class="min-row ${r.ok ? 'is-ok' : ''}">
+          <span class="min-name">${escapeHtml(r.label)}</span>
+          <span class="min-track"><span class="min-fill"
+                style="width:${Math.min(100, (r.done / r.goal) * 100)}%"></span></span>
+          <span class="min-num">${
+            r.ok ? '✓ 達成' : `${r.done} / ${r.goal}<i>${escapeHtml(r.unit)}</i>`
+          }</span>
+        </div>`
+      )
+      .join('');
   }
 
   /** ヘッダの「8/22（土）・連続6日」 */
@@ -476,6 +504,46 @@
   /** 長文は本文の単位でしか出せない。**これに満たない配分の回は長文を出さない** */
   const MIN_READING_QUESTIONS = 2;
 
+  // ---------- 1日のミニマム ----------
+  //
+  // **その日に必ず超えたい床。**セッションは、残っているミニマムから先に出す。
+  //
+  // 分だけで組むと、日によって中身が偏る（単語ばかりの日、算数ばかりの日）。
+  // 床を決めておけば、どの日も同じ土台は踏む。以前の「今日の学習」（曜日ごとのノルマ）
+  // と違うのは、**達成できなくてもセッション自体は成立する**こと。
+  // 足りないぶんは翌日に持ち越さず、その日の残りとしてだけ扱う。
+  //
+  // **単語だけ「正解した数」で数える。**答えた数だと、当てずっぽうで20回押せば
+  // 終わってしまう。覚えたかどうかを見たいので、正解を数える。
+  // 長文は本数（設問の数だと、設問2問の本文で達成になる）。算数は解いた数。
+  const DAILY_MINIMUM = { word: 20, reading: 1, math: 15 };
+
+  /** ミニマムの科目と、数え方の呼び名。画面にそのまま出す */
+  const MINIMUM_ROWS = [
+    { kind: 'word', label: '単語', unit: '正解', done: (c) => c.wordC },
+    { kind: 'reading', label: '長文', unit: '本', done: (c) => c.passages },
+    { kind: 'math', label: '算数', unit: '問', done: (c) => c.math }
+  ];
+
+  /** 今日のミニマムの進み具合。{ kind, label, unit, done, goal, left, ok } の配列 */
+  function minimumProgress(counts = Storage.getTodayCounts()) {
+    return MINIMUM_ROWS.map((r) => {
+      const goal = DAILY_MINIMUM[r.kind];
+      const done = r.done(counts);
+      return { ...r, done, goal, left: Math.max(0, goal - done), ok: done >= goal };
+    });
+  }
+
+  /** ある日の記録がミニマムを満たしているか。きろくの週グラフが使う */
+  function metMinimum(day) {
+    if (!day) return false;
+    return (
+      (day.wordC || 0) >= DAILY_MINIMUM.word &&
+      (day.passages || 0) >= DAILY_MINIMUM.reading &&
+      (day.math || 0) >= DAILY_MINIMUM.math
+    );
+  }
+
   /**
    * レベル判定で出た段。**セッションはここで測った段から出す。**
    *
@@ -576,48 +644,122 @@
     return shuffle(items).sort((a, b) => rank(a) - rank(b));
   }
 
+  /** 長文の本文1本あたりの設問数（平均）。本数と問題数を行き来するのに使う */
+  const questionsPerPassage = () =>
+    PASSAGES.reduce((a, r) => a + r.questions.length, 0) / (PASSAGES.length || 1);
+
+  /**
+   * 単語のミニマムは「正解した数」なので、**何問出せば足りるかは正答率しだい。**
+   *
+   * ちょうど20問出しても、16問しか当たらなければ4問足りない。
+   * これまでの正答率で割り増しておけば、たいてい1回で足りる。
+   * 外れても次の回が残りを拾うので、**当たらなくても壊れない**。
+   * 割り増しが暴走しないよう、正答率は 0.5 を下限にする（最大2倍まで）。
+   */
+  function wordQuestionsFor(correctNeeded) {
+    const rate = kindRate('word');
+    return Math.ceil(correctNeeded / Math.max(0.5, rate === null ? 0.7 : rate));
+  }
+
   /**
    * 分から中身を決める。
-   * 返すのは { minutes, counts: { 科目: 問題数 }, total }
+   * 返すのは { minutes, counts: { 科目: 問題数 }, passages, total, forMinimum }
+   *
+   * **残っているミニマムから先に埋める。**時間が余ったぶんだけ、
+   * 弱いところ重視の割り振り（文法もここで入る）に回す。
+   * ミニマムが残っているあいだ文法が後回しになるのは、床を先に踏むという意味では正しい。
+   * ミニマムを踏み終えた回からは、これまで通り4科目の割り振りになる。
    */
   function planFor(minutes) {
-    let kinds = SESSION_KINDS.filter((k) => sessionPool(k).length > 0);
+    const available = SESSION_KINDS.filter((k) => sessionPool(k).length > 0);
     const budget = minutes * 60;
+    const counts = {};
+    let passages = 0;
+    let spent = 0;
 
-    const share = (list) => {
-      const w = sessionWeights(list);
-      const sum = list.reduce((a, k) => a + w[k], 0) || 1;
-      const out = {};
-      for (const k of list) out[k] = (budget * w[k]) / sum;
-      return out;
-    };
-
-    // 長文が1本ぶんに満たない配分なら外して、そのぶんを他の科目へ回す。
-    // 5分のセッションに長文を混ぜると、本文を読んだところで時間が終わる
-    let sec = share(kinds);
-    if (kinds.includes('reading') && sec.reading / SESSION_SECONDS.reading < MIN_READING_QUESTIONS) {
-      kinds = kinds.filter((k) => k !== 'reading');
-      sec = share(kinds);
+    // ---- 1. 残っているミニマムを、時間の許すかぎり詰める ----
+    // 配る比は「その科目の残りを片づけるのにかかる時間」。
+    // どれか1つだけ先に終わらせるのではなく、3つを同じ歩調で減らしていく
+    const need = {};
+    for (const row of minimumProgress()) {
+      if (!row.left || !available.includes(row.kind)) continue;
+      need[row.kind] =
+        row.kind === 'word'
+          ? wordQuestionsFor(row.left) * SESSION_SECONDS.word
+          : row.kind === 'reading'
+            ? row.left * questionsPerPassage() * SESSION_SECONDS.reading
+            : row.left * SESSION_SECONDS.math;
+    }
+    const needTotal = Object.values(need).reduce((a, b) => a + b, 0);
+    if (needTotal > 0) {
+      // 時間が足りていれば丸ごと、足りなければ同じ割合で縮める
+      const scale = Math.min(1, budget / needTotal);
+      for (const [kind, sec] of Object.entries(need)) {
+        const n = Math.round((sec * scale) / SESSION_SECONDS[kind]);
+        if (kind === 'reading') {
+          // 長文は本文の単位。1本ぶんに満たない配分なら、この回は出さない
+          if (n < MIN_READING_QUESTIONS) continue;
+          passages = Math.max(1, Math.round(n / questionsPerPassage()));
+          counts.reading = Math.round(passages * questionsPerPassage());
+        } else if (n > 0) {
+          counts[kind] = n;
+        }
+        spent += (counts[kind] || 0) * SESSION_SECONDS[kind];
+      }
     }
 
-    const counts = {};
-    for (const k of kinds) counts[k] = Math.max(1, Math.round(sec[k] / SESSION_SECONDS[k]));
+    // ---- 2. 余った時間を、弱いところ重視で配る ----
+    //
+    // **ミニマムを踏み切れない回では、ここへ来ない。**端数の時間が余っていても、
+    // それは文法ではなく残りのミニマムに使うべきもの。
+    // 「ミニマムから先に出します」と言いながら文法が1問混じるのも辻褄が合わない
+    const rest = budget - spent;
+    if (needTotal <= budget && rest > SESSION_SECONDS.math) {
+      let kinds = available;
+      const share = (list) => {
+        const w = sessionWeights(list);
+        const sum = list.reduce((a, k) => a + w[k], 0) || 1;
+        const out = {};
+        for (const k of list) out[k] = (rest * w[k]) / sum;
+        return out;
+      };
+      // 長文が1本ぶんに満たない配分なら外して、そのぶんを他の科目へ回す。
+      // 5分のセッションに長文を混ぜると、本文を読んだところで時間が終わる
+      let sec = share(kinds);
+      if (kinds.includes('reading') && sec.reading / SESSION_SECONDS.reading < MIN_READING_QUESTIONS) {
+        kinds = kinds.filter((k) => k !== 'reading');
+        sec = share(kinds);
+      }
+      for (const k of kinds) {
+        const n = Math.round(sec[k] / SESSION_SECONDS[k]);
+        if (k === 'reading') {
+          if (n < MIN_READING_QUESTIONS) continue;
+          // **長文は本文の単位でしか出せない。**設問3問ぶんの時間を配っても、
+          // 実際には4問の本文が丸ごと1本入る。画面には本数を出し、
+          // 問題数は「およそ」と言う（数を約束すると必ずずれる）
+          const add = Math.max(1, Math.round(n / questionsPerPassage()));
+          passages += add;
+          counts.reading = (counts.reading || 0) + Math.round(add * questionsPerPassage());
+        } else if (n > 0) {
+          counts[k] = (counts[k] || 0) + n;
+        }
+      }
+    }
 
-    // **長文は本文の単位でしか出せない。**設問3問ぶんの時間を配っても、
-    // 実際には4問の本文が丸ごと1本入る。画面には本数を出し、
-    // 問題数は「およそ」と言う（数を約束すると必ずずれる）
-    let passages = 0;
-    if (counts.reading) {
-      const per = PASSAGES.reduce((a, r) => a + r.questions.length, 0) / (PASSAGES.length || 1);
-      passages = Math.max(1, Math.round(counts.reading / per));
-      counts.reading = Math.round(passages * per);
+    // 1問も出ない献立にはしない（在庫があるのに空を返すと、押しても何も起きない）
+    if (!Object.keys(counts).length && available.length) {
+      counts[available[0]] = 1;
+      if (available[0] === 'reading') passages = 1;
     }
 
     return {
       minutes,
       counts,
       passages,
-      total: Object.values(counts).reduce((a, b) => a + b, 0)
+      total: Object.values(counts).reduce((a, b) => a + b, 0),
+      // この回でミニマムを踏み切れる見込みかどうか（ホームの注記に使う）
+      forMinimum: needTotal > 0,
+      coversMinimum: needTotal > 0 && needTotal <= budget
     };
   }
 
@@ -1111,10 +1253,11 @@
     const nextPlan = planFor(Storage.getSettings().sessionMinutes || DEFAULT_SESSION_MINUTES);
     $('#sr-next-title').textContent = `次の${nextPlan.minutes}分（自動で調整しました）`;
     $('#sr-next-kinds').innerHTML = planChipsHtml(nextPlan);
-    const days = daysUntilExam();
-    $('#sr-next-note').textContent =
-      (nextPlan.passages ? `長文${nextPlan.passages}本を含めておよそ${nextPlan.total}問 ・ ` : '') +
-      (days > 0 ? `のこり${days}日` : '');
+    // **次にやることは、残っているミニマム。**日数より先に、そちらを言う
+    const left = minimumProgress().filter((x) => !x.ok);
+    $('#sr-next-note').textContent = left.length
+      ? `今日のミニマムはあと ${left.map((x) => `${x.label}${x.left}${x.unit}`).join('・')}`
+      : '今日のミニマムは踏み終えました。ここから先は積み増しです。';
 
     sessionWrong = [];
     sess.queue.forEach((q, i) => {
@@ -1238,8 +1381,15 @@
     }[focus];
     // **長文だけ本数**なので、そのことをここで言う（チップの数字の意味が変わる）
     const reading = plan.passages ? `長文${plan.passages}本を含めて` : '';
-    $('#plan-note').textContent =
-      `${focusText}。${reading}およそ${plan.total}問です。5分でも連続は途切れません。`;
+    const size = `${reading}およそ${plan.total}問です。`;
+    // ミニマムが残っているあいだは、そこから出していることを先に言う
+    // 単語のミニマムは「正解した数」なので、**踏み終えると約束はできない**
+    // （何問当たるかは解いてみないと分からない）。見込みだとそのまま言う
+    $('#plan-note').textContent = plan.forMinimum
+      ? plan.coversMinimum
+        ? `${size}この回で今日のミニマムに届く見込みです。`
+        : `残っているミニマムから先に出します。${size}足りないぶんは次の回で拾います。`
+      : `${focusText}。${size}5分でも連続は途切れません。`;
   }
 
   function initSession() {
@@ -1446,7 +1596,7 @@
    * tools/stamp-version.mjs で書き換える。
    * スマホで開いたときに、手元のものが最新かを確かめるためのもの。
    */
-  const APP_VERSION = '2026-08-20 (904763d)';
+  const APP_VERSION = '2026-08-22 (56e8df0)';
 
   const EXAM_DATE = '2027-01-07';
 
@@ -4122,10 +4272,13 @@
         const date = parseDateKey(d.date);
         const today = i === days.length - 1;
         const label = today ? '今日' : WEEKDAYS[date.getDay()];
-        return `<div class="weekbar-col" title="${d.date}: ${d.minutes}分">
+        // ミニマムを踏んだ日に印を付ける。**この機能より前の記録には wordC が無い**ので、
+        // 古い日は踏んでいても印が付かない（分からないものを「達成」とは言わない）
+        const met = metMinimum(Storage.getDay(d.date));
+        return `<div class="weekbar-col" title="${d.date}: ${d.minutes}分${met ? '（ミニマム達成）' : ''}">
             <div class="weekbar ${today ? 'is-today' : ''} ${d.minutes ? '' : 'is-empty'}"
                  style="height:${Math.max((d.minutes / max) * 100, 3)}%"></div>
-            <span class="weekbar-label">${label}</span>
+            <span class="weekbar-label">${met ? '✓' : label}</span>
           </div>`;
       })
       .join('');
