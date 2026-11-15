@@ -56,7 +56,7 @@ const NAMES = { study: 'おぼえる', ja2en: '意味→英語', en2ja: '英語�
  * 点検する組み合わせ。**用紙ごとに1行の高さが違う**ので、1種類ずつ見る。
  * 語数は 1枚ちょうど・割り切れない数・数枚にまたがる数を混ぜる
  */
-const PER_DAY = [20, 30, 40];
+const PER_DAY = [10, 20, 30, 40];
 const CASES = [
   ...PARTS.filter((p) => p !== 'answer').map((p) => ({ name: NAMES[p], parts: [p] })),
   // 解答はテストがあるときだけ出る

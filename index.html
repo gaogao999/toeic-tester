@@ -12,14 +12,15 @@
 <body>
 
 <!--
-  紙で覚えて、アプリは記録と進捗。
-    朝  「今日の20語」を作って印刷する
-    昼  紙で覚える
-    夜  紙と同じ番号で、まちがえた語だけ押して記録する
+  紙で覚えて、アプリは記録と進捗。15分ほど。
+    1. 「今日の10語」を作って印刷する
+    2. 紙で覚えて、テストする
+    3. **テストのあとすぐ**、紙と同じ番号で、まちがえた語だけ本人が押して記録する
+       （夜まで待つと忘れる。記録していない紙が残ると次の紙が作れない）
 -->
 <header class="app-header">
   <h1 class="app-title">花の英単語</h1>
-  <span class="streak" id="streak" hidden>連続 <b>0</b>日</span>
+  <span class="streak" id="streak" hidden>今月 <b>0</b>日</span>
 </header>
 
 <main class="container">
@@ -29,10 +30,20 @@
     <!-- 記録していないプリントがないとき：作る -->
     <div id="today-make">
       <div class="card">
-        <p class="card-label" id="make-label">今日の20語</p>
+        <p class="card-label" id="make-label">今日の10語</p>
         <p class="make-mix" id="make-mix"></p>
-        <button class="btn btn-ink btn-lg" id="do-make">今日の20語を作る</button>
+        <button class="btn btn-ink btn-lg" id="do-make">今日の10語を作る</button>
+        <button class="btn btn-ghost btn-small" id="do-make-small">今日は少なめ（5語）</button>
         <p class="hint" id="make-note"></p>
+      </div>
+      <!-- 続いてきたら、語数を増やすかを一度だけ聞く -->
+      <div class="card" id="up-ask" hidden>
+        <p class="card-label">続いていますね</p>
+        <p class="hint" id="up-ask-text"></p>
+        <div class="btn-row">
+          <button class="btn btn-ghost" id="up-no">このまま</button>
+          <button class="btn btn-ink" id="up-yes">20語にする</button>
+        </div>
       </div>
       <div class="card" id="today-done" hidden></div>
     </div>
@@ -45,7 +56,7 @@
           <button class="btn btn-ink" id="do-print-view">🖨 印刷する</button>
           <button class="btn btn-accent" id="do-check">答え合わせ</button>
         </div>
-        <p class="hint">紙で覚えたら、夜に「答え合わせ」で<b>まちがえた語だけ</b>押してください。</p>
+        <p class="hint" id="sheet-note">テストが終わったら、<b>すぐに</b>「答え合わせ」で<b>まちがえた語だけ</b>押してください。</p>
       </div>
 
       <div class="card">
@@ -61,6 +72,22 @@
     <div class="card">
       <p class="card-label" id="check-label"></p>
       <p class="hint"><b>紙と同じ番号です。</b>まちがえた語だけ押して ✕ にしてください。もう一度押すと ○ に戻ります。</p>
+      <!--
+        立ち会う大人へ。**採点する人ではなく、場を整える人。**
+        ✕ を押すのは本人。まちがいを正直に押しても責められないことが、記録の正確さを決める
+      -->
+      <details class="guide">
+        <summary>立ち会うかたへ</summary>
+        <ol>
+          <li>紙を渡して「始めよう」とだけ言う。覚えている間は見張らない</li>
+          <li>テストの時間を計る</li>
+          <li>解答を読み上げる</li>
+          <li><b>✕ を押すのは本人。</b>大人は押さない・判定しない</li>
+          <li>一緒に発音を聞いて終わり。決めた数より増やさない</li>
+        </ol>
+        <p class="guide-sub">言わない方がよいこと: 「何問できた？」「また同じのまちがえてる」、きょうだいとの比べ。<br />
+          休んだ日は理由を聞かず「今日は5語だけやる？」と小さく。</p>
+      </details>
       <div class="check-rows" id="check-rows"></div>
       <p class="check-sum" id="check-sum"></p>
       <div class="btn-row">
@@ -95,7 +122,7 @@
     <div class="card">
       <div class="big-row">
         <div><span class="big" id="p-learned">0</span><span class="unit">語 覚えた</span></div>
-        <div><span class="big" id="p-streak">0</span><span class="unit">日 連続</span></div>
+        <div><span class="big" id="p-month">0</span><span class="unit">日 今月やった</span></div>
       </div>
       <p class="hint" id="p-due"></p>
     </div>
@@ -151,7 +178,7 @@
       <p class="card-label">プリント</p>
       <label class="field"><span>1枚の語数</span>
         <select id="s-perday">
-          <option value="10">10語</option>
+          <option value="10">10語（はじめはここから）</option>
           <option value="20">20語</option>
           <option value="30">30語</option>
           <option value="40">40語</option>

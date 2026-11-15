@@ -42,11 +42,15 @@ const Store = (() => {
     //   ok/ng 正解・不正解の回数
     //   first はじめて記録した日 / last 最後に記録した日
     words: {},
-    // [{ id, date, words: [...], results: { 語: true/false } | null, recordedAt }]
-    //   date は**覚えた日**（印刷した日）。記録を夜中に付けても、その日の勉強として数える
+    // [{ id, date, words: [...], results: { 語: true/false } | null, recordedAt, draft? }]
+    //   date は**覚えた日**（印刷した日）。記録を次の日に付けても、その日の勉強として数える
+    //   draft は答え合わせの途中で押した ✕ の語。画面を閉じても消えないように持つ
     sheets: [],
     settings: {
-      perDay: 20,          // 1枚の語数
+      // 1枚の語数。**はじめは10語。**最初から20語だと、まちがえた語が毎日戻ってきて
+      // 「同じ語にまた会う」のが手応えより疲れになる。続いたら20語を一度だけすすめる（upAsked）
+      perDay: 10,
+      upAsked: false,
       range: 'all',        // 'all'（2級→準1級）/ 'g2' / 'jun1'
       parts: { study: true, ja2en: true, en2ja: false, write: false, answer: true },
       voiceName: '',
@@ -197,14 +201,33 @@ const Store = (() => {
    * 新しい語が1つも入らない日が続くと、進んでいる感じがしなくなるから。
    * （えいごペットは5問中3問まで。同じ割合）
    */
-  function pickWords(pool, worksheetKeys, perDay, today) {
-    const seen = (w) => {
-      const r = rec(w.word);
-      return r && r.ok + r.ng > 0;
-    };
-    const due = pool
+  /** 復習の期限がきた語（期限がふるい順） */
+  function dueWords(pool, today) {
+    return pool
       .filter((w) => seen(w) && rec(w.word).due <= today)
       .sort((a, b) => (rec(a.word).due < rec(b.word).due ? -1 : rec(a.word).due > rec(b.word).due ? 1 : 0));
+  }
+  const seen = (w) => {
+    const r = rec(w.word);
+    return r && r.ok + r.ng > 0;
+  };
+
+  /**
+   * **復習がたまっている日**（休んだあと）。1日ぶんより多く期限がきている。
+   * この日は**復習だけ、少なめ**にする（CATCH_UP 語まで）。
+   * 休んだぶんを一度に取り戻させると、そこで嫌になってやめてしまう。
+   * 新しい語を足さないので、たまった復習は数日で自然に減っていく
+   */
+  const CATCH_UP = 10;
+  function catchingUp(pool) {
+    return dueWords(pool, dateKey()).length > state.settings.perDay;
+  }
+
+  function pickWords(pool, worksheetKeys, perDay, today) {
+    const due = dueWords(pool, today);
+    if (due.length > state.settings.perDay) {
+      return due.slice(0, Math.min(perDay, CATCH_UP)).map((w) => w.word);
+    }
 
     const maxReview = Math.round(perDay * 0.6);
     const review = due.slice(0, maxReview);
@@ -223,13 +246,13 @@ const Store = (() => {
   }
 
   /** 今日のプリントを作る。**記録していないプリントがあるうちは作らない**（null を返す） */
-  function makeSheet(pool, worksheetKeys) {
+  function makeSheet(pool, worksheetKeys, count) {
     if (pendingSheet()) return null;
     const today = dateKey();
     // **並びは作るときに1回だけ混ぜる。**復習の語と新しい語が固まっていると、
     // テストで「前半は知っている語」と分かってしまう。混ぜた並びは保存するので、
     // どの紙も答え合わせの画面も**同じ番号**になる
-    const words = shuffle(pickWords(pool, worksheetKeys, state.settings.perDay, today));
+    const words = shuffle(pickWords(pool, worksheetKeys, count || state.settings.perDay, today));
     if (!words.length) return null;
     const n = sheetsOn(today).length + 1;
     const sheet = { id: `${today}-${n}`, date: today, words, results: null, recordedAt: null };
@@ -259,6 +282,7 @@ const Store = (() => {
       if (typeof results[w] === 'boolean') apply(w, results[w], sheet.date);
     }
     sheet.results = { ...results };
+    delete sheet.draft;
     sheet.recordedAt = new Date().toISOString();
     return save();
   }
@@ -270,17 +294,27 @@ const Store = (() => {
     return new Set(state.sheets.filter((s) => s.results).map((s) => s.date));
   }
 
-  /** 今日を含む連続日数。今日まだなら昨日から数える（今日の分で途切れたことにしない） */
-  function streak() {
-    const days = studiedDates();
-    let n = 0;
-    let d = dateKey();
-    if (!days.has(d)) d = addDays(d, -1);
-    while (days.has(d)) {
-      n += 1;
-      d = addDays(d, -1);
-    }
-    return n;
+  /**
+   * 今月やった日数。**連続日数は数えない。**連続日数は1日休むと0に戻り、
+   * その「なくした」感じで再開が遅れる。月の日数は休んでも減らない
+   */
+  function monthDays() {
+    const ym = dateKey().slice(0, 7);
+    return [...studiedDates()].filter((d) => d.startsWith(ym)).length;
+  }
+
+  /** 直近 n 日（今日を含む）のうち、やった日数 */
+  function daysWithin(n) {
+    const from = addDays(dateKey(), -(n - 1));
+    return [...studiedDates()].filter((d) => d >= from).length;
+  }
+
+  /** 答え合わせの途中（✕ を付けた語）を保存する。画面を閉じても消えないように */
+  function saveDraft(id, ngWords) {
+    const sheet = state.sheets.find((s) => s.id === id);
+    if (!sheet || sheet.results) return;
+    sheet.draft = ngWords.slice();
+    save();
   }
 
   /** ある日の記録: 何語・何問正解 */
@@ -366,6 +400,7 @@ const Store = (() => {
     const settings = clone(DEFAULTS.settings);
     if ([10, 20, 30, 40].includes(ps.perDay)) settings.perDay = ps.perDay;
     if (['all', 'g2', 'jun1'].includes(ps.range)) settings.range = ps.range;
+    if (typeof ps.upAsked === 'boolean') settings.upAsked = ps.upAsked;
     if (typeof ps.voiceName === 'string') settings.voiceName = ps.voiceName;
     if (typeof ps.rate === 'number' && ps.rate >= 0.5 && ps.rate <= 1.2) settings.rate = ps.rate;
     if (ps.parts && typeof ps.parts === 'object') {
@@ -415,7 +450,11 @@ const Store = (() => {
     discardPending,
     recordSheet,
     studiedDates,
-    streak,
+    monthDays,
+    daysWithin,
+    saveDraft,
+    catchingUp,
+    CATCH_UP,
     dayTally,
     dueWithin,
     getSettings,

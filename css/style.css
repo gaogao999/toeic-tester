@@ -246,12 +246,11 @@ body.printing .container { max-width: 900px; }
   width: 100%;
   margin-top: auto;
   border-radius: 4px 4px 0 0;
-  background: color-mix(in srgb, var(--ng) 30%, var(--surface-2));
+  /* 高さはやった語数だけ。正解・まちがいで色分けしない（日ごとの比べになるため） */
+  background: var(--accent);
   overflow: hidden;
 }
 .day-bar.is-empty { background: var(--surface-2); }
-/* 棒の中の緑が正解ぶん、上の薄い赤がまちがいぶん */
-.day-ok { position: absolute; left: 0; right: 0; bottom: 0; background: var(--accent); }
 .day-label { margin-top: 3px; font-size: 0.6rem; color: var(--text-muted); white-space: nowrap; }
 .day.is-today .day-label { color: var(--text); font-weight: 700; }
 
@@ -435,3 +434,20 @@ body.printing .container { max-width: 900px; }
   font-size: 0.9rem;
 }
 .toast[hidden] { display: none; }
+
+/* ---------- 立ち会うかたへ（答え合わせの画面） ---------- */
+.guide {
+  margin: 12px 0 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.82rem;
+}
+.guide summary { font-weight: 700; cursor: pointer; }
+.guide ol { margin: 8px 0 0; padding-left: 1.4em; }
+.guide li { margin: 2px 0; }
+.guide-sub { margin: 8px 0 0; color: var(--text-muted); }
+
+/* btn や card は display を指定しているので、hidden を効かせるには併記が要る */
+.btn[hidden],
+.card[hidden] { display: none; }

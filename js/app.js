@@ -18,7 +18,7 @@
    * 設定画面の下に出すリビジョン。ビルド工程が無いので実行時に git を読めない。
    * コミットの直前に tools/stamp-version.mjs で書き換える。
    */
-  const APP_VERSION = '2026-11-15 (1e663e0)';
+  const APP_VERSION = '2026-11-15 (9d69a9f)';
 
   const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
 
@@ -105,8 +105,9 @@
     if (s) Speech.speak(s.dataset.speak);
   });
 
+  // 見出しには**今月やった日数**を出す。連続日数は1日休むと0に戻り、再開しにくくなる
   function renderHeader() {
-    const n = Store.streak();
+    const n = Store.monthDays();
     $('#streak').hidden = n === 0;
     $('#streak').querySelector('b').textContent = n;
   }
@@ -151,33 +152,63 @@
 
     if (pending) {
       const m = mixOf(pending.words);
-      $('#sheet-label').innerHTML =
-        `${escapeHtml(dateLabel(pending.date))}の${pending.words.length}語　<span class="muted">${escapeHtml(mixText(m))}</span>`;
+      // **前の日の紙が残っていたら、それを記録するのが先。**新しい紙は作れないので、
+      // 何をすればよいかをはっきり出す（責める言い方はしない）
+      const old = pending.date < Store.dateKey();
+      $('#sheet-label').innerHTML = old
+        ? `${escapeHtml(dateLabel(pending.date))}の紙が、まだ記録されていません`
+        : `${escapeHtml(dateLabel(pending.date))}の${pending.words.length}語　<span class="muted">${escapeHtml(mixText(m))}</span>`;
+      $('#sheet-note').innerHTML = old
+        ? 'やってあれば「答え合わせ」で記録してください。やっていなければ、下の「作り直す」で今日の紙にできます。'
+        : 'テストが終わったら、<b>すぐに</b>「答え合わせ」で<b>まちがえた語だけ</b>押してください。';
+      $('#do-check').textContent = old ? 'この紙を記録する' : '答え合わせ';
       $('#sheet-words').innerHTML = pending.words.map((w, i) => wordRow(lookup(w), i + 1)).join('');
       return;
     }
 
-    const per = Store.getSettings().perDay;
+    const settings = Store.getSettings();
     const plan = Store.plan(pool(), WS_KEYS);
+    const per = plan.length || settings.perDay;
     const today = Store.dateKey();
     const doneToday = Store.sheetsOn(today).filter((s) => s.results);
+    const catchUp = Store.catchingUp(pool());
 
     $('#make-label').textContent = doneToday.length ? `今日の${doneToday.length + 1}枚目` : `今日の${per}語`;
     $('#do-make').textContent = doneToday.length ? `もう${per}語作る` : `今日の${per}語を作る`;
     $('#make-mix').textContent = plan.length ? mixText(mixOf(plan)) : '出せる語がありません';
     $('#do-make').disabled = !plan.length;
-    $('#make-note').textContent = '作ると、紙の並びと答え合わせの番号がそろいます。作ったら印刷してください。';
+    // 今日の分が終わったら、追加は目立たせない（「決めた数で終わり」にする）
+    $('#do-make').classList.toggle('btn-ink', !doneToday.length);
+    $('#do-make').classList.toggle('btn-lg', !doneToday.length);
+    $('#do-make').classList.toggle('btn-ghost', !!doneToday.length);
+    // 少なめの日。休み明けや疲れた日の逃げ道。「やらない」より「5語だけ」のほうが戻ってきやすい
+    $('#do-make-small').hidden = !plan.length || per <= 5 || !!doneToday.length;
+    $('#make-note').textContent = catchUp
+      ? '復習がたまっているので、今日は復習だけにしました。新しい語は、たまった分が減ってから出ます。'
+      : '作ると、紙の並びと答え合わせの番号がそろいます。作ったら印刷してください。';
 
-    // 今日すでに記録した分
+    // 続いてきたら、語数を増やすかを**一度だけ**聞く。こちらから勝手には増やさない
+    const askUp = settings.perDay === 10 && !settings.upAsked && !catchUp && !doneToday.length &&
+      Store.daysWithin(14) >= UP_AFTER_DAYS;
+    $('#up-ask').hidden = !askUp;
+    if (askUp) {
+      $('#up-ask-text').textContent =
+        `この2週間で${Store.daysWithin(14)}日やりました。1日20語に増やしますか？ あとから設定でも変えられます。`;
+    }
+
+    // 今日すでに記録した分。**正解の数は出さない。**やったこと（語数）だけ
     const t = Store.dayTally(today);
     $('#today-done').hidden = !t.total;
     if (t.total) {
       $('#today-done').innerHTML =
         `<p class="card-label">今日の記録</p>
-         <p class="done-line"><b>${t.ok}</b> / ${t.total} 語 正解　<span class="muted">${doneToday.length}枚</span></p>
+         <p class="done-line"><b>${t.total}</b> 語 やりました。今日はここまでで大丈夫です。</p>
          <p class="hint">明日の復習: ${Store.dueWithin(1)}語</p>`;
     }
   }
+
+  /** 何日やったら20語をすすめるか（直近2週間のうち） */
+  const UP_AFTER_DAYS = 10;
 
   /** 単語の1行。押すと発音 */
   function wordRow(w, no) {
@@ -206,8 +237,13 @@
       showView('today');
       return;
     }
-    // 開くたびに全部 ○ から始める。**まちがえた語だけ押せば終わる**ようにするため
-    for (const w of sheet.words) if (typeof checking[w] !== 'boolean') checking[w] = true;
+    // 全部 ○ から始める。**まちがえた語だけ押せば終わる**ようにするため。
+    // 途中で閉じていたら、押してあった ✕ を戻す（sheet.draft）
+    if (checking.__id !== sheet.id) {
+      const ng = new Set(sheet.draft || []);
+      checking = { __id: sheet.id };
+      for (const w of sheet.words) checking[w] = !ng.has(w);
+    }
 
     $('#check-label').textContent = `${dateLabel(sheet.date)}の${sheet.words.length}語`;
     $('#check-rows').innerHTML = sheet.words
@@ -230,6 +266,8 @@
     const b = e.target.closest('[data-mark]');
     if (!b) return;
     checking[b.dataset.mark] = !checking[b.dataset.mark];
+    const sheet = Store.pendingSheet();
+    if (sheet) Store.saveDraft(sheet.id, sheet.words.filter((w) => checking[w] === false));
     renderCheck();
   });
 
@@ -243,8 +281,8 @@
       return;
     }
     checking = {};
-    const ok = Object.values(results).filter(Boolean).length;
-    toast(`記録しました　${ok} / ${sheet.words.length} 正解`);
+    // 正解の数は出さない。✕ は「次にまた出る」だけの意味で、点数ではない
+    toast('記録しました。✕ の語は、また近いうちに出てきます');
     showView('today');
   });
 
@@ -437,10 +475,10 @@
       .join('');
 
     $('#p-learned').textContent = learnedAll.toLocaleString();
-    $('#p-streak').textContent = Store.streak();
+    $('#p-month').textContent = Store.monthDays();
     $('#p-due').textContent = `復習の予定: 明日まで ${Store.dueWithin(1)}語 ／ 1週間以内 ${Store.dueWithin(7)}語`;
 
-    // この2週間。棒の高さは記録した語数、✓ は1枚以上記録した日
+    // この2週間。棒の高さは記録した語数。**正解の割合は出さない**（日ごとに比べる材料になる）
     const days = [];
     for (let i = 13; i >= 0; i--) days.push(Store.addDays(Store.dateKey(), -i));
     const tallies = days.map((d) => ({ d, ...Store.dayTally(d) }));
@@ -449,11 +487,8 @@
       .map((t, i) => {
         const [, m, d] = t.d.split('-').map(Number);
         const h = t.total ? Math.max(6, (t.total / max) * 100) : 3;
-        const okh = t.total ? (t.ok / t.total) * 100 : 0;
-        return `<div class="day ${i === tallies.length - 1 ? 'is-today' : ''}" title="${t.d}: ${t.ok}/${t.total}">
-            <div class="day-bar ${t.total ? '' : 'is-empty'}" style="height:${h}%">
-              <span class="day-ok" style="height:${okh}%"></span>
-            </div>
+        return `<div class="day ${i === tallies.length - 1 ? 'is-today' : ''}" title="${t.d}: ${t.total}語">
+            <div class="day-bar ${t.total ? '' : 'is-empty'}" style="height:${h}%"></div>
             <span class="day-label">${i === tallies.length - 1 ? '今日' : `${m}/${d}`}</span>
           </div>`;
       })
@@ -464,11 +499,9 @@
     $('#p-sheets').innerHTML = sheets.length
       ? sheets
         .map((s) => {
-          const ok = Object.values(s.results).filter(Boolean).length;
           return `<button class="sheet-line" data-reprint="${escapeHtml(s.id)}">
               <span>${escapeHtml(dateLabel(s.date))}</span>
-              <span class="muted">${s.words.length}語</span>
-              <span class="sheet-score">${ok} / ${s.words.length}</span>
+              <span class="sheet-score">${s.words.length}語</span>
               <span class="muted">🖨</span>
             </button>`;
         })
@@ -624,8 +657,8 @@
   // 今日の画面のボタン
   // ============================================================
 
-  $('#do-make').addEventListener('click', () => {
-    const sheet = Store.makeSheet(pool(), WS_KEYS);
+  function makeAndPrint(count) {
+    const sheet = Store.makeSheet(pool(), WS_KEYS, count);
     if (!sheet) {
       toast('出せる語がありません');
       return;
@@ -633,6 +666,17 @@
     checking = {};
     printTarget = null;
     showView('print');
+  }
+  $('#do-make').addEventListener('click', () => makeAndPrint());
+  $('#do-make-small').addEventListener('click', () => makeAndPrint(5));
+  $('#up-yes').addEventListener('click', () => {
+    Store.updateSettings({ perDay: 20, upAsked: true });
+    toast('1日20語にしました');
+    renderToday();
+  });
+  $('#up-no').addEventListener('click', () => {
+    Store.updateSettings({ upAsked: true });
+    renderToday();
   });
   $('#do-print-view').addEventListener('click', () => {
     printTarget = null;
