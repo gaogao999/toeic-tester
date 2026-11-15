@@ -1,56 +1,26 @@
 /**
- * 英単語プリント — 紙を組んで印刷するだけ。
+ * 花の英単語 — 紙で覚えて、アプリは記録と進捗。
  *
- * **学習記録は持たない。**覚えたかどうかは紙の上の話で、アプリが持つ理由がない。
- * 画面に出ているものが、そのまま印刷される（プレビュー用に別の組み方をしない）。
+ *   朝  「今日の20語」を作って印刷する（復習の期限がきた語＋新しい語）
+ *   昼  紙で覚える
+ *   夜  紙と同じ番号で、まちがえた語だけ押して記録する → 次の日の20語が決まる
+ *
+ * **紙からアプリへの戻し方は「まちがえた語だけ押す」に絞ってある。**
+ * 20語ぜんぶに ○× を付けさせると3日で続かなくなる。ふつうは2〜5回押せば終わる。
  */
 (() => {
   'use strict';
 
   const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
   /**
-   * 画面の左上に出すリビジョン。
-   * ビルド工程が無いので実行時に git を読めない。コミットの直前に
-   * tools/stamp-version.mjs で書き換える。
+   * 設定画面の下に出すリビジョン。ビルド工程が無いので実行時に git を読めない。
+   * コミットの直前に tools/stamp-version.mjs で書き換える。
    */
-  const APP_VERSION = '2026-08-24 (10400a2)';
+  const APP_VERSION = '2026-11-15 (1e663e0)';
 
-  const LEVEL_LABELS = { 2: '基礎 A2', 3: '標準 B1', 4: '応用 B2' };
-
-  /**
-   * 1枚に入る行数。**用紙ごとに決め打ちにしてある。**
-   *
-   * ブラウザの改ページ任せにすると、画面のプレビューと刷り上がりがずれる。
-   * こちらで行を枚数ぶんに切り分けておけば、**画面の1枚＝紙の1枚**になる。
-   * 数は**目分量ではなく実測**で決めてある。A4（1122px）から上下の余白と
-   * 見出しを引くと本文に使えるのが 938px で、それを1行の高さで割った数。
-   * 最初は目分量で置いていたら、画面2枚が紙3ページに割れた。
-   *
-   * 例文つきの一覧だけ、**例文の無い語がある**ぶん余る。
-   * 全部に例文が付いた最悪の場合で収まる数にしてある（余るほうは害がない）。
-   *
-   * **行の高さを CSS で変えたら、ここも対で直すこと。**
-   * `node tools/audit-print.mjs` が、画面の枚数と刷り上がりのページ数が
-   * 合っているかを見ている。
-   */
-  const ROWS_PER_PAGE = {
-    list: 23,
-    listExample: 14,
-    ja2en: 22,
-    en2ja: 22,
-    write: 18,
-    answer: 30
-  };
-
-  const SHEET_TITLES = {
-    list: '英単語 おぼえる用',
-    ja2en: '英単語テスト　意味 → 英語',
-    en2ja: '英単語テスト　英語 → 意味',
-    write: '英単語 書いて覚える'
-  };
-
-  const KEY = 'eis-print:v1';
+  const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
 
   function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, (c) => ({
@@ -58,357 +28,634 @@
     })[c]);
   }
 
-  // ============================================================
-  // 設定の読み書き
-  // ============================================================
-  //
-  // **古いアプリの保存キー（eis-app:v1）には触らない。**
-  // あちらには学習記録が入ったままで、アプリを戻せば読み出せる。
-  // こちらは「前に選んだ範囲」を覚えておくだけなので、別のキーを使う。
+  let toastTimer = null;
+  function toast(msg) {
+    const el = $('#toast');
+    el.textContent = msg;
+    el.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.hidden = true; }, 2200);
+  }
 
-  const DEFAULTS = {
-    sheet: 'list',
-    level: 'all',
-    category: 'all',
-    order: 'id',
-    start: 1,
-    count: 40,
-    example: false,
-    answer: true,
-    phonetic: true
+  // ============================================================
+  // 単語
+  // ============================================================
+
+  const GRADE_NAME = { g2: '2級', jun1: '準1級', ws: 'ワークシート' };
+
+  /**
+   * 使う語のぜんぶ。**単語帳（js/data.js）に、ワークシートで出た語を足したもの。**
+   * ワークシートの語が単語帳にあれば単語帳の意味を使い、無ければワークシートの意味を使う
+   * （単語帳に無い語の級は 'ws'）
+   */
+  const BY_KEY = new Map();
+  for (const w of WORDS) BY_KEY.set(Store.keyOf(w.word), { ...w, ws: false });
+  for (const w of WORKSHEET_WORDS) {
+    const k = Store.keyOf(w.word);
+    const have = BY_KEY.get(k);
+    if (have) have.ws = true;
+    else BY_KEY.set(k, { word: w.word, meaning: w.meaning, grade: 'ws', ws: true });
+  }
+  const ALL = [...BY_KEY.values()];
+  const WS_KEYS = new Set(WORKSHEET_WORDS.map((w) => Store.keyOf(w.word)));
+
+  const lookup = (word) => BY_KEY.get(Store.keyOf(word)) || { word, meaning: '', grade: 'ws' };
+
+  /**
+   * プリントに出してよい語。設定の「出す範囲」で決まる。
+   * **ワークシートの語は範囲にかかわらず入れる**（文章の中で出会った語なので）
+   */
+  function pool() {
+    const range = Store.getSettings().range;
+    const inRange = (w) => w.ws || range === 'all' || w.grade === range;
+    // 'all' のときは 2級 → 準1級 の順。js/data.js の並びがすでにそうなっている
+    return ALL.filter(inRange);
+  }
+
+  // ============================================================
+  // 画面の切り替え
+  // ============================================================
+
+  // 印刷する紙。今日のプリントか、記録の画面で選んだ過去のプリント
+  let printTarget = null;
+  // 答え合わせ中の ○×（まだ記録していないもの）
+  let checking = {};
+
+  function showView(name) {
+    $$('.view').forEach((v) => v.classList.toggle('is-active', v.id === `view-${name}`));
+    // 答え合わせと印刷は「今日」のタブの中の画面
+    const tab = ['check', 'print'].includes(name) ? 'today' : name;
+    $$('.tab').forEach((t) => t.classList.toggle('is-active', t.dataset.view === tab));
+    document.body.classList.toggle('printing', name === 'print');
+    window.scrollTo(0, 0);
+    if (name === 'today') renderToday();
+    if (name === 'check') renderCheck();
+    if (name === 'print') renderPrint();
+    if (name === 'progress') renderProgress();
+    if (name === 'words') renderWordsFromTop();
+    if (name === 'settings') renderSettings();
+    renderHeader();
+  }
+
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('[data-view]');
+    if (t) showView(t.dataset.view);
+    // 発音。単語の行ならどこを押してもよい（押す的を大きくする）
+    const s = e.target.closest('[data-speak]');
+    if (s) Speech.speak(s.dataset.speak);
+  });
+
+  function renderHeader() {
+    const n = Store.streak();
+    $('#streak').hidden = n === 0;
+    $('#streak').querySelector('b').textContent = n;
+  }
+
+  // ============================================================
+  // 日付の表し方
+  // ============================================================
+
+  function dateLabel(key, long) {
+    const [y, m, d] = key.split('-').map(Number);
+    const wd = WEEKDAYS[new Date(y, m - 1, d).getDay()];
+    return long ? `${y}年${m}月${d}日（${wd}）` : `${m}/${d}（${wd}）`;
+  }
+
+  // ============================================================
+  // 今日
+  // ============================================================
+
+  /** 今日のプリントの見込み。復習が何語・新しい語が何語か */
+  function mixOf(words) {
+    let review = 0;
+    let ws = 0;
+    for (const w of words) {
+      const r = Store.rec(w);
+      if (r && r.ok + r.ng > 0) review += 1;
+      else if (WS_KEYS.has(Store.keyOf(w))) ws += 1;
+    }
+    return { review, fresh: words.length - review, ws };
+  }
+
+  function mixText(m) {
+    const parts = [];
+    if (m.review) parts.push(`復習 ${m.review}語`);
+    if (m.fresh) parts.push(`新しい語 ${m.fresh}語${m.ws ? `（うちワークシートの語 ${m.ws}）` : ''}`);
+    return parts.join(' ＋ ');
+  }
+
+  function renderToday() {
+    const pending = Store.pendingSheet();
+    $('#today-make').hidden = !!pending;
+    $('#today-sheet').hidden = !pending;
+
+    if (pending) {
+      const m = mixOf(pending.words);
+      $('#sheet-label').innerHTML =
+        `${escapeHtml(dateLabel(pending.date))}の${pending.words.length}語　<span class="muted">${escapeHtml(mixText(m))}</span>`;
+      $('#sheet-words').innerHTML = pending.words.map((w, i) => wordRow(lookup(w), i + 1)).join('');
+      return;
+    }
+
+    const per = Store.getSettings().perDay;
+    const plan = Store.plan(pool(), WS_KEYS);
+    const today = Store.dateKey();
+    const doneToday = Store.sheetsOn(today).filter((s) => s.results);
+
+    $('#make-label').textContent = doneToday.length ? `今日の${doneToday.length + 1}枚目` : `今日の${per}語`;
+    $('#do-make').textContent = doneToday.length ? `もう${per}語作る` : `今日の${per}語を作る`;
+    $('#make-mix').textContent = plan.length ? mixText(mixOf(plan)) : '出せる語がありません';
+    $('#do-make').disabled = !plan.length;
+    $('#make-note').textContent = '作ると、紙の並びと答え合わせの番号がそろいます。作ったら印刷してください。';
+
+    // 今日すでに記録した分
+    const t = Store.dayTally(today);
+    $('#today-done').hidden = !t.total;
+    if (t.total) {
+      $('#today-done').innerHTML =
+        `<p class="card-label">今日の記録</p>
+         <p class="done-line"><b>${t.ok}</b> / ${t.total} 語 正解　<span class="muted">${doneToday.length}枚</span></p>
+         <p class="hint">明日の復習: ${Store.dueWithin(1)}語</p>`;
+    }
+  }
+
+  /** 単語の1行。押すと発音 */
+  function wordRow(w, no) {
+    const stage = Store.stageOf(w.word);
+    const chip = { learned: '覚えた', learning: '覚えかけ', missed: 'まちがえた', new: '' }[stage];
+    return `<button class="word-row" data-speak="${escapeHtml(w.word)}">
+        ${no ? `<span class="w-no">${no}</span>` : ''}
+        <span class="w-word">${escapeHtml(w.word)}</span>
+        <span class="w-meaning">${escapeHtml(w.meaning)}</span>
+        <span class="w-tags">
+          ${w.ws ? '<span class="tag tag-ws">ワークシート</span>' : ''}
+          <span class="tag">${escapeHtml(GRADE_NAME[w.grade] || '')}</span>
+          ${chip ? `<span class="tag tag-${stage}">${chip}</span>` : ''}
+        </span>
+        <span class="w-speak" aria-hidden="true">🔊</span>
+      </button>`;
+  }
+
+  // ============================================================
+  // 答え合わせ
+  // ============================================================
+
+  function renderCheck() {
+    const sheet = Store.pendingSheet();
+    if (!sheet) {
+      showView('today');
+      return;
+    }
+    // 開くたびに全部 ○ から始める。**まちがえた語だけ押せば終わる**ようにするため
+    for (const w of sheet.words) if (typeof checking[w] !== 'boolean') checking[w] = true;
+
+    $('#check-label').textContent = `${dateLabel(sheet.date)}の${sheet.words.length}語`;
+    $('#check-rows').innerHTML = sheet.words
+      .map((w, i) => {
+        const x = lookup(w);
+        const ok = checking[w];
+        return `<div class="check-row ${ok ? '' : 'is-ng'}">
+            <span class="w-no">${i + 1}</span>
+            <button class="c-word" data-speak="${escapeHtml(x.word)}">${escapeHtml(x.word)} <span aria-hidden="true">🔊</span></button>
+            <span class="c-meaning">${escapeHtml(x.meaning)}</span>
+            <button class="c-mark" data-mark="${escapeHtml(w)}" aria-label="${ok ? '正解' : 'まちがい'}">${ok ? '○' : '✕'}</button>
+          </div>`;
+      })
+      .join('');
+    const ng = sheet.words.filter((w) => !checking[w]).length;
+    $('#check-sum').textContent = `○ ${sheet.words.length - ng}　✕ ${ng}`;
+  }
+
+  $('#check-rows').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-mark]');
+    if (!b) return;
+    checking[b.dataset.mark] = !checking[b.dataset.mark];
+    renderCheck();
+  });
+
+  $('#do-record').addEventListener('click', () => {
+    const sheet = Store.pendingSheet();
+    if (!sheet) return;
+    const results = {};
+    for (const w of sheet.words) results[w] = checking[w] !== false;
+    if (!Store.recordSheet(sheet.id, results)) {
+      toast('記録できませんでした。ブラウザの保存領域がいっぱいかもしれません');
+      return;
+    }
+    checking = {};
+    const ok = Object.values(results).filter(Boolean).length;
+    toast(`記録しました　${ok} / ${sheet.words.length} 正解`);
+    showView('today');
+  });
+
+  // ============================================================
+  // 印刷
+  // ============================================================
+
+  /**
+   * 1枚に入る行数。**用紙ごとに決め打ちにしてある。**
+   *
+   * ブラウザの改ページ任せにすると、画面のプレビューと刷り上がりがずれる。
+   * こちらで行を枚数ぶんに切り分けておけば、**画面の1枚＝紙の1枚**になる。
+   * 数は**目分量ではなく実測**で決める（A4 1122px から余白と見出しを引いた本文の高さ ÷ 1行の高さ）。
+   * **行の高さを CSS で変えたら、ここも対で直すこと。**`node tools/audit-print.mjs` が見ている
+   */
+  // **最悪の日でも割れない数**にしてある。意味がいちばん長い語ばかりの日と、
+  // 英語がいちばん長い語（threaten with extinction など熟語）ばかりの日。
+  // 割れないのは、行の高さが語で変わらないようにしてあるから:
+  //   英語は折り返さない（長い熟語は字を小さく）・紙の意味は16字まで（paperMeaning）。
+  // 最悪の日に1枚いっぱいで、下に 20〜60px 残る。audit-print.mjs が両方の日で確かめている
+  const ROWS_PER_PAGE = { study: 21, ja2en: 22, en2ja: 22, write: 17, answer: 25 };
+
+  const PART_TITLES = {
+    study: 'おぼえる',
+    ja2en: 'テスト　意味 → 英語',
+    en2ja: 'テスト　英語 → 意味',
+    write: '書いて覚える',
+    answer: '解答'
   };
 
-  function loadSettings() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(KEY));
-      if (!saved || typeof saved !== 'object') return { ...DEFAULTS };
-      const out = { ...DEFAULTS };
-      for (const k of Object.keys(DEFAULTS)) {
-        if (typeof saved[k] === typeof DEFAULTS[k]) out[k] = saved[k];
-      }
-      return out;
-    } catch (e) {
-      return { ...DEFAULTS };
-    }
+  // 刷る順。おぼえる → テスト → 書く → 解答（解答は最後。折って隠せるように）
+  const PART_ORDER = ['study', 'ja2en', 'en2ja', 'write', 'answer'];
+
+  function paginate(rows, per) {
+    const pages = [];
+    for (let i = 0; i < rows.length; i += per) pages.push(rows.slice(i, i + per));
+    return pages.length ? pages : [[]];
   }
 
-  function saveSettings(s) {
-    try {
-      localStorage.setItem(KEY, JSON.stringify(s));
-    } catch (e) {
-      /* 保存できなくても紙は作れる。黙って続ける */
-    }
-  }
-
-  let settings = loadSettings();
-
-  // ランダムの並びを、設定をいじるまで固定しておくためのたね。
-  // 毎回組み直すと、1枚目を刷ってから2枚目を刷るあいだに中身が変わる
-  let shuffleSeed = Date.now();
-
-  // ============================================================
-  // 語を選ぶ
-  // ============================================================
-
-  /** たねから決まる擬似乱数。同じたねなら同じ並びになる */
-  function seeded(seed) {
-    let s = seed >>> 0;
-    return () => {
-      s = (s * 1664525 + 1013904223) >>> 0;
-      return s / 4294967296;
-    };
-  }
-
-  function shuffleWith(array, seed) {
-    const rand = seeded(seed);
-    const a = array.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(rand() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  }
-
-  /** レベルと分野で絞り、並べ替えたもの。範囲（何語目から）はこの中での位置 */
-  function pool() {
-    let words = WORD_DATA.filter((w) => {
-      if (settings.level !== 'all' && String(w.level) !== String(settings.level)) return false;
-      if (settings.category !== 'all' && w.category !== settings.category) return false;
-      return true;
-    });
-
-    if (settings.order === 'alpha') {
-      words = words.slice().sort((a, b) => a.word.localeCompare(b.word));
-    } else if (settings.order === 'random') {
-      words = shuffleWith(words, shuffleSeed);
-    }
-    return words;
-  }
-
-  /** 実際に紙に載る語 */
-  function selected() {
-    const all = pool();
-    const start = Math.min(Math.max(1, settings.start), Math.max(1, all.length));
-    return { all, start, words: all.slice(start - 1, start - 1 + settings.count) };
-  }
-
-  // ============================================================
-  // 紙を組む
-  // ============================================================
-
-  /** 1枚ぶんの枠。中身（行）は用紙ごとに作る */
-  function sheetHtml(inner, meta) {
+  /** 1枚ぶんの枠 */
+  function sheetHtml(part, inner, meta, page, pages) {
+    const test = part === 'ja2en' || part === 'en2ja';
     return `<section class="sheet">
         <header class="sheet-head">
           <div class="sheet-title">
-            <b>${escapeHtml(meta.title)}</b>
-            <span class="sheet-range">${escapeHtml(meta.range)}</span>
+            <b>${escapeHtml(PART_TITLES[part])}</b>
+            <span class="sheet-range">${escapeHtml(meta.date)} ・ ${meta.count}語</span>
           </div>
           <div class="sheet-meta">
-            <span class="name-field">名前 <i></i></span>
-            <span class="page-no">${meta.page} / ${meta.pages}</span>
+            ${test ? `<span class="score-field"><i></i> / ${meta.count}</span>` : ''}
+            ${pages > 1 ? `<span class="page-no">${page} / ${pages}</span>` : ''}
           </div>
         </header>
         ${inner}
       </section>`;
   }
 
-  /** 行を1枚ぶんずつに切り分ける。**画面の1枚＝紙の1枚**にするため */
-  function paginate(rows, perPage) {
-    const pages = [];
-    for (let i = 0; i < rows.length; i += perPage) pages.push(rows.slice(i, i + perPage));
-    return pages.length ? pages : [[]];
-  }
-
-  const phoneticCell = (w) =>
-    settings.phonetic ? `<td class="c-ph">${escapeHtml(w.phonetic || '')}</td>` : '';
-  const phoneticHead = () => (settings.phonetic ? '<th class="c-ph">発音</th>' : '');
-
-  /** おぼえる用の一覧。覚えたか自分で印を付けられるよう、チェック欄を3つ置く */
-  function buildList(words, meta) {
-    const withExample = settings.example;
-    const perPage = withExample ? ROWS_PER_PAGE.listExample : ROWS_PER_PAGE.list;
-
-    const rows = words.map((w, i) => {
-      const example = withExample && w.example
-        ? `<tr class="row-example"><td></td><td colspan="${settings.phonetic ? 4 : 3}"
-             class="c-example">${escapeHtml(w.example)}</td></tr>`
-        : '';
-      return `<tr>
-          <td class="c-no">${meta.start + i}</td>
-          <td class="c-word">${escapeHtml(w.word)}</td>
-          ${phoneticCell(w)}
-          <td class="c-pos">${escapeHtml(w.pos || '')}</td>
-          <td class="c-meaning">${escapeHtml(w.meaning)}</td>
-          <td class="c-check"><i></i><i></i><i></i></td>
-        </tr>${example}`;
-    });
-
-    return paginate(rows, perPage).map((page, i) =>
-      sheetHtml(
-        `<table class="sheet-table">
-          <thead><tr>
-            <th class="c-no">#</th><th class="c-word">単語</th>${phoneticHead()}
-            <th class="c-pos">品詞</th><th class="c-meaning">意味</th>
-            <th class="c-check">チェック</th>
-          </tr></thead>
-          <tbody>${page.join('')}</tbody>
-        </table>`,
-        { ...meta, page: i + 1, pages: Math.max(1, Math.ceil(rows.length / perPage)) }
-      )
-    );
-  }
-
   /**
-   * テストの紙。**問題だけを出し、答えは書かない。**
-   * 解答は別の紙にして最後に付ける（折って隠せるように）
+   * 紙に載せる意味。**言い換えの並びを、頭から PAPER_MEANING 字まで**に切る。
+   * 長い意味は「当たり前の事だが、もちろんのことだが、当然のことながら」のような
+   * 同じことの言い換えで、紙では最初の1〜2つで足りる。これで1行が2行を超えなくなり、
+   * ROWS_PER_PAGE を最悪の日に合わせて大きく減らさずに済む。
+   * 最初の1つは長くても必ず残す。アプリの画面には全部出す
    */
-  function buildQuiz(words, meta, dir) {
-    const perPage = ROWS_PER_PAGE[dir];
-    const askJa = dir === 'ja2en';
-
-    const rows = words.map((w, i) => `<tr>
-        <td class="c-no">${meta.start + i}</td>
-        <td class="${askJa ? 'c-meaning' : 'c-word'}">${escapeHtml(askJa ? w.meaning : w.word)}</td>
-        ${askJa || !settings.phonetic ? '' : `<td class="c-ph">${escapeHtml(w.phonetic || '')}</td>`}
-        <td class="c-blank"></td>
-      </tr>`);
-
-    const cols = askJa ? 3 : settings.phonetic ? 4 : 3;
-    return paginate(rows, perPage).map((page, i) =>
-      sheetHtml(
-        `<table class="sheet-table sheet-quiz">
-          <thead><tr>
-            <th class="c-no">#</th>
-            <th class="${askJa ? 'c-meaning' : 'c-word'}">${askJa ? '意味' : '単語'}</th>
-            ${askJa || !settings.phonetic ? '' : '<th class="c-ph">発音</th>'}
-            <th class="c-blank">${askJa ? '英単語を書く' : '意味を書く'}</th>
-          </tr></thead>
-          <tbody>${page.join('')}</tbody>
-        </table>
-        <p class="sheet-foot">${cols ? '' : ''}</p>`,
-        { ...meta, page: i + 1, pages: Math.max(1, Math.ceil(rows.length / perPage)) }
-      )
-    );
-  }
-
-  /** 書いて覚える。薄い字をなぞってから、自分で2回書く */
-  function buildWrite(words, meta) {
-    const perPage = ROWS_PER_PAGE.write;
-    const rows = words.map((w, i) => `<tr>
-        <td class="c-no">${meta.start + i}</td>
-        <td class="c-word">${escapeHtml(w.word)}</td>
-        <td class="c-meaning">${escapeHtml(w.meaning)}</td>
-        <td class="c-trace">${escapeHtml(w.word)}</td>
-        <td class="c-blank"></td>
-      </tr>`);
-
-    return paginate(rows, perPage).map((page, i) =>
-      sheetHtml(
-        `<table class="sheet-table sheet-write">
-          <thead><tr>
-            <th class="c-no">#</th><th class="c-word">単語</th><th class="c-meaning">意味</th>
-            <th class="c-trace">なぞる</th><th class="c-blank">書く</th>
-          </tr></thead>
-          <tbody>${page.join('')}</tbody>
-        </table>`,
-        { ...meta, page: i + 1, pages: Math.max(1, Math.ceil(rows.length / perPage)) }
-      )
-    );
-  }
-
-  /** 解答。**詰めて組む**（答え合わせに使うだけなので、書く欄が要らない） */
-  function buildAnswer(words, meta) {
-    const perPage = ROWS_PER_PAGE.answer;
-    const rows = words.map((w, i) => `<tr>
-        <td class="c-no">${meta.start + i}</td>
-        <td class="c-word">${escapeHtml(w.word)}</td>
-        <td class="c-meaning">${escapeHtml(w.meaning)}</td>
-      </tr>`);
-
-    return paginate(rows, perPage).map((page, i) =>
-      sheetHtml(
-        `<table class="sheet-table sheet-answer">
-          <thead><tr>
-            <th class="c-no">#</th><th class="c-word">単語</th><th class="c-meaning">意味</th>
-          </tr></thead>
-          <tbody>${page.join('')}</tbody>
-        </table>`,
-        { ...meta, title: `${meta.title}　解答`, page: i + 1, pages: Math.max(1, Math.ceil(rows.length / perPage)) }
-      )
-    );
-  }
-
-  // ============================================================
-  // 描く
-  // ============================================================
-
-  function rangeLabel(start, words) {
-    const level = settings.level === 'all' ? 'すべてのレベル' : LEVEL_LABELS[settings.level];
-    const category = settings.category === 'all' ? '' : ` ・ ${settings.category}`;
-    const span = words.length ? `${start}〜${start + words.length - 1}語目` : '該当なし';
-    return `${level}${category} ・ ${span}`;
-  }
-
-  function render() {
-    const { all, start, words } = selected();
-    const meta = { title: SHEET_TITLES[settings.sheet], range: rangeLabel(start, words), start };
-
-    let sheets = [];
-    if (!words.length) {
-      $('#papers').innerHTML =
-        '<p class="empty">この範囲に単語がありません。レベル・分野・範囲を変えてください。</p>';
-    } else {
-      if (settings.sheet === 'list') sheets = buildList(words, meta);
-      else if (settings.sheet === 'write') sheets = buildWrite(words, meta);
-      else sheets = buildQuiz(words, meta, settings.sheet);
-
-      // 解答はテストのときだけ。一覧と書いて覚えるは答えが紙の上にある
-      const quiz = settings.sheet === 'ja2en' || settings.sheet === 'en2ja';
-      if (quiz && settings.answer) sheets = sheets.concat(buildAnswer(words, meta));
-
-      $('#papers').innerHTML = sheets.join('');
+  const PAPER_MEANING = 16;
+  const LONG_WORD = 16;
+  function paperMeaning(m) {
+    const parts = String(m || '').split('、');
+    let out = parts[0];
+    for (const p of parts.slice(1)) {
+      if ((out + '、' + p).length > PAPER_MEANING) break;
+      out += '、' + p;
     }
-
-    $('#range-note').textContent = all.length
-      ? `対象 ${all.length.toLocaleString()}語のうち ${start}語目から（例文つきの語は ${
-          all.filter((w) => w.example).length.toLocaleString()
-        }語）`
-      : '対象の単語がありません';
-    $('#page-note').textContent = sheets.length ? `全 ${sheets.length} 枚（A4 縦）` : '';
-    window.scrollTo(0, 0);
+    return out;
   }
+
+  function buildPart(part, words, meta) {
+    const per = ROWS_PER_PAGE[part];
+    const items = words.map((w, i) => {
+      const x = lookup(w);
+      return { ...x, meaning: paperMeaning(x.meaning), no: i + 1 };
+    });
+    // 長い熟語の行は字を小さくする（CSS の .is-long。英語を1行に収めるため）
+    const tr = (x) => `<tr${x.word.length > LONG_WORD ? ' class="is-long"' : ''}>`;
+
+    const row = {
+      study: (x) => `${tr(x)}<td class="c-no">${x.no}</td><td class="c-word">${escapeHtml(x.word)}</td>
+          <td class="c-meaning">${escapeHtml(x.meaning)}</td><td class="c-check"><i></i><i></i><i></i></td></tr>`,
+      ja2en: (x) => `${tr(x)}<td class="c-no">${x.no}</td><td class="c-meaning">${escapeHtml(x.meaning)}</td><td class="c-blank"></td></tr>`,
+      en2ja: (x) => `${tr(x)}<td class="c-no">${x.no}</td><td class="c-word">${escapeHtml(x.word)}</td><td class="c-blank"></td></tr>`,
+      write: (x) => `${tr(x)}<td class="c-no">${x.no}</td><td class="c-word">${escapeHtml(x.word)}</td>
+          <td class="c-meaning">${escapeHtml(x.meaning)}</td><td class="c-trace">${escapeHtml(x.word)}</td><td class="c-blank"></td></tr>`,
+      answer: (x) => `${tr(x)}<td class="c-no">${x.no}</td><td class="c-word">${escapeHtml(x.word)}</td><td class="c-meaning">${escapeHtml(x.meaning)}</td></tr>`
+    }[part];
+
+    const head = {
+      study: '<th class="c-no">#</th><th class="c-word">単語</th><th class="c-meaning">意味</th><th class="c-check">チェック</th>',
+      ja2en: '<th class="c-no">#</th><th class="c-meaning">意味</th><th class="c-blank">英語を書く</th>',
+      en2ja: '<th class="c-no">#</th><th class="c-word">単語</th><th class="c-blank">意味を書く</th>',
+      write: '<th class="c-no">#</th><th class="c-word">単語</th><th class="c-meaning">意味</th><th class="c-trace">なぞる</th><th class="c-blank">書く</th>',
+      answer: '<th class="c-no">#</th><th class="c-word">単語</th><th class="c-meaning">意味</th>'
+    }[part];
+
+    const pages = paginate(items.map(row), per);
+    return pages.map((p, i) =>
+      sheetHtml(
+        part,
+        `<table class="sheet-table sheet-${part}"><thead><tr>${head}</tr></thead><tbody>${p.join('')}</tbody></table>`,
+        meta,
+        i + 1,
+        pages.length
+      )
+    );
+  }
+
+  function renderPrint() {
+    const sheet = printTarget || Store.pendingSheet();
+    if (!sheet) {
+      showView('today');
+      return;
+    }
+    const parts = Store.getSettings().parts;
+    $$('#parts [data-part]').forEach((c) => { c.checked = !!parts[c.dataset.part]; });
+
+    const meta = { date: dateLabel(sheet.date, true), count: sheet.words.length };
+    // 解答はテストがあるときだけ意味がある
+    const hasTest = parts.ja2en || parts.en2ja;
+    const html = PART_ORDER.filter((p) => parts[p] && (p !== 'answer' || hasTest))
+      .flatMap((p) => buildPart(p, sheet.words, meta));
+
+    $('#papers').innerHTML = html.join('') ||
+      '<p class="empty">印刷する紙を1つ以上えらんでください。</p>';
+    $('#page-count').textContent = html.length;
+    $('#do-print').disabled = !html.length;
+    // 解答だけ選んでいてテストが無いときは、解答が出ないことを伝える
+    $('[data-part="answer"]').closest('label').classList.toggle('is-off', !hasTest);
+  }
+
+  $('#parts').addEventListener('change', (e) => {
+    const c = e.target.closest('[data-part]');
+    if (!c) return;
+    const parts = { ...Store.getSettings().parts, [c.dataset.part]: c.checked };
+    Store.updateSettings({ parts });
+    renderPrint();
+  });
+
+  $('#do-print').addEventListener('click', () => window.print());
+  $('#print-back').addEventListener('click', () => {
+    const back = printTarget ? 'progress' : 'today';
+    printTarget = null;
+    showView(back);
+  });
 
   // ============================================================
-  // 画面
+  // 記録（進捗）
   // ============================================================
 
-  function syncVisibility() {
-    // 効かない項目を出しておくと、押しても何も起きない欄になる
-    $('#opt-example').hidden = settings.sheet !== 'list';
-    $('#opt-answer').hidden = !(settings.sheet === 'ja2en' || settings.sheet === 'en2ja');
-    $('#do-shuffle').hidden = settings.order !== 'random';
+  function renderProgress() {
+    const grades = [
+      { key: 'g2', name: '2級', words: ALL.filter((w) => w.grade === 'g2') },
+      { key: 'jun1', name: '準1級', words: ALL.filter((w) => w.grade === 'jun1') },
+      { key: 'ws', name: 'ワークシートの語', words: ALL.filter((w) => w.ws) }
+    ];
+
+    let learnedAll = 0;
+    $('#p-grades').innerHTML = grades
+      .map((g) => {
+        const c = { learned: 0, learning: 0, new: 0 };
+        for (const w of g.words) {
+          const s = Store.stageOf(w.word);
+          if (s === 'learned') c.learned += 1;
+          else if (s === 'new') c.new += 1;
+          else c.learning += 1;
+        }
+        if (g.key !== 'ws') learnedAll += c.learned;
+        const total = g.words.length || 1;
+        const pct = (n) => `${(n / total) * 100}%`;
+        return `<div class="grade-row">
+            <div class="grade-head">
+              <span class="grade-name">${escapeHtml(g.name)}</span>
+              <span class="grade-num"><b>${c.learned.toLocaleString()}</b> / ${g.words.length.toLocaleString()}語
+                <span class="muted">（覚えかけ ${c.learning}）</span></span>
+            </div>
+            <div class="bar">
+              <span class="seg-learned" style="width:${pct(c.learned)}"></span>
+              <span class="seg-learning" style="width:${pct(c.learning)}"></span>
+            </div>
+          </div>`;
+      })
+      .join('');
+
+    $('#p-learned').textContent = learnedAll.toLocaleString();
+    $('#p-streak').textContent = Store.streak();
+    $('#p-due').textContent = `復習の予定: 明日まで ${Store.dueWithin(1)}語 ／ 1週間以内 ${Store.dueWithin(7)}語`;
+
+    // この2週間。棒の高さは記録した語数、✓ は1枚以上記録した日
+    const days = [];
+    for (let i = 13; i >= 0; i--) days.push(Store.addDays(Store.dateKey(), -i));
+    const tallies = days.map((d) => ({ d, ...Store.dayTally(d) }));
+    const max = Math.max(Store.getSettings().perDay, ...tallies.map((t) => t.total));
+    $('#p-days').innerHTML = tallies
+      .map((t, i) => {
+        const [, m, d] = t.d.split('-').map(Number);
+        const h = t.total ? Math.max(6, (t.total / max) * 100) : 3;
+        const okh = t.total ? (t.ok / t.total) * 100 : 0;
+        return `<div class="day ${i === tallies.length - 1 ? 'is-today' : ''}" title="${t.d}: ${t.ok}/${t.total}">
+            <div class="day-bar ${t.total ? '' : 'is-empty'}" style="height:${h}%">
+              <span class="day-ok" style="height:${okh}%"></span>
+            </div>
+            <span class="day-label">${i === tallies.length - 1 ? '今日' : `${m}/${d}`}</span>
+          </div>`;
+      })
+      .join('');
+
+    // これまでのプリント（新しい順）。押すともう一度印刷できる
+    const sheets = Store.allSheets().filter((s) => s.results).reverse().slice(0, 30);
+    $('#p-sheets').innerHTML = sheets.length
+      ? sheets
+        .map((s) => {
+          const ok = Object.values(s.results).filter(Boolean).length;
+          return `<button class="sheet-line" data-reprint="${escapeHtml(s.id)}">
+              <span>${escapeHtml(dateLabel(s.date))}</span>
+              <span class="muted">${s.words.length}語</span>
+              <span class="sheet-score">${ok} / ${s.words.length}</span>
+              <span class="muted">🖨</span>
+            </button>`;
+        })
+        .join('')
+      : '<p class="hint">まだ記録がありません。「今日」から始めてください。</p>';
   }
 
-  function syncInputs() {
-    $('#f-sheet').value = settings.sheet;
-    $('#f-level').value = settings.level;
-    $('#f-category').value = settings.category;
-    $('#f-order').value = settings.order;
-    $('#f-start').value = settings.start;
-    $('#f-count').value = String(settings.count);
-    $('#f-example').checked = settings.example;
-    $('#f-answer').checked = settings.answer;
-    $('#f-phonetic').checked = settings.phonetic;
-    syncVisibility();
+  $('#p-sheets').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-reprint]');
+    if (!b) return;
+    printTarget = Store.allSheets().find((s) => s.id === b.dataset.reprint) || null;
+    if (printTarget) showView('print');
+  });
+
+  // ============================================================
+  // 単語
+  // ============================================================
+
+  const LIST_PAGE = 150;
+  let listLimit = LIST_PAGE;
+
+  function filteredWords() {
+    const q = $('#w-search').value.trim().toLowerCase();
+    const grade = $('#w-grade').value;
+    const stage = $('#w-stage').value;
+    return ALL.filter((w) => {
+      if (grade === 'ws' ? !w.ws : grade !== 'all' && w.grade !== grade) return false;
+      if (stage !== 'all') {
+        const s = Store.stageOf(w.word);
+        const bucket = s === 'missed' ? 'learning' : s;
+        if (bucket !== stage) return false;
+      }
+      if (q && !w.word.toLowerCase().includes(q) && !w.meaning.includes(q)) return false;
+      return true;
+    });
   }
 
-  function update(patch) {
-    settings = { ...settings, ...patch };
-    // 絞り込みを変えたら、前の範囲が在庫を飛び越していることがある
-    const total = pool().length;
-    if (settings.start > total) settings.start = 1;
-    if (settings.start < 1) settings.start = 1;
-    saveSettings(settings);
-    syncInputs();
-    render();
+  function renderWords() {
+    const list = filteredWords();
+    const shown = list.slice(0, listLimit);
+    $('#w-count').textContent = `${list.length.toLocaleString()}語`;
+    $('#w-rows').innerHTML = shown.map((w) => wordRow(w)).join('') ||
+      '<p class="hint">見つかりませんでした。</p>';
+    $('#w-more').hidden = list.length <= listLimit;
+    $('#w-more').textContent = `さらに表示（残り ${(list.length - listLimit).toLocaleString()}語）`;
   }
+
+  function renderWordsFromTop() {
+    listLimit = LIST_PAGE;
+    renderWords();
+  }
+
+  $('#w-search').addEventListener('input', renderWordsFromTop);
+  $('#w-grade').addEventListener('change', renderWordsFromTop);
+  $('#w-stage').addEventListener('change', renderWordsFromTop);
+  $('#w-more').addEventListener('click', () => {
+    listLimit += LIST_PAGE;
+    renderWords();
+  });
+
+  // ============================================================
+  // 設定
+  // ============================================================
+
+  function renderVoices() {
+    const sel = $('#s-voice');
+    const vs = Speech.voices();
+    const cur = Speech.current();
+    if (!Speech.supported || !vs.length) {
+      sel.innerHTML = '<option>（この端末には英語の声がありません）</option>';
+      sel.disabled = true;
+      $('#s-voice-note').textContent = '';
+      return;
+    }
+    sel.disabled = false;
+    sel.innerHTML = vs
+      .map((v) => `<option value="${escapeHtml(v.name)}" ${cur && cur.name === v.name ? 'selected' : ''}>${escapeHtml(Speech.label(v))}</option>`)
+      .join('');
+    // 高品質の声が無い端末には、無料で入れられることを教える（えいごペットと同じ案内）
+    $('#s-voice-note').innerHTML = Speech.hasGood()
+      ? '「高品質」と付いた声がいちばん自然です。'
+      : 'もっと自然な声にできます。iPhone・iPad の <b>設定 → アクセシビリティ → 読み上げコンテンツ → 声 → 英語</b> で「拡張」や「Premium」の声をダウンロードすると、ここに「高品質」として出てきます（無料）。';
+  }
+
+  function renderSettings() {
+    const s = Store.getSettings();
+    $('#s-perday').value = String(s.perDay);
+    $('#s-range').value = s.range;
+    $('#s-rate').value = String(s.rate);
+    renderVoices();
+  }
+
+  $('#s-perday').addEventListener('change', (e) => Store.updateSettings({ perDay: Number(e.target.value) }));
+  $('#s-range').addEventListener('change', (e) => Store.updateSettings({ range: e.target.value }));
+  $('#s-rate').addEventListener('change', (e) => {
+    Store.updateSettings({ rate: Number(e.target.value) });
+    Speech.speak('Hello. This is my voice.');
+  });
+  $('#s-voice').addEventListener('change', (e) => {
+    Speech.setVoice(e.target.value);
+    Speech.speak('Hello. This is my voice.');
+  });
+  $('#s-voice-test').addEventListener('click', () => Speech.speak('Hello. This is my voice.'));
+
+  $('#s-export').addEventListener('click', () => {
+    const blob = new Blob([Store.exportJSON()], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `hana-eitango-${Store.dateKey()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('記録を書き出しました');
+  });
+  $('#s-import').addEventListener('click', () => $('#s-import-file').click());
+  $('#s-import-file').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        if (!confirm('いまの記録を、このファイルの記録で置き換えます。よろしいですか？')) return;
+        Store.importJSON(String(reader.result));
+        toast('記録を読み込みました');
+        showView('progress');
+      } catch (err) {
+        toast(`読み込めませんでした: ${err.message}`);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+  $('#s-restore').addEventListener('click', () => {
+    if (!Store.hasBackup()) {
+      toast('まだバックアップがありません');
+      return;
+    }
+    if (!confirm('前日までの状態に戻します。今日の記録は消えます。よろしいですか？')) return;
+    if (Store.restoreBackup()) {
+      toast('1日前の状態に戻しました');
+      showView('progress');
+    }
+  });
+  $('#s-reset').addEventListener('click', () => {
+    if (!confirm('すべての記録を消します。よろしいですか？')) return;
+    if (!confirm('本当に消しますか？ 書き出していなければ戻せません。')) return;
+    Store.reset();
+    toast('記録を消しました');
+    showView('today');
+  });
+
+  // ============================================================
+  // 今日の画面のボタン
+  // ============================================================
+
+  $('#do-make').addEventListener('click', () => {
+    const sheet = Store.makeSheet(pool(), WS_KEYS);
+    if (!sheet) {
+      toast('出せる語がありません');
+      return;
+    }
+    checking = {};
+    printTarget = null;
+    showView('print');
+  });
+  $('#do-print-view').addEventListener('click', () => {
+    printTarget = null;
+    showView('print');
+  });
+  $('#do-check').addEventListener('click', () => showView('check'));
+  $('#do-discard').addEventListener('click', () => {
+    if (!confirm('このプリントを捨てて、作り直しますか？（記録はされません）')) return;
+    Store.discardPending();
+    checking = {};
+    showView('today');
+  });
+
+  // ============================================================
+  // 初期化
+  // ============================================================
 
   function init() {
     $('#app-version').textContent = APP_VERSION;
-
-    $('#f-category').innerHTML =
-      '<option value="all">すべて</option>' +
-      CATEGORIES.map((c) => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
-
-    syncInputs();
-    render();
-
-    $('#f-sheet').addEventListener('change', (e) => update({ sheet: e.target.value }));
-    $('#f-level').addEventListener('change', (e) => update({ level: e.target.value, start: 1 }));
-    $('#f-category').addEventListener('change', (e) => update({ category: e.target.value, start: 1 }));
-    $('#f-order').addEventListener('change', (e) => update({ order: e.target.value, start: 1 }));
-    $('#f-count').addEventListener('change', (e) => update({ count: Number(e.target.value) }));
-    $('#f-start').addEventListener('change', (e) => update({ start: Number(e.target.value) || 1 }));
-    $('#f-example').addEventListener('change', (e) => update({ example: e.target.checked }));
-    $('#f-answer').addEventListener('change', (e) => update({ answer: e.target.checked }));
-    $('#f-phonetic').addEventListener('change', (e) => update({ phonetic: e.target.checked }));
-
-    // 「次の分」で刷り進められるようにする。これが毎日の使い方になる
-    $('#f-next').addEventListener('click', () => {
-      const total = pool().length;
-      const next = settings.start + settings.count;
-      update({ start: next > total ? total : next });
+    Speech.init(() => {
+      if ($('#view-settings').classList.contains('is-active')) renderVoices();
     });
-    $('#f-prev').addEventListener('click', () =>
-      update({ start: Math.max(1, settings.start - settings.count) })
-    );
-
-    $('#do-shuffle').addEventListener('click', () => {
-      shuffleSeed = Date.now();
-      render();
-    });
-    $('#do-print').addEventListener('click', () => window.print());
+    showView('today');
   }
 
   document.addEventListener('DOMContentLoaded', init);

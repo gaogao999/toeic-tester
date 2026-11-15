@@ -3,102 +3,214 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>英単語プリント</title>
+<title>花の英単語</title>
 <link rel="stylesheet" href="css/style.css" />
 <link rel="icon" href="icons/icon-180.png" />
 <link rel="apple-touch-icon" href="icons/icon-180.png" />
+<meta name="apple-mobile-web-app-title" content="花の英単語" />
 </head>
 <body>
 
 <!--
-  画面はこれだけ。**左が設定、右が紙。**
-  右に見えているものが、そのまま印刷される（プレビュー用に別の組み方をしない）。
+  紙で覚えて、アプリは記録と進捗。
+    朝  「今日の20語」を作って印刷する
+    昼  紙で覚える
+    夜  紙と同じ番号で、まちがえた語だけ押して記録する
 -->
-<div class="layout">
+<header class="app-header">
+  <h1 class="app-title">花の英単語</h1>
+  <span class="streak" id="streak" hidden>連続 <b>0</b>日</span>
+</header>
 
-  <aside class="controls" id="controls">
-    <h1 class="app-title">英単語プリント</h1>
+<main class="container">
 
-    <label class="field">
-      <span>用紙</span>
-      <select id="f-sheet">
-        <option value="list">おぼえる用（一覧）</option>
-        <option value="ja2en">テスト　意味 → 英語</option>
-        <option value="en2ja">テスト　英語 → 意味</option>
-        <option value="write">書いて覚える</option>
-      </select>
-    </label>
-
-    <label class="field">
-      <span>レベル</span>
-      <select id="f-level">
-        <option value="all">すべて</option>
-        <option value="2">基礎 A2</option>
-        <option value="3">標準 B1</option>
-        <option value="4">応用 B2</option>
-      </select>
-    </label>
-
-    <label class="field">
-      <span>分野</span>
-      <select id="f-category"></select>
-    </label>
-
-    <label class="field">
-      <span>並び</span>
-      <select id="f-order">
-        <option value="id">収録順</option>
-        <option value="alpha">アルファベット順</option>
-        <option value="random">ランダム</option>
-      </select>
-    </label>
-
-    <div class="field">
-      <span>範囲</span>
-      <div class="range-row">
-        <input type="number" id="f-start" min="1" value="1" />
-        <span class="range-sep">語目から</span>
-        <select id="f-count">
-          <option value="20">20語</option>
-          <option value="40" selected>40語</option>
-          <option value="60">60語</option>
-          <option value="100">100語</option>
-          <option value="200">200語</option>
-        </select>
+  <!-- ============ 今日 ============ -->
+  <section class="view is-active" id="view-today">
+    <!-- 記録していないプリントがないとき：作る -->
+    <div id="today-make">
+      <div class="card">
+        <p class="card-label" id="make-label">今日の20語</p>
+        <p class="make-mix" id="make-mix"></p>
+        <button class="btn btn-ink btn-lg" id="do-make">今日の20語を作る</button>
+        <p class="hint" id="make-note"></p>
       </div>
-      <div class="range-nav">
-        <button type="button" id="f-prev">← 前の分</button>
-        <button type="button" id="f-next">次の分 →</button>
-      </div>
-      <p class="hint" id="range-note"></p>
+      <div class="card" id="today-done" hidden></div>
     </div>
 
-    <!-- 用紙によって効く項目が違うので、効かないものは隠す -->
-    <label class="check" id="opt-example">
-      <input type="checkbox" id="f-example" />
-      <span>例文を入れる</span>
-    </label>
-    <label class="check" id="opt-answer">
-      <input type="checkbox" id="f-answer" checked />
-      <span>解答を最後に付ける</span>
-    </label>
-    <label class="check">
-      <input type="checkbox" id="f-phonetic" checked />
-      <span>発音記号を入れる</span>
-    </label>
+    <!-- 記録していないプリントがあるとき：刷る・答え合わせ -->
+    <div id="today-sheet" hidden>
+      <div class="card">
+        <p class="card-label" id="sheet-label"></p>
+        <div class="btn-row">
+          <button class="btn btn-ink" id="do-print-view">🖨 印刷する</button>
+          <button class="btn btn-accent" id="do-check">答え合わせ</button>
+        </div>
+        <p class="hint">紙で覚えたら、夜に「答え合わせ」で<b>まちがえた語だけ</b>押してください。</p>
+      </div>
 
-    <button class="btn btn-print" id="do-print">🖨 印刷する</button>
-    <button class="btn" id="do-shuffle" hidden>組み直す</button>
+      <div class="card">
+        <p class="card-label">今日の語　<span class="muted">押すと発音</span></p>
+        <div class="word-rows" id="sheet-words"></div>
+        <button class="btn btn-ghost btn-small" id="do-discard">作り直す</button>
+      </div>
+    </div>
+  </section>
 
-    <p class="hint" id="page-note"></p>
-    <p class="hint muted" id="app-version"></p>
-  </aside>
+  <!-- ============ 答え合わせ ============ -->
+  <section class="view" id="view-check">
+    <div class="card">
+      <p class="card-label" id="check-label"></p>
+      <p class="hint"><b>紙と同じ番号です。</b>まちがえた語だけ押して ✕ にしてください。もう一度押すと ○ に戻ります。</p>
+      <div class="check-rows" id="check-rows"></div>
+      <p class="check-sum" id="check-sum"></p>
+      <div class="btn-row">
+        <button class="btn btn-ghost" data-view="today">あとで</button>
+        <button class="btn btn-ink" id="do-record">記録する</button>
+      </div>
+    </div>
+  </section>
 
-  <!-- ここに出ているものが、そのまま紙になる -->
-  <main class="papers" id="papers"></main>
-</div>
+  <!-- ============ 印刷 ============ -->
+  <section class="view" id="view-print">
+    <div class="card print-controls">
+      <p class="card-label">印刷する紙</p>
+      <div class="parts" id="parts">
+        <label class="check"><input type="checkbox" data-part="study" /> おぼえる用（一覧）</label>
+        <label class="check"><input type="checkbox" data-part="ja2en" /> テスト　意味 → 英語</label>
+        <label class="check"><input type="checkbox" data-part="en2ja" /> テスト　英語 → 意味</label>
+        <label class="check"><input type="checkbox" data-part="write" /> 書いて覚える</label>
+        <label class="check"><input type="checkbox" data-part="answer" /> 解答（最後に付ける）</label>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="print-back">もどる</button>
+        <button class="btn btn-ink" id="do-print">🖨 印刷（<span id="page-count">0</span>枚）</button>
+      </div>
+    </div>
+    <!-- ここに出ているものが、そのまま紙になる -->
+    <div class="papers" id="papers"></div>
+  </section>
+
+  <!-- ============ 記録 ============ -->
+  <section class="view" id="view-progress">
+    <div class="card">
+      <div class="big-row">
+        <div><span class="big" id="p-learned">0</span><span class="unit">語 覚えた</span></div>
+        <div><span class="big" id="p-streak">0</span><span class="unit">日 連続</span></div>
+      </div>
+      <p class="hint" id="p-due"></p>
+    </div>
+
+    <div class="card">
+      <p class="card-label">級ごと</p>
+      <div id="p-grades"></div>
+      <div class="legend">
+        <span><i class="seg-learned"></i>覚えた（3回続けて正解）</span>
+        <span><i class="seg-learning"></i>覚えかけ</span>
+        <span><i class="seg-new"></i>まだ</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="card-label">この2週間</p>
+      <div class="days" id="p-days"></div>
+    </div>
+
+    <div class="card">
+      <p class="card-label">これまでのプリント　<span class="muted">押すともう一度印刷できます</span></p>
+      <div id="p-sheets"></div>
+    </div>
+  </section>
+
+  <!-- ============ 単語 ============ -->
+  <section class="view" id="view-words">
+    <div class="card">
+      <div class="filters">
+        <input type="search" id="w-search" placeholder="英語か日本語で探す" />
+        <select id="w-grade">
+          <option value="all">すべての級</option>
+          <option value="g2">2級</option>
+          <option value="jun1">準1級</option>
+          <option value="ws">ワークシートの語</option>
+        </select>
+        <select id="w-stage">
+          <option value="all">すべて</option>
+          <option value="new">まだ</option>
+          <option value="learning">覚えかけ</option>
+          <option value="learned">覚えた</option>
+        </select>
+      </div>
+      <p class="hint" id="w-count"></p>
+      <div class="word-rows" id="w-rows"></div>
+      <button class="btn btn-ghost" id="w-more" hidden>さらに表示</button>
+    </div>
+  </section>
+
+  <!-- ============ 設定 ============ -->
+  <section class="view" id="view-settings">
+    <div class="card">
+      <p class="card-label">プリント</p>
+      <label class="field"><span>1枚の語数</span>
+        <select id="s-perday">
+          <option value="10">10語</option>
+          <option value="20">20語</option>
+          <option value="30">30語</option>
+          <option value="40">40語</option>
+        </select>
+      </label>
+      <label class="field"><span>出す範囲</span>
+        <select id="s-range">
+          <option value="all">2級から始めて準1級へ</option>
+          <option value="g2">2級だけ</option>
+          <option value="jun1">準1級だけ</option>
+        </select>
+      </label>
+      <p class="hint">ワークシートで出会った語は、範囲にかかわらず先に出します。</p>
+    </div>
+
+    <div class="card">
+      <p class="card-label">発音</p>
+      <label class="field"><span>声</span><select id="s-voice"></select></label>
+      <label class="field"><span>速さ</span>
+        <select id="s-rate">
+          <option value="0.7">ゆっくり</option>
+          <option value="0.85">ふつう</option>
+          <option value="1">はやい</option>
+        </select>
+      </label>
+      <button class="btn btn-ghost" id="s-voice-test">🔊 ためす</button>
+      <p class="hint" id="s-voice-note"></p>
+    </div>
+
+    <div class="card">
+      <p class="card-label">記録の保存</p>
+      <p class="hint">記録はこのブラウザの中に保存されます。<b>ほかの端末やブラウザには移りません。</b>
+        ときどき「書き出す」でファイルに保存しておくと安心です。</p>
+      <div class="btn-row wrap">
+        <button class="btn btn-ghost" id="s-export">書き出す</button>
+        <button class="btn btn-ghost" id="s-import">読み込む</button>
+        <button class="btn btn-ghost" id="s-restore">1日前に戻す</button>
+        <button class="btn btn-danger" id="s-reset">ぜんぶ消す</button>
+      </div>
+      <input type="file" id="s-import-file" accept="application/json" hidden />
+    </div>
+
+    <p class="hint center" id="app-version"></p>
+  </section>
+</main>
+
+<nav class="tabs" id="tabs">
+  <button class="tab is-active" data-view="today">今日</button>
+  <button class="tab" data-view="progress">記録</button>
+  <button class="tab" data-view="words">単語</button>
+  <button class="tab" data-view="settings">設定</button>
+</nav>
+
+<div class="toast" id="toast" hidden></div>
 
 <script src="js/data.js"></script>
+<script src="js/worksheet.js"></script>
+<script src="js/store.js"></script>
+<script src="js/speech.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
