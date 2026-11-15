@@ -1,65 +1,23 @@
+/*
+  英単語プリント
+
+  **紙が主役。**画面は紙を組むための操作盤で、右に見えているものがそのまま刷られる。
+  紙の上では色を使わない（家庭用プリンタで刷るので、黒一色で読めることを優先する）。
+*/
+
 :root {
-  --bg: #f4f6fb;
+  --bg: #eef0f4;
   --surface: #ffffff;
-  --surface-2: #f0f3fa;
-  --border: #e2e7f0;
+  --border: #d8dde6;
   --text: #1d2433;
-  --text-muted: #67718a;
-  --primary: #3b5bdb;
-  --primary-dark: #2f49b0;
-  --green: #2f9e58;
-  --orange: #e08a12;
-  --red: #d64545;
-  --radius: 14px;
-  --shadow: 0 2px 12px rgba(29, 36, 51, 0.07);
-  /* いちばん押してほしいものに使う「黒」。**暗いテーマでは背景に沈むので、
-     色を直書きせず必ずこの変数を通すこと**（暗いほうは一段持ち上げた面にしてある） */
+  --text-muted: #6b7486;
   --ink: #1a1d23;
-  --ink-text: #ffffff;
-  --ink-sub: rgba(255, 255, 255, 0.62);
-  --ink-2: rgba(255, 255, 255, 0.09);
-}
+  --accent: #2f9e58;
+  --radius: 10px;
 
-/* 端末の設定がダークのとき。ただし利用者が明示的にライトを選んでいれば適用しない */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --bg: #151922;
-    --surface: #1e2430;
-    --surface-2: #262d3b;
-    --border: #333b4d;
-    --text: #e8ecf4;
-    --text-muted: #98a2b8;
-    --primary: #6b8afd;
-    --primary-dark: #5573e8;
-    --green: #4cbd76;
-    --orange: #f0a739;
-    --red: #f0645f;
-    --shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-    --ink: #2c3547;
-    --ink-text: #eef2f9;
-    --ink-sub: rgba(238, 242, 249, 0.62);
-    --ink-2: rgba(255, 255, 255, 0.08);
-  }
-}
-
-/* 利用者が明示的にダークを選んだとき */
-:root[data-theme='dark'] {
-  --bg: #151922;
-  --surface: #1e2430;
-  --surface-2: #262d3b;
-  --border: #333b4d;
-  --text: #e8ecf4;
-  --text-muted: #98a2b8;
-  --primary: #6b8afd;
-  --primary-dark: #5573e8;
-  --green: #4cbd76;
-  --orange: #f0a739;
-  --red: #f0645f;
-  --shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-  --ink: #2c3547;
-  --ink-text: #eef2f9;
-  --ink-sub: rgba(238, 242, 249, 0.62);
-  --ink-2: rgba(255, 255, 255, 0.08);
+  /* 紙。A4縦から余白を引いた中身の大きさ */
+  --paper-w: 210mm;
+  --paper-pad: 14mm 12mm;
 }
 
 * { box-sizing: border-box; }
@@ -74,1977 +32,206 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 
-/* ---------- ヘッダー / 下タブ ---------- */
-.app-header {
+/* ---------- 画面の骨組み ---------- */
+.layout { display: flex; align-items: flex-start; gap: 24px; padding: 20px; }
+
+.controls {
   position: sticky;
-  top: 0;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 10px 16px;
-}
-
-/* ヘッダは日付と連続日数だけ。アプリ名は毎日見るものではないので置かない */
-.header-today {
-  margin: 0;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-.header-streak { color: var(--green); }
-.header-streak[hidden] { display: none; }
-
-.gear-btn {
-  border: none;
-  background: none;
-  font-size: 1.25rem;
-  line-height: 1;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 6px;
-}
-
-/* 下タブ。常に画面下に固定する（1画面完結の前提）。
-   指で押す的なので、Apple の指針にある 44px より十分に大きく取る */
-.bottom-nav {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 20;
-  display: flex;
-  height: 68px;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-.tab {
-  flex: 1;
+  top: 20px;
+  flex: 0 0 290px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  border: none;
-  background: none;
-  color: var(--text-muted);
-  font-size: 0.72rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  /* 押した手ごたえを出す。的が大きいだけだと押せたか分かりにくい */
-  transition: background 0.12s ease;
-}
-.tab:active { background: var(--surface-2); }
-.tab-icon { font-size: 1.35rem; line-height: 1; }
-.tab.is-active { color: var(--primary); font-weight: 700; }
-
-.container {
-  max-width: 720px;
-  margin: 0 auto;
-  /* 下タブに隠れないよう、下に余白を足す */
-  padding: 14px 16px calc(84px + env(safe-area-inset-bottom));
-}
-
-.view { display: none; }
-.view.is-active { display: block; animation: fade 0.2s ease; }
-
-@keyframes fade {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: none; }
-}
-
-/* ---------- 共通パーツ ---------- */
-.panel {
+  gap: 14px;
+  padding: 18px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
 }
 
-.panel-title {
-  margin: 0 0 12px;
-  font-size: 0.95rem;
-  font-weight: 700;
+.app-title { margin: 0 0 2px; font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em; }
+
+.field { display: flex; flex-direction: column; gap: 5px; font-size: 0.78rem; color: var(--text-muted); }
+.field select,
+.field input[type='number'] {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.92rem;
 }
 
-.hint {
-  margin: 8px 0 0;
-  color: var(--text-muted);
+.range-row { display: flex; align-items: center; gap: 6px; }
+.range-row input[type='number'] { width: 5.5em; }
+.range-sep { flex-shrink: 0; font-size: 0.78rem; }
+.range-nav { display: flex; gap: 8px; margin-top: 8px; }
+.range-nav button {
+  flex: 1;
+  padding: 8px 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
   font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
 }
+.range-nav button:hover { border-color: var(--text); }
+
+.check { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; cursor: pointer; }
+.check[hidden] { display: none; }
 
 .btn {
-  padding: 11px 18px;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  background: var(--surface-2);
-  color: var(--text);
-  font-family: inherit;
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.08s ease, filter 0.15s ease;
-}
-.btn:hover { filter: brightness(0.96); }
-.btn:active { transform: scale(0.98); }
-.btn:disabled { opacity: 0.45; cursor: not-allowed; }
-
-.btn-primary { background: var(--primary); color: #fff; }
-.btn-secondary { background: var(--surface-2); border-color: var(--border); }
-.btn-success { background: var(--green); color: #fff; }
-.btn-danger { background: var(--red); color: #fff; }
-.btn-danger-ghost { background: none; border-color: var(--red); color: var(--red); }
-.btn-ghost { background: none; border-color: var(--border); color: var(--text-muted); }
-.btn-lg { padding: 15px 20px; font-size: 1rem; }
-.btn-icon { padding: 8px 14px; font-size: 0.85rem; background: var(--surface-2); border-color: var(--border); }
-.btn-icon.is-on { background: var(--orange); color: #fff; border-color: var(--orange); }
-
-/* ---------- ダッシュボード ---------- */
-.dashboard {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 12px 8px;
-  text-align: center;
-  box-shadow: var(--shadow);
-}
-.stat-label { display: block; font-size: 0.7rem; color: var(--text-muted); }
-.stat-value { font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
-.stat-unit { font-size: 0.7rem; color: var(--text-muted); margin-left: 2px; }
-.accent-green { color: var(--green); }
-.accent-orange { color: var(--orange); }
-.accent-red { color: var(--red); }
-
-.progress-block {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
-}
-.progress-head {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  margin-bottom: 8px;
-}
-
-.progress-bar {
-  height: 10px;
-  background: var(--surface-2);
-  border-radius: 99px;
-  overflow: hidden;
-}
-.progress-bar.slim { height: 6px; flex: 1; }
-.progress-fill {
-  height: 100%;
-  width: 0;
-  background: linear-gradient(90deg, var(--primary), var(--green));
-  border-radius: 99px;
-  transition: width 0.3s ease;
-}
-
-/* ---------- フィルタ ---------- */
-.filters {
-  display: grid;
-  /* minmax(0,…) にしないと、選択肢の文字が長い列が枠からはみ出す */
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; font-size: 0.78rem; color: var(--text-muted); }
-.field select { width: 100%; }
-.field select,
-.list-toolbar input,
-.list-toolbar select {
-  padding: 9px 10px;
+  padding: 12px 16px;
   border: 1px solid var(--border);
   border-radius: 9px;
   background: var(--surface);
   color: var(--text);
   font-family: inherit;
-  font-size: 0.9rem;
-}
-
-.start-buttons { display: grid; gap: 10px; }
-
-/* ---------- 単語カード ---------- */
-.session-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
-  font-size: 0.82rem;
-  color: var(--text-muted);
-}
-.score { font-weight: 700; color: var(--green); }
-
-.card {
-  perspective: 1400px;
-  height: 320px;
-  margin-bottom: 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
   cursor: pointer;
 }
-.card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.5s;
-  transform-style: preserve-3d;
-}
-.card-inner.is-flipped { transform: rotateY(180deg); }
+.btn:hover { border-color: var(--text); }
+.btn[hidden] { display: none; }
+.btn-print { background: var(--ink); border-color: var(--ink); color: #fff; }
 
-.card-face {
-  position: absolute;
-  inset: 0;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+.hint { margin: 0; font-size: 0.76rem; color: var(--text-muted); }
+.hint.muted { opacity: 0.6; }
+
+.papers { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 20px; min-width: 0; }
+.empty {
+  padding: 40px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 18px;
-  box-shadow: var(--shadow);
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  overflow-y: auto;
-}
-.card-back { transform: rotateY(180deg); }
-
-.badge-row { display: flex; gap: 6px; margin-bottom: 14px; }
-.badge {
-  padding: 3px 10px;
-  border-radius: 99px;
-  background: var(--primary);
-  color: #fff;
-  font-size: 0.7rem;
-  font-weight: 700;
-}
-.badge-ghost { background: var(--surface-2); color: var(--text-muted); }
-.badge-check { background: var(--green); }
-
-.card-word { margin: 0; font-size: 2rem; font-weight: 700; word-break: break-word; }
-.card-phonetic { margin: 6px 0 0; color: var(--text-muted); font-size: 0.95rem; }
-.card-tip { margin-top: 22px; color: var(--text-muted); font-size: 0.78rem; }
-
-.card-pos { margin: 0 0 6px; color: var(--primary); font-size: 0.8rem; font-weight: 700; }
-.card-meaning { margin: 0 0 16px; font-size: 1.35rem; font-weight: 700; }
-.card-note {
-  margin: -8px 0 14px;
-  padding: 4px 10px;
-  border-radius: 8px;
-  background: rgba(224, 138, 18, 0.14);
-  color: var(--orange);
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-/* 同義語・対義語は注意ではなく参考情報なので、警告色にしない */
-.card-note.is-relation {
-  background: var(--surface-2);
-  color: var(--text-muted);
-  font-weight: 500;
-  line-height: 1.7;
-}
-
-.card-example {
-  border-top: 1px solid var(--border);
-  padding-top: 14px;
-  font-size: 0.9rem;
+  border-radius: var(--radius);
   color: var(--text-muted);
 }
-.card-example .ja { margin: 6px 0 0; font-size: 0.85rem; }
 
-.card-tools { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }
-.answer-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-.nav-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.nav-buttons .btn { padding: 11px 6px; font-size: 0.85rem; white-space: nowrap; }
-
-/* ---------- クイズ ---------- */
-.mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.mode-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 3px;
-  padding: 14px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface-2);
-  color: var(--text);
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-.mode-card:hover { border-color: var(--primary); }
-.mode-icon { font-size: 1.1rem; }
-.mode-name { font-weight: 700; font-size: 0.92rem; }
-.mode-desc { font-size: 0.75rem; color: var(--text-muted); }
-
-.quiz-panel { min-height: 300px; }
-.quiz-prompt-label { margin: 0 0 8px; font-size: 0.78rem; color: var(--text-muted); }
-.quiz-question {
-  margin: 0 0 18px;
-  font-size: 1.5rem;
-  font-weight: 700;
-  text-align: center;
-  word-break: break-word;
-}
-.quiz-question .blank { color: var(--primary); }
-.quiz-question.sentence { font-size: 1.05rem; line-height: 1.9; text-align: left; }
-
-.answer-form { display: grid; gap: 10px; }
-/* display を指定した要素は hidden 属性だけでは隠れないので、ここで打ち消す */
-.answer-form[hidden] { display: none; }
-
-.answer-input {
-  width: 100%;
-  padding: 15px 16px;
-  border: 2px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface-2);
-  color: var(--text);
-  font-family: inherit;
-  font-size: 1.15rem;
-  text-align: center;
-  letter-spacing: 0.03em;
-}
-.answer-input:focus {
-  outline: none;
-  border-color: var(--primary);
-  background: var(--surface);
-}
-.answer-input.is-correct { border-color: var(--green); color: var(--green); font-weight: 700; }
-.answer-input.is-wrong { border-color: var(--red); color: var(--red); }
-.answer-input:disabled { opacity: 1; }
-
-.answer-hint {
-  margin: 0;
-  min-height: 1.2em;
-  text-align: center;
-  font-size: 0.85rem;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  word-break: break-all;
+/* ---------- 紙 ---------- */
+/*
+  画面でも A4 の実寸で見せる。**プレビュー用に別の組み方をしない**ので、
+  ここで整えた見た目がそのまま刷り上がりになる
+*/
+.sheet {
+  width: var(--paper-w);
+  min-height: 297mm;
+  padding: var(--paper-pad);
+  background: #fff;
+  color: #000;
+  box-shadow: 0 2px 14px rgba(29, 36, 51, 0.14);
 }
 
-.answer-actions { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 8px; }
-.answer-actions .btn { padding: 11px 6px; font-size: 0.85rem; white-space: nowrap; }
-
-.feedback-typed { margin: 0 0 8px; font-size: 0.92rem; color: var(--red); }
-
-.quiz-feedback {
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border);
-}
-.feedback-title { margin: 0 0 4px; font-weight: 700; }
-.feedback-detail { margin: 0 0 8px; font-size: 0.92rem; }
-.feedback-note { margin: 0 0 8px; font-size: 0.85rem; color: var(--orange); font-weight: 600; }
-.feedback-example { margin: 0 0 14px; font-size: 0.85rem; color: var(--text-muted); }
-
-.result-panel { text-align: center; }
-.result-emoji { font-size: 3rem; margin: 4px 0; }
-.result-score { margin: 0; font-size: 1.6rem; }
-.result-rate { margin: 4px 0 16px; color: var(--text-muted); }
-.result-list { text-align: left; max-height: 260px; overflow-y: auto; margin-bottom: 16px; }
-.result-item {
-  display: flex;
-  gap: 8px;
-  align-items: baseline;
-  padding: 8px 10px;
-  border-radius: 8px;
-  font-size: 0.88rem;
-}
-.result-item.ok { background: rgba(47, 158, 88, 0.1); }
-.result-item.ng { background: rgba(214, 69, 69, 0.1); }
-.result-item b { min-width: 32%; }
-.result-actions { display: grid; gap: 8px; }
-
-/* ---------- 単語一覧 ---------- */
-.list-toolbar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.list-toolbar input[type='search'] { grid-column: 1 / -1; }
-
-.word-list { margin-top: 12px; }
-.word-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 11px 4px;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-}
-.word-main { flex: 1; min-width: 0; }
-
-.learn-check {
-  flex-shrink: 0;
-  width: 22px;
-  height: 22px;
-  accent-color: var(--green);
-  cursor: pointer;
-}
-.word-row.is-learned .word-en { text-decoration: line-through; }
-.word-row.is-learned .word-main { opacity: 0.55; }
-.word-en { font-weight: 700; }
-.word-ja { font-size: 0.83rem; color: var(--text-muted); }
-.word-detail {
-  display: none;
-  padding: 4px 4px 12px;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  border-bottom: 1px solid var(--border);
-}
-.word-detail.is-open { display: block; }
-
-.list-more { width: 100%; margin-top: 14px; }
-.mastery {
-  flex-shrink: 0;
-  font-size: 0.7rem;
-  padding: 2px 8px;
-  border-radius: 99px;
-  background: var(--surface-2);
-  color: var(--text-muted);
-}
-.mastery.m-high { background: rgba(47, 158, 88, 0.15); color: var(--green); }
-.mastery.m-mid { background: rgba(224, 138, 18, 0.15); color: var(--orange); }
-.mastery.m-low { background: rgba(214, 69, 69, 0.15); color: var(--red); }
-.star-btn { border: none; background: none; font-size: 1.1rem; cursor: pointer; color: var(--orange); }
-
-/* ---------- 学習記録 ---------- */
-.chart {
+.sheet-head {
   display: flex;
   align-items: flex-end;
-  gap: 4px;
-  height: 140px;
-  padding-top: 8px;
-}
-.chart-col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; gap: 4px; }
-.chart-bar { width: 100%; background: var(--primary); border-radius: 4px 4px 0 0; min-height: 2px; }
-.chart-bar.empty { background: var(--surface-2); }
-.chart-label { font-size: 0.6rem; color: var(--text-muted); }
-
-.box-dist { display: grid; gap: 8px; }
-.box-row { display: flex; align-items: center; gap: 10px; font-size: 0.82rem; }
-.box-name { width: 90px; color: var(--text-muted); flex-shrink: 0; }
-.box-track { flex: 1; height: 16px; background: var(--surface-2); border-radius: 6px; overflow: hidden; }
-.box-fill { height: 100%; background: var(--primary); border-radius: 6px; }
-.box-num { width: 40px; text-align: right; }
-
-.data-actions { display: grid; gap: 8px; }
-
-.empty-state { text-align: center; padding: 40px 16px; color: var(--text-muted); }
-.empty-state .btn { margin-top: 12px; }
-
-/* ---------- トースト ---------- */
-.toast {
-  position: fixed;
-  left: 50%;
-  bottom: 24px;
-  transform: translateX(-50%);
-  background: var(--text);
-  color: var(--bg);
-  padding: 10px 20px;
-  border-radius: 99px;
-  font-size: 0.85rem;
-  z-index: 50;
-  box-shadow: var(--shadow);
-}
-
-@media (max-width: 480px) {
-  .dashboard { grid-template-columns: repeat(2, 1fr); }
-  .card { height: 300px; }
-  .card-word { font-size: 1.7rem; }
-}
-
-/* ---------- 受験までのカウントダウン ---------- */
-/*
-  色を敷かず、**数字の大きさだけで伝える。**以前は青→緑のグラデーションを敷いていたが、
-  ここは毎日いちばん先に目に入る場所で、その下に置いた黒いセッションカードと
-  色を取り合っていた。押してほしいのはカードのほうなので、こちらは静かにする
-*/
-.countdown-card {
-  padding: 4px 2px 14px;
-  margin-bottom: 14px;
-  border-bottom: 2px solid var(--text);
-}
-.countdown-main { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
-.countdown-days { margin: 0; line-height: 0.9; }
-#countdown-number { font-size: 3.4rem; font-weight: 800; letter-spacing: -0.03em; }
-.countdown-unit { font-size: 1.05rem; font-weight: 700; margin-left: 3px; }
-.countdown-unit[hidden] { display: none; }
-.countdown-side { text-align: right; }
-.countdown-label { margin: 0; font-size: 0.78rem; font-weight: 700; }
-.countdown-weeks { margin: 2px 0 0; font-size: 0.78rem; color: var(--text-muted); }
-
-/* 1マス＝1週。日で数えると多すぎて残りの実感が湧かない */
-.weekgrid { display: flex; gap: 3px; margin-top: 12px; }
-.wk { flex: 1; height: 13px; border-radius: 3px; }
-.wk-now { background: var(--text); }
-.wk-todo { background: var(--surface-2); border: 1px solid var(--border); }
-.wk-exam { background: var(--green); }
-.weekgrid-legend {
-  display: flex;
   justify-content: space-between;
-  margin-top: 5px;
-  font-size: 0.7rem;
-  color: var(--text-muted);
-}
-
-/* ---------- セッション（ホーム） ---------- */
-/* きのうの途中から。中断したセッションがあるときだけ出る */
-.resume-card {
-  display: flex;
-  align-items: center;
   gap: 12px;
-  width: 100%;
-  padding: 12px 14px;
-  margin-bottom: 16px;
-  border: 1px solid var(--green);
-  border-radius: var(--radius);
-  background: var(--surface);
-  background: color-mix(in srgb, var(--green) 10%, var(--surface));
-  color: var(--text);
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-.resume-card[hidden] { display: none; }
-.resume-play {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  background: var(--green);
-  color: #fff;
-  font-size: 0.8rem;
-}
-.resume-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-.resume-title { font-size: 0.92rem; font-weight: 700; }
-.resume-sub { font-size: 0.78rem; color: var(--text-muted); }
-
-/* 1日のミニマム。**その日に必ず超えたい床** */
-.minimum {
-  padding: 14px 16px;
-  margin-bottom: 16px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  box-shadow: var(--shadow);
-}
-.minimum.is-done { border-color: var(--green); }
-.minimum-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
+  padding-bottom: 6px;
   margin-bottom: 10px;
-  font-size: 0.82rem;
-  font-weight: 700;
+  border-bottom: 1.5px solid #000;
 }
-.minimum-status { color: var(--text-muted); font-variant-numeric: tabular-nums; }
-.minimum-status.is-done { color: var(--green); }
+.sheet-title b { font-size: 13pt; font-weight: 700; }
+.sheet-range { margin-left: 10px; font-size: 9pt; }
+.sheet-meta { display: flex; align-items: flex-end; gap: 14px; font-size: 9pt; white-space: nowrap; }
+/* 名前を書く下線。印刷でも必ず出したいので border で引く */
+.name-field i { display: inline-block; width: 28mm; border-bottom: 1px solid #000; }
+.page-no { font-variant-numeric: tabular-nums; }
 
-.minimum-rows { display: grid; gap: 8px; }
-.min-row { display: flex; align-items: center; gap: 10px; font-size: 0.82rem; }
-.min-name { width: 2.6em; flex-shrink: 0; font-weight: 700; }
-.min-track { flex: 1; height: 8px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
-.min-fill { display: block; height: 100%; background: var(--text); border-radius: 99px; transition: width 0.3s ease; }
-/* 「5 / 20正解」がいちばん長い。折り返すと2行になって行がずれる */
-.min-num {
-  flex-shrink: 0;
-  width: 5.8em;
-  text-align: right;
-  white-space: nowrap;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
+.sheet-table { width: 100%; border-collapse: collapse; font-size: 10.5pt; }
+.sheet-table th {
+  padding: 2mm 2mm;
+  border-bottom: 1px solid #000;
+  font-size: 8.5pt;
+  font-weight: 600;
+  text-align: left;
 }
-.min-num i { font-style: normal; font-weight: 400; color: var(--text-muted); margin-left: 2px; }
-.min-row.is-ok .min-fill { background: var(--green); }
-.min-row.is-ok .min-num { color: var(--green); }
+.sheet-table td {
+  padding: 2mm;
+  border-bottom: 1px solid #bbb;
+  vertical-align: middle;
+}
 
-.pick-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 8px;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-.pick-count { font-weight: 700; color: var(--text); }
+.c-no { width: 10mm; font-size: 8.5pt; color: #666; font-variant-numeric: tabular-nums; }
+.c-word { width: 42mm; font-weight: 700; }
+.c-ph { width: 32mm; font-size: 9pt; color: #444; }
+.c-pos { width: 12mm; font-size: 8.5pt; color: #444; }
+.c-meaning { }
+.c-check { width: 22mm; white-space: nowrap; text-align: right; }
+/* 覚えたら自分で印を付ける箱。3回ぶん */
+.c-check i { display: inline-block; width: 4.5mm; height: 4.5mm; margin-left: 1.5mm; border: 1px solid #666; }
+
+/* 例文は単語の下にぶら下げる。行の区切りを消して、同じ語のかたまりに見せる */
+.row-example td { border-bottom: 1px solid #bbb; padding-top: 0; }
+.row-example + tr td { }
+.c-example { font-size: 9pt; color: #333; line-height: 1.5; }
+.sheet-table tr:has(+ .row-example) td { border-bottom: none; padding-bottom: 0.5mm; }
 
 /*
-  今日やる中身。**画面でいちばん濃い面**にして、ここだけ押せばいいと分かるようにする。
-  色は --ink を通す（暗いテーマで背景に沈まないよう、あちらでは持ち上げた面になる）
+  書く紙（テストと書いて覚える）。
+
+  **問いと、それを書く線を同じ高さにそろえる。**行の下辺に線を引いていたら、
+  線が次の語の行に寄って見えて、どちらの答えを書く線なのか分からなかった。
+  行の区切り線も消す。黒い罫線と競って、紙が線だらけになる
 */
-.plan-card {
-  display: block;
-  width: 100%;
-  padding: 16px;
-  border: none;
-  border-radius: var(--radius);
-  background: var(--ink);
-  color: var(--ink-text);
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-  box-shadow: var(--shadow);
+.sheet-quiz td,
+.sheet-write td {
+  vertical-align: bottom;
+  padding-bottom: 1.2mm;
+  border-bottom: none;
+}
+.sheet-quiz .c-blank,
+.sheet-write .c-blank,
+.sheet-write .c-trace { border-bottom: 1px solid #000; }
+
+.sheet-quiz td { height: 11mm; }
+.sheet-quiz .c-meaning { width: 55mm; }
+
+/* 書いて覚える。薄い字をなぞってから、右の欄に自分で書く */
+.sheet-write td { height: 13mm; }
+.sheet-write .c-word { width: 34mm; }
+.sheet-write .c-meaning { width: 34mm; font-size: 9.5pt; }
+.c-trace { width: 42mm; color: #c4c4c4; font-weight: 700; }
+
+/* 解答。詰めて組む（書く欄が要らない） */
+.sheet-answer { font-size: 9.5pt; }
+.sheet-answer td { padding: 1.2mm 2mm; }
+
+.sheet-foot { margin: 4mm 0 0; font-size: 8pt; color: #666; }
+
+/* ---------- 印刷 ---------- */
+@page {
+  size: A4 portrait;
+  margin: 0;              /* 余白は .sheet の padding で取る（画面と同じ組みにするため） */
+}
+
+@media print {
+  body { background: #fff; }
+  .layout { display: block; padding: 0; }
+  .controls { display: none; }
+  .papers { display: block; gap: 0; }
+
+  .sheet {
+    width: auto;
+    min-height: auto;
+    box-shadow: none;
+    /* 1枚ずつ必ず改ページする。画面の1枚＝紙の1枚 */
+    break-after: page;
+    page-break-after: always;
+  }
+  .sheet:last-child { break-after: auto; page-break-after: auto; }
+
+  /* 枠線と薄い字を、プリンタの「背景を印刷しない」設定で消させない */
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* ---------- 画面が狭いとき ---------- */
+@media (max-width: 1100px) {
+  .layout { flex-direction: column; align-items: stretch; }
+  .controls { position: static; flex: none; width: 100%; }
+  /* 紙は実寸のまま。縮めると刷り上がりと違う見え方になるので、横に送る */
+  .papers { overflow-x: auto; align-items: flex-start; }
 }
-.plan-card-static { cursor: default; margin-bottom: 16px; }
-.plan-top { display: flex; align-items: center; gap: 10px; }
-.plan-min { flex: 1; font-size: 1.05rem; font-weight: 700; }
-.plan-min b { font-size: 2rem; font-weight: 800; margin-right: 4px; letter-spacing: -0.02em; }
-.plan-sub { font-size: 0.78rem; color: var(--ink-sub); }
-.plan-play {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 999px;
-  background: var(--green);
-  color: #fff;
-  font-size: 0.95rem;
-}
-.plan-kinds { display: flex; gap: 8px; margin-top: 12px; }
-.plan-kind {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 8px 2px;
-  border-radius: 10px;
-  background: var(--ink-2);
-  font-size: 0.68rem;
-  color: var(--ink-sub);
-}
-.plan-kind b { font-size: 1.35rem; font-weight: 800; line-height: 1.2; color: var(--ink-text); }
-/* 単位まで書く。「20 単語」だけだと20問と読まれる */
-.plan-kind i { font-style: normal; font-size: 0.62rem; opacity: 0.75; }
-.plan-note { display: block; margin-top: 10px; font-size: 0.76rem; color: var(--ink-sub); }
-
-/* 見込み時間。**約束ではない**ので、セッションの文字より小さく添える */
-.plan-est { margin-left: 8px; font-size: 0.8rem; font-weight: 600; color: var(--ink-sub); }
-.plan-est b { font-size: 1.1rem; font-weight: 800; }
-
-/* この回で目標に届いたか。結果画面の上のほうに、横に並べて出す */
-.sr-target { display: flex; gap: 8px; margin-bottom: 16px; }
-.sr-target[hidden] { display: none; }
-.sr-target-item {
-  flex: 1;
-  padding: 8px 4px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
-  text-align: center;
-  font-size: 0.76rem;
-  color: var(--text-muted);
-}
-.sr-target-item b { display: block; font-size: 1rem; color: var(--text); font-variant-numeric: tabular-nums; }
-.sr-target-item.is-ok { border-color: var(--green); }
-.sr-target-item.is-ok b { color: var(--green); }
-
-/* ---------- セッション中 ---------- */
-.sess-bar {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  margin-bottom: 10px;
-}
-.sess-clock { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-.sess-clock.is-low { color: var(--red); }
-.sess-clock-unit { font-size: 0.72rem; color: var(--text-muted); }
-.sess-count { flex: 1; margin-left: 8px; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
-.sess-quit { padding: 6px 12px; font-size: 0.8rem; }
-
-/* 科目ごとの帯。幅がそのまま問題数の比になる（flex に問題数を入れている） */
-.sess-track { display: flex; gap: 4px; }
-.sess-seg { height: 6px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
-.sess-seg-fill { display: block; height: 100%; background: var(--text); border-radius: 99px; transition: width 0.3s ease; }
-.sess-legend {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  margin: 6px 0 12px;
-  font-size: 0.74rem;
-  color: var(--text-muted);
-}
-.sess-legend-kinds { display: flex; gap: 10px; flex-wrap: wrap; }
-.sess-kind.is-now { color: var(--text); font-weight: 700; }
-.sess-kind.is-done { color: var(--green); }
-.sess-legend-days { flex-shrink: 0; }
-
-/* 科目の切れ目に出す帯。ここで頭を切り替えてもらう */
-.sess-chip {
-  display: inline-block;
-  margin: 0 0 12px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: var(--surface-2);
-  background: color-mix(in srgb, var(--green) 14%, var(--surface));
-  color: var(--green);
-  font-size: 0.78rem;
-  font-weight: 700;
-}
-.sess-chip[hidden] { display: none; }
-.sess-chip.is-warn {
-  background: var(--surface-2);
-  background: color-mix(in srgb, var(--orange) 14%, var(--surface));
-  color: var(--orange);
-}
-
-.sess-passage { margin-bottom: 14px; }
-.sess-passage[hidden] { display: none; }
-.sess-passage-meta { margin: 0; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }
-.sess-passage-title { margin: 2px 0 8px; font-size: 1.05rem; font-weight: 700; }
-.sess-passage p { margin: 0 0 10px; font-size: 0.95rem; line-height: 1.8; }
-.sess-question { margin: 0 0 12px; font-size: 1rem; font-weight: 700; }
-/* 単語は設問文が語ひとつ。ほかの科目と同じ大きさだと小さすぎる */
-.sess-question.is-word { font-size: 1.7rem; letter-spacing: -0.01em; }
-
-/* 選択肢に記号の丸を付ける。長い選択肢でも「どれを押したか」が分かる */
-.choice-key {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  margin-right: 10px;
-  border-radius: 999px;
-  background: var(--surface-2);
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-#sess-choices .choice { display: flex; align-items: center; }
-#sess-choices .choice.is-correct,
-#sess-choices .choice.is-wrong { color: inherit; }
-#sess-choices .choice.is-correct {
-  background: var(--surface-2);
-  background: color-mix(in srgb, var(--green) 14%, var(--surface));
-  border-color: var(--green);
-  color: var(--text);
-  font-weight: 700;
-}
-#sess-choices .choice.is-wrong {
-  background: var(--surface-2);
-  background: color-mix(in srgb, var(--red) 12%, var(--surface));
-  border-color: var(--red);
-  color: var(--text);
-}
-#sess-choices .choice.is-correct .choice-key { background: var(--green); color: #fff; }
-#sess-choices .choice.is-wrong .choice-key { background: var(--red); color: #fff; }
-
-/* 次へは画面の下に貼り付ける。長文は本文が長く、押せる場所まで遠い */
-.sess-foot {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 25;
-  display: flex;
-  gap: 10px;
-  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-}
-.sess-foot[hidden] { display: none; }
-.sess-foot .btn { flex: 1; padding: 14px 16px; }
-.sess-foot .btn-primary { flex: 2; background: var(--ink); color: var(--ink-text); }
-/* セッション中は下タブを隠す。途中で別の画面へ行かせない。
-   **body に付けた印で消す。**画面（section）は main の中にあるので、
-   兄弟セレクタでは下タブに届かない */
-body.in-session .bottom-nav { display: none; }
-
-/* ---------- セッション結果 ---------- */
-.streak-banner {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 10px 14px;
-  margin-bottom: 14px;
-  border-radius: 10px;
-  background: var(--surface-2);
-  background: color-mix(in srgb, var(--green) 12%, var(--surface));
-  color: var(--green);
-  font-size: 0.82rem;
-  font-weight: 700;
-}
-.streak-banner[hidden] { display: none; }
-.sr-meta { margin: 0; font-size: 0.76rem; color: var(--text-muted); }
-.sr-headline { margin: 2px 0 14px; font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
-.sr-score { display: flex; align-items: baseline; gap: 8px; }
-.sr-num { font-size: 2.6rem; font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
-.sr-of { flex: 1; font-size: 0.9rem; color: var(--text-muted); }
-.sr-rate {
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: var(--surface-2);
-  background: color-mix(in srgb, var(--green) 14%, var(--surface));
-  color: var(--green);
-  font-size: 0.82rem;
-  font-weight: 700;
-}
-.sr-rate.is-low {
-  background: var(--surface-2);
-  background: color-mix(in srgb, var(--red) 12%, var(--surface));
-  color: var(--red);
-}
-.sr-bar { margin: 10px 0 16px; }
-.sr-bar .progress-fill { background: var(--text); }
-
-.sr-kinds { display: grid; gap: 10px; }
-.sr-kind { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
-.sr-kind-name { width: 4.5em; flex-shrink: 0; font-weight: 700; white-space: nowrap; }
-.sr-kind-track { flex: 1; height: 8px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
-.sr-kind-fill { display: block; height: 100%; background: var(--text); border-radius: 99px; }
-.sr-kind-num { flex-shrink: 0; font-variant-numeric: tabular-nums; font-weight: 700; }
-.sr-kind.is-low .sr-kind-fill { background: var(--red); }
-.sr-kind.is-low .sr-kind-num { color: var(--red); }
-
-.sr-actions { display: flex; gap: 10px; margin-top: 4px; }
-.sr-actions .btn { flex: 1; padding: 15px 12px; }
-.sr-actions .btn-primary { background: var(--ink); color: var(--ink-text); }
-.sr-home { display: block; width: 100%; margin-top: 10px; }
-
-/* ---------- ぜんぶ ---------- */
-.view-title { margin: 0 0 4px; font-size: 1.45rem; font-weight: 800; letter-spacing: -0.02em; }
-.all-rows {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  margin: 14px 0 16px;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-}
-.all-rows .row-line { padding: 14px 16px; }
-.all-rows .row-sub.is-weak { color: var(--red); font-weight: 700; }
-/* レベル判定で出た段。押すとその段に絞って開くことの目印 */
-.row-level {
-  margin-left: 6px;
-  padding: 1px 7px;
-  border-radius: 999px;
-  background: var(--surface-2);
-  color: var(--text-muted);
-  font-size: 0.68rem;
-  font-weight: 700;
-  white-space: nowrap;
-}
-.row-mock { background: var(--ink); color: var(--ink-text); }
-.row-mock .row-sub { color: var(--ink-sub); }
-
-.focus-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.focus-chip {
-  padding: 9px 16px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--surface);
-  color: var(--text);
-  font-family: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-.focus-chip.is-active { background: var(--ink); color: var(--ink-text); border-color: var(--ink); font-weight: 700; }
-
-/* ---------- きろく ---------- */
-.stats-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding-bottom: 12px;
-  margin-bottom: 14px;
-  border-bottom: 2px solid var(--text);
-}
-.stats-head-days { font-size: 0.8rem; color: var(--text-muted); }
-.stats-head-days b { font-size: 1.2rem; color: var(--text); }
-
-.vocab-head { margin: 0 0 6px; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
-/* **track と のこり を同じ色にしない。**帯の端が見えず、全体の量が分からなくなる */
-.vocab-bar {
-  display: flex;
-  height: 14px;
-  border-radius: 4px;
-  overflow: hidden;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-}
-.vocab-seg { display: block; height: 100%; }
-.vocab-seg.is-done { background: var(--text); }
-.vocab-seg.is-shaky { background: var(--text-muted); }
-.vocab-seg.is-todo { background: var(--surface-2); }
-.vocab-legend { display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.74rem; color: var(--text-muted); }
-.vocab-key b { color: var(--text); }
-
-.week-head { margin: 20px 0 8px; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
-.weekbars { display: flex; align-items: flex-end; gap: 6px; height: 96px; margin-bottom: 18px; }
-.weekbars[hidden] { display: none; }
-.weekbar-col { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; }
-.weekbar {
-  width: 100%;
-  margin-top: auto;
-  border-radius: 6px 6px 0 0;
-  background: var(--text);
-}
-.weekbar.is-today { background: var(--green); }
-.weekbar.is-empty { background: var(--border); min-height: 4px; }
-.weekbar-label { margin-top: 4px; font-size: 0.7rem; color: var(--text-muted); }
-
-.qtypes { display: grid; gap: 10px; }
-.qtype-row { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
-.qtype-name { width: 6.5em; flex-shrink: 0; }
-.qtype-track { flex: 1; height: 8px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
-.qtype-fill { display: block; height: 100%; background: var(--text); border-radius: 99px; }
-.qtype-rate { flex-shrink: 0; width: 3em; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
-.qtype-row.is-low .qtype-fill { background: var(--red); }
-.qtype-row.is-low .qtype-rate { color: var(--red); }
-.qtype-go { width: 100%; margin-top: 4px; }
-
-/* ---------- カレンダー ---------- */
-.calendar-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-.calendar-title { font-weight: 700; font-size: 1rem; }
-.cal-nav { padding: 6px 14px; font-size: 1.1rem; line-height: 1; }
-
-.calendar {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 3px;
-}
-.cal-dow {
-  text-align: center;
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  padding-bottom: 4px;
-}
-.cal-dow.sun, .cal-cell.sun .cal-num { color: var(--red); }
-.cal-dow.sat, .cal-cell.sat .cal-num { color: var(--primary); }
-
-.cal-cell {
-  position: relative;
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  background: var(--surface-2);
-}
-.cal-cell.is-empty { background: none; }
-.cal-cell.is-today {
-  outline: 2px solid var(--primary);
-  outline-offset: -2px;
-  font-weight: 700;
-}
-.cal-cell.is-exam {
-  background: var(--red);
-  font-weight: 700;
-}
-.cal-cell.is-exam .cal-num,
-.cal-cell.is-exam.sun .cal-num,
-.cal-cell.is-exam.sat .cal-num { color: #fff; }
-
-.cal-flag { position: absolute; top: -2px; right: 1px; font-size: 0.65rem; }
-.cal-dot {
-  position: absolute;
-  bottom: 5px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--green);
-}
-.cal-cell.is-exam .cal-dot { background: #fff; }
-
-.calendar-legend {
-  display: flex;
-  gap: 14px;
-  justify-content: center;
-  margin-top: 14px;
-  font-size: 0.72rem;
-  color: var(--text-muted);
-}
-.calendar-legend span { display: flex; align-items: center; gap: 4px; }
-.dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
-.dot-exam { background: var(--red); }
-.dot-today { background: none; border: 2px solid var(--primary); }
-.dot-studied { background: var(--green); border-radius: 50%; width: 7px; height: 7px; }
-
-.calendar-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
-
-#exam-date {
-  padding: 9px 10px;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  background: var(--surface);
-  color: var(--text);
-  font-family: inherit;
-  font-size: 0.9rem;
-}
-
-.countdown-strip {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  width: 100%;
-  padding: 12px 16px;
-  margin-bottom: 16px;
-  border: none;
-  border-radius: var(--radius);
-  background: linear-gradient(135deg, var(--primary), var(--green));
-  color: #fff;
-  font-family: inherit;
-  font-size: 0.85rem;
-  cursor: pointer;
-  box-shadow: var(--shadow);
-}
-.countdown-strip:active { transform: scale(0.99); }
-.strip-days strong { font-size: 1.5rem; font-weight: 700; }
-.strip-more { font-size: 0.75rem; opacity: 0.85; }
-
-/* ---------- 2科目カード ---------- */
-.subjects {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 18px;
-}
-.subject-card {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px;
-  box-shadow: var(--shadow);
-}
-.subject-name { margin: 0; font-size: 0.9rem; font-weight: 700; }
-.subject-count { margin: 0; font-size: 1.35rem; font-weight: 700; line-height: 1.1; }
-.subject-progress { margin: 0; font-size: 0.72rem; color: var(--text-muted); }
-.subject-actions { display: grid; gap: 6px; margin-top: 4px; }
-.subject-actions .btn { padding: 9px 8px; font-size: 0.82rem; }
-
-.section-title {
-  margin: 0 0 10px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  letter-spacing: 0.04em;
-}
-
-/* ---------- 算数 ---------- */
-.start-math { width: 100%; }
-.hint.center { text-align: center; }
-
-.math-panel { min-height: 300px; }
-.math-tag {
-  margin: 0 0 10px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--primary);
-}
-.math-question {
-  margin: 0 0 18px;
-  font-size: 1.15rem;
-  font-weight: 600;
-  line-height: 1.7;
-}
-
-/* 文法の問題文。空所（___）が本文に埋もれないよう、行間を広めに取る */
-.grammar-question {
-  margin: 0 0 18px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  line-height: 1.9;
-  word-break: normal;
-  overflow-wrap: anywhere;
-}
-
-/* ---- 算数の図 ----
-   SVG の中の色は必ずここの変数を通す。SVG に色を直書きすると明暗の切り替えで
-   線が背景に埋もれる（黒い線をダークの背景に置いてしまう）。 */
-.math-figure {
-  margin: 0 0 18px;
-  padding: 8px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-}
-.math-figure[hidden] { display: none; }
-.math-figure svg {
-  display: block;
-  width: 100%;
-  max-width: 340px;
-  height: auto;
-  margin: 0 auto;
-  overflow: visible;
-}
-
-.math-figure .f-face { fill: var(--primary); fill-opacity: 0.1; stroke: var(--primary); stroke-width: 2; stroke-linejoin: round; }
-/* 奥の面。手前より薄くして前後が分かるようにする */
-.math-figure .f-back { fill-opacity: 0.04; stroke-opacity: 0.45; }
-.math-figure .f-edge { stroke: var(--primary); stroke-width: 2; stroke-linecap: round; fill: none; }
-.math-figure .f-dash { stroke: var(--primary); stroke-width: 1.6; stroke-dasharray: 5 4; stroke-opacity: 0.75; fill: none; }
-.math-figure .f-grid { stroke: var(--border); stroke-width: 1; }
-.math-figure .f-axis { stroke: var(--text-muted); stroke-width: 1.6; }
-.math-figure .f-arc { stroke: var(--text-muted); stroke-width: 1.6; fill: none; }
-/* 問われている角。ここだけ色を変えて、どこを答えるのか一目で分かるようにする */
-.math-figure .f-arc-ask { stroke: var(--orange); stroke-width: 2.4; }
-/* 問われている線分。直径を与えて半径を問う問題で、2本を見分けるために色を変える */
-.math-figure .f-ask-line { stroke: var(--orange); stroke-width: 2.4; stroke-opacity: 1; }
-.math-figure .f-right { fill: none; stroke: var(--text-muted); stroke-width: 1.4; }
-.math-figure .f-dot { fill: var(--primary); stroke: none; }
-
-.math-figure text { font-family: inherit; }
-.math-figure .f-label { font-size: 13px; font-weight: 700; fill: var(--text); }
-.math-figure .f-inner { font-size: 12px; font-weight: 700; fill: var(--text-muted); }
-.math-figure .f-mini { font-size: 11px; font-weight: 600; fill: var(--text-muted); }
-.math-figure .f-ask { font-size: 15px; font-weight: 800; fill: var(--orange); }
-.math-figure .f-tick { font-size: 10px; font-weight: 600; fill: var(--text-muted); }
-
-.math-input-row { display: flex; align-items: center; gap: 10px; }
-.math-input-row .answer-input { flex: 1; }
-.math-unit {
-  flex-shrink: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-.math-actions { grid-template-columns: 1fr 1.2fr; }
-
-.math-explanation {
-  margin: 0 0 14px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: var(--surface-2);
-  font-size: 0.88rem;
-  line-height: 1.7;
-}
-
-@media (max-width: 380px) {
-  .subjects { grid-template-columns: 1fr; }
-}
-
-/* ---------- 長文読解 ---------- */
-.subject-sub { font-size: 0.72rem; font-weight: 400; color: var(--text-muted); }
-
-.reading-list { display: grid; gap: 8px; margin-top: 12px; }
-.reading-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface-2);
-  color: var(--text);
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-.reading-item:hover { border-color: var(--primary); }
-.reading-item.is-done { border-color: var(--green); }
-.reading-item-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.reading-item-title { font-weight: 700; font-size: 0.95rem; }
-.reading-item-meta { font-size: 0.72rem; color: var(--text-muted); }
-.reading-item-progress { font-size: 0.72rem; font-weight: 700; color: var(--green); }
-
-.back-link { margin-bottom: 12px; padding: 7px 12px; font-size: 0.82rem; }
-
-.passage-panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
-}
-.passage-meta { margin: 0 0 4px; font-size: 0.72rem; color: var(--text-muted); }
-.passage-title { margin: 0 0 12px; font-size: 1.15rem; font-weight: 700; }
-.passage-text { font-size: 0.98rem; line-height: 1.95; }
-.passage-text p { margin: 0 0 12px; }
-.passage-text p:last-child { margin-bottom: 0; }
-
-.glossary {
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border);
-  font-size: 0.85rem;
-}
-.glossary summary { cursor: pointer; color: var(--primary); font-weight: 600; }
-.glossary dl {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 4px 12px;
-  margin: 10px 0 0;
-}
-.glossary dt { font-weight: 700; }
-.glossary dd { margin: 0; color: var(--text-muted); }
-
-.reading-question {
-  margin: 0 0 14px;
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.7;
-}
-
-/* 4択（長文読解で使用） */
-.choices { display: grid; gap: 8px; }
-/* display を指定した要素は hidden が効かないので明示する（過去に踏んだ罠） */
-.choices[hidden] { display: none; }
-.choice {
-  padding: 12px 14px;
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  background: var(--surface-2);
-  color: var(--text);
-  font-family: inherit;
-  font-size: 0.92rem;
-  line-height: 1.6;
-  text-align: left;
-  cursor: pointer;
-}
-.choice:hover:not(:disabled) { border-color: var(--primary); }
-.choice.is-correct { background: var(--green); border-color: var(--green); color: #fff; font-weight: 700; }
-.choice.is-wrong { background: var(--red); border-color: var(--red); color: #fff; }
-.choice:disabled { cursor: default; }
-
-/* ---------- 分野別の正答率 ---------- */
-.accuracy-groups { display: grid; gap: 16px; margin-top: 12px; }
-.accuracy-group-name {
-  margin: 0 0 8px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-.accuracy-row {
-  display: grid;
-  grid-template-columns: 5.5rem 1fr 2.6rem 2.6rem;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.75rem;
-  padding: 3px 0;
-}
-.accuracy-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.accuracy-track {
-  height: 8px;
-  background: var(--surface-2);
-  border-radius: 99px;
-  overflow: hidden;
-}
-.accuracy-fill { display: block; height: 100%; border-radius: 99px; }
-.accuracy-fill.t-high { background: var(--green); }
-.accuracy-fill.t-mid { background: var(--orange); }
-.accuracy-fill.t-low { background: var(--red); }
-.accuracy-rate { font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
-.accuracy-rate.t-high { color: var(--green); }
-.accuracy-rate.t-mid { color: var(--orange); }
-.accuracy-rate.t-low { color: var(--red); }
-.accuracy-count {
-  color: var(--text-muted);
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-/* ---------- 模擬試験 ---------- */
-.mock-filters { margin-bottom: 4px; }
-
-.mock-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 8px;
-  font-size: 0.82rem;
-  color: var(--text-muted);
-}
-.mock-timer {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text);
-  font-variant-numeric: tabular-nums;
-}
-.mock-timer.is-low { color: var(--red); }
-.mock-quit { padding: 5px 12px; font-size: 0.78rem; }
-.mock-progress { margin-bottom: 14px; }
-
-.mock-passage {
-  max-height: 240px;
-  overflow-y: auto;
-  padding: 12px 14px;
-  margin-bottom: 14px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface-2);
-  font-size: 0.9rem;
-  line-height: 1.85;
-}
-.mock-passage p { margin: 0 0 10px; }
-.mock-passage p:last-child { margin-bottom: 0; }
-.mock-passage-title { font-weight: 700; }
-
-.mock-question {
-  margin: 0 0 14px;
-  font-size: 1.02rem;
-  font-weight: 600;
-  line-height: 1.7;
-}
-.choice.is-picked { border-color: var(--primary); background: var(--surface); font-weight: 700; }
-
-.mock-nav { display: grid; grid-template-columns: 1fr 1.4fr; gap: 8px; margin-top: 14px; }
-/* 「前へ」が無いレベル判定では、「次へ」を1列いっぱいに広げる */
-.mock-nav.solo { grid-template-columns: 1fr; }
-
-.mock-breakdown { display: grid; gap: 8px; margin-bottom: 16px; text-align: left; }
-.mock-break-row {
-  display: grid;
-  grid-template-columns: 4.5rem 1fr 5.5rem;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.78rem;
-}
-.mock-break-bar {
-  height: 8px;
-  background: var(--surface-2);
-  border-radius: 99px;
-  overflow: hidden;
-}
-.mock-break-bar span {
-  display: block;
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--green));
-  border-radius: 99px;
-}
-.mock-break-num { text-align: right; font-variant-numeric: tabular-nums; }
-
-.mock-history { display: grid; gap: 4px; }
-.mock-history-row {
-  display: grid;
-  grid-template-columns: 3.2rem 4.5rem 1fr 3rem 3rem;
-  gap: 8px;
-  padding: 6px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.8rem;
-  font-variant-numeric: tabular-nums;
-}
-.mock-history-row:last-child { border-bottom: none; }
-.mock-history-mode { color: var(--text-muted); }
-.mock-history-score { font-weight: 700; }
-.mock-history-rate { text-align: right; color: var(--green); font-weight: 700; }
-.mock-history-time { text-align: right; color: var(--text-muted); }
-
-/* ---------- レベル判定（適応型）---------- */
-
-.mock-level {
-  padding: 3px 10px;
-  border-radius: 99px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.adaptive-summary {
-  margin: 20px 0;
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface-2);
-  text-align: left;
-}
-
-/* 科目ごとに1行。名前・判定・得点を並べ、その下に出題順の棒を置く */
-.adaptive-row + .adaptive-row {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border);
-}
-.adaptive-row-head {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-.adaptive-row-name {
-  font-weight: 700;
-  font-size: 0.95rem;
-}
-.adaptive-row-level {
-  color: var(--primary);
-  font-weight: 700;
-  font-size: 0.95rem;
-}
-/* 得点は右端へ。科目名と判定の長さがばらつくため */
-.adaptive-row-score {
-  margin-left: auto;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-/* 出題順に1本ずつ。棒の高さがそのまま難易度 */
-.adaptive-chart {
-  display: flex;
-  align-items: flex-end;
-  gap: 3px;
-  height: 72px;
-  padding: 6px 0;
-  border-bottom: 1px solid var(--border);
-}
-.adaptive-step {
-  flex: 1;
-  min-width: 4px;
-  border-radius: 3px 3px 0 0;
-}
-.adaptive-step.ok { background: var(--green); }
-.adaptive-step.ng { background: var(--red); }
-
-.adaptive-note {
-  margin: 8px 0 0;
-  font-size: 0.85rem;
-  line-height: 1.8;
-  color: var(--text-muted);
-}
-/* 見出しの根拠。科目ごとの説明とは別の役割なので、少し離して置く */
-.adaptive-head-note {
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border);
-}
-.adaptive-head-note[hidden] { display: none; }
-
-/* スワイプでタブを移動できるので、横方向のジェスチャを妨げないようにする */
-body { touch-action: pan-y; }
-.tabs { touch-action: pan-x; }
-.passage-text,
-.mock-passage,
-.word-list,
-.result-list { touch-action: pan-y; }
-
-/* ------------------------------------------------------------
-   サクサク4択（テンポ重視・制限時間つき）
-   ------------------------------------------------------------ */
-
-.tempo-setting {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-}
-
-.tempo-panel {
-  text-align: center;
-}
-
-/* 残り時間のバー。減っていく様子だけで時間が分かるようにする */
-.tempo-timer-track {
-  height: 6px;
-  border-radius: 3px;
-  background: var(--surface-2);
-  overflow: hidden;
-  margin-bottom: 18px;
-}
-
-.tempo-timer-fill {
-  height: 100%;
-  width: 100%;
-  border-radius: 3px;
-  background: var(--primary);
-}
-
-.tempo-combo {
-  min-height: 1.4em;
-  margin: 0 0 4px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--orange);
-}
-
-.tempo-word {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1.25;
-  word-break: break-word;
-}
-
-.tempo-phonetic {
-  min-height: 1.3em;
-  margin: 4px 0 20px;
-  font-size: 0.9rem;
-  color: var(--text-muted);
-}
-
-.tempo-choices {
-  display: grid;
-  gap: 10px;
-}
-
-.tempo-choice {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 14px 16px;
-  font: inherit;
-  font-size: 1rem;
-  text-align: left;
-  color: var(--text);
-  background: var(--surface-2);
-  border: 2px solid var(--border);
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: border-color 0.12s, background 0.12s;
-}
-
-.tempo-choice:hover:not(:disabled) { border-color: var(--primary); }
-.tempo-choice:disabled { cursor: default; }
-
-.tempo-num {
-  flex: none;
-  width: 24px;
-  height: 24px;
-  display: grid;
-  place-items: center;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  background: var(--surface);
-  border-radius: 50%;
-}
-
-/* 長文読解の選択肢と同じ見せ方。一瞬で正誤が分かるように塗りつぶす */
-.tempo-choice.is-correct {
-  background: var(--green);
-  border-color: var(--green);
-  color: #fff;
-  font-weight: 700;
-}
-
-.tempo-choice.is-wrong {
-  background: var(--red);
-  border-color: var(--red);
-  color: #fff;
-}
-
-.tempo-choice.is-correct .tempo-num,
-.tempo-choice.is-wrong .tempo-num {
-  color: var(--text);
-}
-
-.tempo-actions {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 18px;
-}
-
-.result-extra {
-  margin: -4px 0 16px;
-  font-size: 0.9rem;
-  color: var(--text-muted);
-}
-
-/* ------------------------------------------------------------
-   模擬試験のあとの実力診断
-   ------------------------------------------------------------ */
-
-.diagnosis {
-  margin: 20px 0;
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface-2);
-  text-align: left;
-}
-
-.diagnosis-title { margin: 0 0 10px; font-size: 0.95rem; font-weight: 700; }
-.diagnosis-loading { margin: 0; font-size: 0.88rem; color: var(--text-muted); }
-
-.diagnosis-level {
-  margin: 0 0 4px;
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--primary);
-}
-.diagnosis-reason { margin: 0 0 10px; font-size: 0.85rem; color: var(--text-muted); }
-.diagnosis-comment { margin: 0 0 14px; font-size: 0.92rem; line-height: 1.8; }
-
-.diagnosis-cols { display: grid; gap: 14px; margin-bottom: 6px; }
-.diagnosis-sub {
-  margin: 0 0 6px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-
-.diagnosis-list { margin: 0 0 12px; padding-left: 1.3em; font-size: 0.88rem; line-height: 1.8; }
-.diagnosis-list li { margin-bottom: 6px; }
-.diagnosis-list .muted { color: var(--text-muted); list-style: none; margin-left: -1.3em; }
-
-.diagnosis-cheer {
-  margin: 8px 0 0;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: var(--surface);
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-.diagnosis-source { margin: 10px 0 0; font-size: 0.72rem; color: var(--text-muted); }
-
-@media (min-width: 520px) {
-  .diagnosis-cols { grid-template-columns: 1fr 1fr; }
-}
-
-/* ------------------------------------------------------------
-   1画面完結版のパーツ（行リスト・チップ・折りたたみ）
-   ------------------------------------------------------------ */
-
-/* 学習ハブの科目チップ */
-.study-chips { display: flex; gap: 8px; margin-bottom: 12px; }
-.study-chip {
-  flex: 1;
-  padding: 10px 8px;
-  border: 1px solid var(--border);
-  border-radius: 99px;
-  background: var(--surface);
-  color: var(--text-muted);
-  font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-.study-chip.is-active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #fff;
-}
-
-/* 1行メニュー。高さ46px以上を保つ */
-.row-list { display: grid; }
-.row-line {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  min-height: 46px;
-  padding: 8px 4px;
-  border: none;
-  border-bottom: 1px solid var(--border);
-  background: none;
-  color: var(--text);
-  font-family: inherit;
-  font-size: 0.95rem;
-  text-align: left;
-  cursor: pointer;
-}
-.row-list .row-line:last-child,
-.row-fold summary.row-line,
-details .row-line { border-bottom: none; }
-.row-icon { flex-shrink: 0; font-size: 1.1rem; width: 1.5em; text-align: center; }
-.row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.row-name { font-weight: 700; font-size: 0.95rem; }
-.row-name .badge { margin-left: 4px; }
-.row-sub {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.row-chevron { flex-shrink: 0; color: var(--text-muted); font-size: 1.1rem; }
-.row-rate { flex-shrink: 0; font-weight: 700; font-variant-numeric: tabular-nums; }
-.row-rate.t-high { color: var(--green); }
-.row-rate.t-mid { color: var(--orange); }
-.row-rate.t-low { color: var(--red); }
-.row-solve {
-  flex-shrink: 0;
-  padding: 6px 14px;
-  border-radius: 99px;
-  background: var(--primary);
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-/* details を1行メニューとして使うときの体裁 */
-details.row-fold > summary,
-details.range-fold > summary,
-details.calendar-fold > summary {
-  list-style: none;
-  cursor: pointer;
-}
-details.row-fold > summary::-webkit-details-marker,
-details.range-fold > summary::-webkit-details-marker,
-details.calendar-fold > summary::-webkit-details-marker { display: none; }
-details[open] .row-chevron { transform: rotate(90deg); }
-
-.row-fold-body {
-  display: grid;
-  gap: 8px;
-  padding: 4px 4px 10px;
-}
-
-.range-change {
-  flex-shrink: 0;
-  padding: 6px 14px;
-  border: 1px solid var(--border);
-  border-radius: 99px;
-  color: var(--primary);
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-.range-fold-body { margin-top: 10px; }
-.range-fold .row-name .row-sub { font-weight: 400; margin-left: 6px; }
-
-.calendar-fold[open] > summary { margin-bottom: 12px; }
-.study-panel { padding: 6px 12px; }
-
-/* 折りたたみ式のレビュー・グラフ */
-.review-fold summary {
-  cursor: pointer;
-  color: var(--primary);
-  font-weight: 700;
-  font-size: 0.9rem;
-  padding: 4px 0;
-  list-style: none;
-}
-.review-fold summary::-webkit-details-marker { display: none; }
-.review-fold[open] summary { margin-bottom: 10px; }
-.fold-title { margin-top: 16px; }
-
-/* 記録の1行サマリー */
-.stats-summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 12px 16px;
-  font-size: 0.92rem;
-}
-.dashboard-3 { grid-template-columns: repeat(3, 1fr); }
-
-/* サクサク4択の選択肢は指の置き場所が毎回同じになるよう高さを揃える */
-.tempo-choice { min-height: 56px; }
-
-.key-input {
-  width: 100%;
-  padding: 9px 10px;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  background: var(--surface);
-  color: var(--text);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.85rem;
-}
-
-/* ---------- 設定の切り替え ---------- */
-.setting-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-}
-.setting-row:last-child { border-bottom: none; }
-.setting-main { display: flex; flex-direction: column; gap: 2px; flex: 1; }
-.setting-name { font-size: 0.92rem; font-weight: 600; }
-.setting-sub { font-size: 0.76rem; color: var(--text-muted); line-height: 1.6; }
-.setting-toggle { width: 20px; height: 20px; flex-shrink: 0; accent-color: var(--primary); }
-
-/* ふりがな。読みが小さすぎると意味がないので、本文の6割ほどにする */
-ruby rt { font-size: 0.6em; color: var(--text-muted); font-weight: 400; }
-
-/* ---------- 長文読解の選び方 ---------- */
-.reading-random { width: 100%; margin-top: 10px; }
-.reading-pick { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 10px; }
-.reading-pick summary { cursor: pointer; list-style: none; }
-.reading-pick summary::-webkit-details-marker { display: none; }
-.reading-pick[open] .row-chevron { transform: rotate(90deg); }
-
-/* ---------- レベルごとの覚え具合 ---------- */
-/* ---- 算数の単元マップ ----
-   たて 25 単元 × よこ 5 学年。スマホの幅（約 360px）に収めるため、
-   単元名の欄は固定幅にして、マスは残りを等分する。 */
-.math-map {
-  display: grid;
-  gap: 3px;
-  margin-bottom: 10px;
-  font-variant-numeric: tabular-nums;
-}
-.mm-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) repeat(5, 22px) 40px;
-  gap: 3px;
-  align-items: center;
-}
-.mm-head { margin-bottom: 2px; }
-.mm-th, .mm-sum {
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  text-align: center;
-}
-.mm-sum { text-align: right; }
-
-.mm-name {
-  /* 単元名。ボタンだが行として見えるようにする */
-  appearance: none;
-  border: 0;
-  background: none;
-  padding: 0 2px 0 0;
-  font: inherit;
-  font-size: 0.72rem;
-  color: var(--text);
-  text-align: left;
-  cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.mm-name:hover { color: var(--primary); }
-
-.mm-cell {
-  appearance: none;
-  height: 22px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 0;
-  cursor: pointer;
-}
-.mm-cell.mm-th { border: 0; cursor: default; height: auto; }
-
-/* 濃さの4段。凡例の4つとちょうど対応する。
-   間を広く取っているのは、暗いテーマだと中間色が見分けられなくなるため */
-.mm-s0 { background: var(--surface); }
-.mm-s1 { background: color-mix(in srgb, var(--green) 26%, var(--surface)); }
-.mm-s2 { background: color-mix(in srgb, var(--green) 60%, var(--surface)); border-color: color-mix(in srgb, var(--green) 60%, var(--surface)); }
-.mm-s3 { background: var(--green); border-color: var(--green); }
-/* 問題が存在しない学年。押せないので枠だけ薄く残す */
-.mm-none {
-  background: repeating-linear-gradient(
-    -45deg, transparent, transparent 3px, var(--border) 3px, var(--border) 4px
-  );
-  border-style: dashed;
-  cursor: default;
-}
-/* 間違えたまま戻っている問題があるマスに赤い点を出す */
-.mm-cell.has-weak { position: relative; }
-.mm-cell.has-weak::after {
-  content: '';
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--red);
-}
-
-.mm-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  font-size: 0.68rem;
-  color: var(--text-muted);
-}
-.mm-chip {
-  width: 12px;
-  height: 12px;
-  border: 1px solid var(--border);
-  border-radius: 3px;
-}
-.math-map-next { margin: 0 0 10px; }
-.math-map-next[hidden] { display: none; }
-
-/* 文中に置くボタン。リンクのように見せる */
-.linkish {
-  appearance: none;
-  border: 0;
-  background: none;
-  padding: 0;
-  font: inherit;
-  font-weight: 700;
-  color: var(--primary);
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.mastery-levels { display: grid; gap: 14px; margin-bottom: 12px; }
-
-.mastery-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 5px;
-  font-size: 0.82rem;
-}
-.mastery-level { font-weight: 700; }
-.mastery-num { color: var(--text-muted); font-variant-numeric: tabular-nums; }
-
-/* 1レベル＝1本。中を段階ごとに塗り分ける */
-.mastery-bar {
-  display: flex;
-  height: 14px;
-  border-radius: 99px;
-  overflow: hidden;
-  background: var(--surface-2);
-}
-.mastery-seg { display: block; height: 100%; }
-
-/* 覚えているほど濃い緑。苦手だけは赤にして、進み具合と区別する */
-.mastery-seg.is-mastered, .mastery-chip.is-mastered { background: var(--green); }
-.mastery-seg.is-almost,   .mastery-chip.is-almost   { background: color-mix(in srgb, var(--green) 55%, var(--surface-2)); }
-.mastery-seg.is-vague,    .mastery-chip.is-vague    { background: color-mix(in srgb, var(--green) 25%, var(--surface-2)); }
-.mastery-seg.is-weak,     .mastery-chip.is-weak     { background: var(--red); }
-.mastery-seg.is-new,      .mastery-chip.is-new      { background: var(--surface-2); }
-
-.mastery-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  font-size: 0.74rem;
-  color: var(--text-muted);
-}
-.mastery-key { display: flex; align-items: center; gap: 4px; }
-.mastery-chip {
-  width: 11px;
-  height: 11px;
-  border-radius: 3px;
-  border: 1px solid var(--border);
-}
-
-/* リビジョン。設定画面のいちばん下に、目立たない字で出す */
-.app-version { font-size: 0.7rem; opacity: 0.7; }
