@@ -8,8 +8,8 @@
  * えいごペットはさらに bangluutru/eiken-workbook から取っている。
  * **そちらにはライセンスも出どころの説明も無い。**
  *
- * 取り込んだ日: 2026-11-15
- *   2級   1044語
+ * 取り込んだ日: 2026-11-16
+ *   2級   1043語
  *   準1級 2782語
  *
  * 各エントリ: { word, meaning, grade }
@@ -71,7 +71,7 @@ const WORDS = [
   { word: 'precious', meaning: '貴重な、大切な', grade: 'g2' },
   { word: 'specialize in', meaning: 'に特化する、専門とする', grade: 'g2' },
   { word: 'vaccine', meaning: 'ワクチン', grade: 'g2' },
-  { word: 'neverthless', meaning: 'にも関わらず', grade: 'g2' },
+  { word: 'nevertheless', meaning: 'にも関わらず', grade: 'g2' },
   { word: 'checkup', meaning: '健康診断、照合', grade: 'g2' },
   { word: 'health insurance', meaning: '健康保険', grade: 'g2' },
   { word: 'memory loss', meaning: '記憶喪失、記憶消失', grade: 'g2' },
@@ -85,7 +85,7 @@ const WORDS = [
   { word: 'genetically', meaning: '遺伝的に', grade: 'g2' },
   { word: 'be made from', meaning: 'から作られる、を原料とする', grade: 'g2' },
   { word: 'major', meaning: '専攻科目', grade: 'g2' },
-  { word: 'be threatened to', meaning: 'に脅かされる', grade: 'g2' },
+  { word: 'be threatened by', meaning: 'に脅かされる', grade: 'g2' },
   { word: 'with luck', meaning: '運が良ければ', grade: 'g2' },
   { word: 'offensive', meaning: '攻撃的な、無礼な', grade: 'g2' },
   { word: 'abrupt', meaning: '突然の、不意の', grade: 'g2' },
@@ -151,7 +151,6 @@ const WORDS = [
   { word: 'instruct', meaning: '指示する、教える', grade: 'g2' },
   { word: 'get used to', meaning: '慣れる', grade: 'g2' },
   { word: 'out of date', meaning: '時代遅れの', grade: 'g2' },
-  { word: 'in tough', meaning: 'に強い', grade: 'g2' },
   { word: 'under way', meaning: '進行中で', grade: 'g2' },
   { word: 'come into being', meaning: '生まれ出る、生ずる', grade: 'g2' },
   { word: 'in need of', meaning: 'を必要として', grade: 'g2' },
@@ -181,7 +180,7 @@ const WORDS = [
   { word: 'nursery school', meaning: '保育園', grade: 'g2' },
   { word: 'acquaint', meaning: '知らせる、通知する', grade: 'g2' },
   { word: 'mindful', meaning: '気をつけて', grade: 'g2' },
-  { word: 'stand still', meaning: '停止、休止、行き詰まり', grade: 'g2' },
+  { word: 'stand still', meaning: 'じっとしている、静止する', grade: 'g2' },
   { word: 'incredible', meaning: '信じられない', grade: 'g2' },
   { word: 'in terms of', meaning: 'に関して、の点から', grade: 'g2' },
   { word: 'for sure', meaning: '確かに、間違いなく', grade: 'g2' },
@@ -213,7 +212,7 @@ const WORDS = [
   { word: 'psychology', meaning: '心理学', grade: 'g2' },
   { word: 'cough', meaning: '咳払いする/咳', grade: 'g2' },
   { word: 'sincerely', meaning: '心から、真心こめて', grade: 'g2' },
-  { word: 'absorb in', meaning: '吸収する、没頭する', grade: 'g2' },
+  { word: 'be absorbed in', meaning: '没頭する', grade: 'g2' },
   { word: 'spiritually', meaning: '精神的に', grade: 'g2' },
   { word: 'confess', meaning: 'を打ち明ける、白状する', grade: 'g2' },
   { word: 'reservation', meaning: '予約', grade: 'g2' },

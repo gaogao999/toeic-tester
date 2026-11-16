@@ -18,7 +18,7 @@
    * 設定画面の下に出すリビジョン。ビルド工程が無いので実行時に git を読めない。
    * コミットの直前に tools/stamp-version.mjs で書き換える。
    */
-  const APP_VERSION = '2026-11-15 (9d69a9f)';
+  const APP_VERSION = '2026-11-15 (9670ce3)';
 
   const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
 
@@ -56,6 +56,8 @@
     if (have) have.ws = true;
     else BY_KEY.set(k, { word: w.word, meaning: w.meaning, grade: 'ws', ws: true });
   }
+  // 例文（js/examples.js）。無い語は ex が null で、紙にも画面にも何も出さない
+  for (const [k, w] of BY_KEY) w.ex = EXAMPLES[k] || null;
   const ALL = [...BY_KEY.values()];
   const WS_KEYS = new Set(WORKSHEET_WORDS.map((w) => Store.keyOf(w.word)));
 
@@ -218,6 +220,7 @@
         ${no ? `<span class="w-no">${no}</span>` : ''}
         <span class="w-word">${escapeHtml(w.word)}</span>
         <span class="w-meaning">${escapeHtml(w.meaning)}</span>
+        ${w.ex ? `<span class="w-ex" data-speak="${escapeHtml(w.ex.en)}">🔊 ${escapeHtml(w.ex.en)}<small>${escapeHtml(w.ex.ja)}</small></span>` : ''}
         <span class="w-tags">
           ${w.ws ? '<span class="tag tag-ws">ワークシート</span>' : ''}
           <span class="tag">${escapeHtml(GRADE_NAME[w.grade] || '')}</span>
@@ -302,8 +305,10 @@
   // 英語がいちばん長い語（threaten with extinction など熟語）ばかりの日。
   // 割れないのは、行の高さが語で変わらないようにしてあるから:
   //   英語は折り返さない（長い熟語は字を小さく）・紙の意味は16字まで（paperMeaning）。
-  // 最悪の日に1枚いっぱいで、下に 20〜60px 残る。audit-print.mjs が両方の日で確かめている
-  const ROWS_PER_PAGE = { study: 21, ja2en: 22, en2ja: 22, write: 17, answer: 25 };
+  // 最悪の日に1枚いっぱいで、下に 20〜60px 残る。audit-print.mjs が最悪の日を3通り確かめている。
+  // おぼえるは**例文つきで2行になる語**に合わせて15（例文のない語ばかりの日は下が空く。
+  // 語ごとに行数を変えると、画面と紙の枚数が合わなくなるので、そろえるほうを取った）
+  const ROWS_PER_PAGE = { study: 15, ja2en: 22, en2ja: 22, write: 17, answer: 25 };
 
   const PART_TITLES = {
     study: 'おぼえる',
@@ -366,10 +371,21 @@
       return { ...x, meaning: paperMeaning(x.meaning), no: i + 1 };
     });
     // 長い熟語の行は字を小さくする（CSS の .is-long。英語を1行に収めるため）
-    const tr = (x) => `<tr${x.word.length > LONG_WORD ? ' class="is-long"' : ''}>`;
+    const tr = (x, extra) => {
+      const cls = [x.word.length > LONG_WORD ? 'is-long' : '', extra || ''].filter(Boolean).join(' ');
+      return `<tr${cls ? ` class="${cls}"` : ''}>`;
+    };
 
     const row = {
-      study: (x) => `${tr(x)}<td class="c-no">${x.no}</td><td class="c-word">${escapeHtml(x.word)}</td>
+      // 例文のある語は2行にする。2行目は単語と意味の欄をまたいで英文だけ（訳は載せない。
+      // 載せると3行になり1枚に入る語が減る。訳はアプリで見られる）
+      study: (x) => x.ex
+        // 2行をまたぐ（rowspan）と、Chrome がその欄の下線を引かずに線が途中で切れたので、
+        // 2行目にも空の欄を置いて線を通す
+        ? `${tr(x, 'has-ex')}<td class="c-no">${x.no}</td><td class="c-word">${escapeHtml(x.word)}</td>
+            <td class="c-meaning">${escapeHtml(x.meaning)}</td><td class="c-check"><i></i><i></i><i></i></td></tr>
+           <tr class="ex-row"><td></td><td class="c-ex" colspan="2">${escapeHtml(x.ex.en)}</td><td></td></tr>`
+        : `${tr(x)}<td class="c-no">${x.no}</td><td class="c-word">${escapeHtml(x.word)}</td>
           <td class="c-meaning">${escapeHtml(x.meaning)}</td><td class="c-check"><i></i><i></i><i></i></td></tr>`,
       ja2en: (x) => `${tr(x)}<td class="c-no">${x.no}</td><td class="c-meaning">${escapeHtml(x.meaning)}</td><td class="c-blank"></td></tr>`,
       en2ja: (x) => `${tr(x)}<td class="c-no">${x.no}</td><td class="c-word">${escapeHtml(x.word)}</td><td class="c-blank"></td></tr>`,

@@ -77,12 +77,14 @@ let checked = 0;
  * ここで割れなければどの日も割れない。
  *   meaning … 意味がいちばん長い語ばかり（言い換えが並ぶ語）
  *   word    … 英語がいちばん長い語ばかり（threaten with extinction などの熟語）
+ *   ex      … 例文のある語ばかり（例文の長い順）。おぼえるの紙で1語が2行になる
  */
-const WORST_NAMES = { meaning: '意味が長い語だけ', word: '英語が長い語だけ' };
+const WORST_NAMES = { meaning: '意味が長い語だけ', word: '英語が長い語だけ', ex: '例文つきの語だけ' };
 const RUNS = [
   ...PER_DAY.map((n) => ({ perDay: n, worst: null })),
   { perDay: 40, worst: 'meaning' },
-  { perDay: 40, worst: 'word' }
+  { perDay: 40, worst: 'word' },
+  { perDay: 40, worst: 'ex' }
 ];
 
 for (const run of RUNS) {
@@ -97,7 +99,9 @@ for (const run of RUNS) {
     const sheets = [];
     if (worst) {
       // 長い順に n 語。答え合わせ前のプリントとして置く
-      const longest = WORDS.slice().sort((a, b) => b[worst].length - a[worst].length).slice(0, n).map((w) => w.word);
+      const longest = worst === 'ex'
+        ? Object.keys(EXAMPLES).sort((a, b) => EXAMPLES[b].en.length - EXAMPLES[a].en.length).slice(0, n)
+        : WORDS.slice().sort((a, b) => b[worst].length - a[worst].length).slice(0, n).map((w) => w.word);
       sheets.push({ id: 'worst', date: '2026-01-01', words: longest, results: null, recordedAt: null });
     }
     localStorage.setItem('hana-eiken:v1', JSON.stringify({ v: 1, words: {}, sheets, settings: { perDay: n } }));

@@ -45,8 +45,8 @@
 `file://` でも動くよう、モジュールを使わず `<script>` の読み込み順で依存を解決している。この順番は変えない。
 
 ```
-js/data.js → js/worksheet.js → js/store.js → js/speech.js → js/app.js
-  WORDS        WORKSHEET_WORDS    Store         Speech         画面
+js/data.js → js/worksheet.js → js/examples.js → js/store.js → js/speech.js → js/app.js
+  WORDS        WORKSHEET_WORDS    EXAMPLES         Store         Speech         画面
 ```
 
 ```bash
@@ -105,7 +105,7 @@ node tools/stamp-version.mjs # コミット直前にリビジョンを刻む
 
 | 用紙 | 1枚 |
 | --- | --- |
-| おぼえる | 21行 |
+| おぼえる | 15語（例文つきで1語2行になるため） |
 | テスト（両方向） | 22行 |
 | 書いて覚える | 17行 |
 | 解答 | 25行 |
@@ -115,6 +115,7 @@ node tools/stamp-version.mjs # コミット直前にリビジョンを刻む
 
 - **英語は折り返さない**（`white-space: nowrap`）。17字以上の熟語は字を小さくする（`.is-long`）。
   いちばん長いのは `threaten with extinction`（24字）
+- **例文は60文字以内**（`audit-words.mjs` が見る）。おぼえるの紙で単語と意味の欄をまたいで1行に入る長さ
 - **紙の意味は16字までに切る**（`paperMeaning`）。長い意味は
   「当たり前の事だが、もちろんのことだが、当然のことながら」のような言い換えの並びで、頭の1〜2つで足りる
 
@@ -141,7 +142,17 @@ node tools/stamp-version.mjs # コミット直前にリビジョンを刻む
 
 - **品詞は持たない。**元データの品詞が当てにならない（2級・準1級の半分近くが「名詞」）
 - **元データ（bangluutru/eiken-workbook）にはライセンスが無い。**リポジトリは非公開をすすめている
+- **見出し語の誤り**（つづり誤り・崩れた熟語）は `import-eigo-pet.mjs` の `WORD_FIXES` で直す
 - ワークシートの語のうち2級・準1級に無いもの（準2級の語など）は `grade: 'ws'` として足す
+
+## 例文（`js/examples.js`）
+
+**このアプリのために書いたオリジナルの文。**教材・試験・本から取らない（リポジトリが公開のため）。
+いまは最初に出てくる500語ぶん。**手で書き足してよい**（取り込みのデータとは別）。キーは見出し語の小文字。
+
+- 8〜12語・60文字以内・見出し語（活用形でよい）を含む・米式つづり。`audit-words.mjs` が見る
+- 紙（おぼえる）には英文だけ。訳はアプリの単語の行に出す。テストの紙には出さない（答えのヒントになる）
+- 書き足すときは、書いた人とは別の目で見直す。最初の500文は60文を直した
 
 ## 発音（`js/speech.js`）
 

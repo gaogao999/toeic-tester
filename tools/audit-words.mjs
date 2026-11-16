@@ -18,10 +18,10 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ctx = {};
 vm.createContext(ctx);
 // const で宣言された値は vm の外から見えないので、最後に取り出す
-for (const f of ['js/data.js', 'js/worksheet.js']) {
-  vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf8') + '\n;this.__ = { ...(this.__ || {}), ...(typeof WORDS !== "undefined" ? { WORDS, GRADE_LABELS } : {}), ...(typeof WORKSHEET_WORDS !== "undefined" ? { WORKSHEET_WORDS } : {}) };', ctx);
+for (const f of ['js/data.js', 'js/worksheet.js', 'js/examples.js']) {
+  vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf8') + '\n;this.__ = { ...(this.__ || {}), ...(typeof WORDS !== "undefined" ? { WORDS, GRADE_LABELS } : {}), ...(typeof WORKSHEET_WORDS !== "undefined" ? { WORKSHEET_WORDS } : {}), ...(typeof EXAMPLES !== "undefined" ? { EXAMPLES } : {}) };', ctx);
 }
-const { WORDS, GRADE_LABELS, WORKSHEET_WORDS } = ctx.__;
+const { WORDS, GRADE_LABELS, WORKSHEET_WORDS, EXAMPLES } = ctx.__;
 
 const problems = [];
 const bad = (msg) => problems.push(msg);
@@ -56,6 +56,33 @@ for (const w of WORKSHEET_WORDS) {
   if (!seen.has(k)) wsOnly += 1;
 }
 
+// --- examples.js ---
+// 紙の「おぼえる」で1行に収まる長さ。超えると行が2行に折れて、1枚に入る語の数が狂う
+const EX_MAX = 60;
+// 英式つづり。受ける学校はアメリカ式
+const BRITISH = /\b(colour|favour|honour|neighbour|behaviour|centre|metre|litre|theatre|organis|realis|recognis|apologis|travelled|travelling|cancelled|practise|defence|licence|grey|programme)/i;
+// 見出し語のうち、例文では形が変わってよい語・置きかえる語
+const FLEX = /^(a|b|be|is|am|are|was|were|do|does|did|have|has|had|come|came|go|went|take|took|get|got|make|made|one's|oneself|someone|something|~|～)$/i;
+let exCount = 0;
+for (const [k, x] of Object.entries(EXAMPLES)) {
+  const at = `examples.js「${k}」`;
+  exCount += 1;
+  if (k !== k.toLowerCase()) bad(`${at}: キーは小文字にする`);
+  if (!seen.has(k) && !wsSeen.has(k)) bad(`${at}: 単語データに無い語の例文`);
+  if (!x || !x.en || !x.ja) { bad(`${at}: en か ja が空`); continue; }
+  if (x.en.length > EX_MAX) bad(`${at}: 例文が${x.en.length}文字（${EX_MAX}文字まで）`);
+  const n = x.en.split(/\s+/).length;
+  if (n < 6 || n > 13) bad(`${at}: 例文が${n}語（8〜12語の目安）`);
+  if (BRITISH.test(x.en)) bad(`${at}: 英式つづり（${x.en.match(BRITISH)[0]}）`);
+  // 見出し語の各語が、語幹の形で文に出ているか（活用は許す）
+  const en = x.en.toLowerCase();
+  const miss = k.split(/\s+/).filter((t) => !FLEX.test(t)).filter((t) => {
+    const stem = t.replace(/(ies|ied|es|ed|ing|e|y|s)$/, '').slice(0, Math.max(3, t.length - 3));
+    return !en.includes(stem);
+  });
+  if (miss.length) bad(`${at}: 見出し語（${miss.join(' ')}）が例文に見当たらない`);
+}
+
 const byGrade = {};
 for (const w of WORDS) byGrade[w.grade] = (byGrade[w.grade] || 0) + 1;
 const longest = (f) => WORDS.reduce((a, w) => (w[f].length > a[f].length ? w : a));
@@ -63,7 +90,7 @@ const longest = (f) => WORDS.reduce((a, w) => (w[f].length > a[f].length ? w : a
 console.log('単語データ');
 for (const [g, n] of Object.entries(byGrade)) console.log(`  ${GRADE_LABELS[g].padEnd(4)} ${n}語`);
 console.log(`  ワークシートの語 ${WORKSHEET_WORDS.length}語（うち2級・準1級に無い語 ${wsOnly}）`);
-console.log(`  ぜんぶで ${seen.size + wsOnly}語`);
+console.log(`  ぜんぶで ${seen.size + wsOnly}語（例文つき ${exCount}語）`);
 console.log(`  いちばん長い英語: ${longest('word').word}（${longest('word').word.length}字）`);
 console.log(`  いちばん長い意味: ${longest('meaning').meaning}（${longest('meaning').meaning.length}字）`);
 

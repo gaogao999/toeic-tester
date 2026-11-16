@@ -23,6 +23,8 @@
  * - **日本語のあいだの半角空白を消す。**元の PDF の改行の名残で
  *   「丁度間に 合って」「やむを得ず する」のように割れている（7語）
  *
+ * - **見出し語の誤りを直す**（WORD_FIXES）。つづり誤り・崩れた熟語が5語あった
+ *
  * ## 持ってこないもの
  *
  * - **品詞。当てにならない。**produce・defend・dizzy・dispose が「名詞」になっている
@@ -68,18 +70,42 @@ const GRADES = [
   { key: 'jun1', label: '英検準1級' }
 ];
 
+/**
+ * 見出し語そのものが誤っている語。**元データの誤り**で、例文を付けるときの見直しで見つかった。
+ * null は取り込まない（何の語か決められないもの）。
+ * 直したら、記録のキー（小文字の語）も変わる。すでに記録のある語を直すときは注意
+ */
+const WORD_FIXES = {
+  neverthless: { word: 'nevertheless' },                       // つづりの誤り
+  'be threatened to': { word: 'be threatened by' },            // 「に脅かされる」は by
+  'absorb in': { word: 'be absorbed in', meaning: '没頭する' }, // 熟語は受け身。「吸収する」は absorb 単独の意味
+  // 「停止、行き詰まり」は名詞 standstill の意味（準1級に別にある）。stand still は「じっとしている」
+  'stand still': { meaning: 'じっとしている、静止する' },
+  'in tough': null                                             // こういう熟語は無い。「に強い」とも合わない
+};
+
 const words = [];
 const seen = new Set();
 let fixedSpace = 0;
+let fixedWords = 0;
 for (const g of GRADES) {
   for (const w of BANK[g.key].words) {
-    const word = String(w[0]).trim();
+    let word = String(w[0]).trim();
+    let fix = WORD_FIXES[word.toLowerCase()];
+    if (fix === null) {
+      fixedWords += 1;
+      continue;
+    }
+    if (fix) {
+      fixedWords += 1;
+      word = fix.word || word;
+    }
     const key = word.toLowerCase();
     // 級をまたいだ重複は無いはずだが、あれば先に出た級（易しいほう）を残す
     if (seen.has(key)) continue;
     seen.add(key);
     const before = String(w[1]);
-    const meaning = cleanMeaning(before);
+    const meaning = fix && fix.meaning ? fix.meaning : cleanMeaning(before);
     if (/[^\x00-\x7F] +[^\x00-\x7F]/.test(before.replace(/，/g, '、'))) fixedSpace += 1;
     words.push({ word, meaning, grade: g.key });
   }
@@ -118,3 +144,4 @@ ${words.map((w) => `  { word: ${q(w.word)}, meaning: ${q(w.meaning)}, grade: ${q
 fs.writeFileSync(path.join(ROOT, 'js/data.js'), out);
 console.log(`js/data.js を書き出しました: 2級 ${counts.g2}語 ／ 準1級 ${counts.jun1}語 ／ 計 ${words.length}語`);
 console.log(`  意味の中の改行くずれを直した語: ${fixedSpace}`);
+console.log(`  見出し語の誤りを直した・外した語: ${fixedWords}（WORD_FIXES）`);

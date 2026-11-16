@@ -145,7 +145,7 @@ body.printing .container { max-width: 900px; }
 .word-row {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-areas: 'no word speak' 'no meaning speak' 'no tags speak';
+  grid-template-areas: 'no word speak' 'no meaning speak' 'no ex speak' 'no tags speak';
   column-gap: 10px;
   align-items: center;
   width: 100%;
@@ -162,6 +162,9 @@ body.printing .container { max-width: 900px; }
 .w-no { grid-area: no; min-width: 1.6em; font-size: 0.78rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .w-word { grid-area: word; font-size: 1.05rem; font-weight: 700; }
 .w-meaning { grid-area: meaning; font-size: 0.85rem; color: var(--text-muted); }
+/* 例文。押すと例文を読み上げる（行全体は単語を読む。いちばん近い data-speak が勝つ） */
+.word-row .w-ex { grid-area: ex; font-size: 0.82rem; font-style: italic; margin-top: 2px; }
+.word-row .w-ex small { display: block; font-style: normal; color: var(--text-muted); font-size: 0.75rem; }
 .w-tags { grid-area: tags; display: flex; gap: 4px; flex-wrap: wrap; margin-top: 2px; }
 .w-tags:empty { display: none; }
 .w-speak { grid-area: speak; font-size: 1.1rem; }
@@ -357,6 +360,16 @@ body.printing .container { max-width: 900px; }
 .sheet-table .is-long .c-trace { font-size: 9.5pt; }
 .c-check { width: 22mm; white-space: nowrap; text-align: right; }
 /* 覚えたら自分で印を付ける箱。3回ぶん */
+/* おぼえるの紙の例文。単語と意味の欄をまたいで1行。上の行との区切り線は引かない */
+.sheet-study tr.has-ex td { border-bottom: none; padding-bottom: 0.5mm; }
+.sheet-study .c-ex {
+  padding-top: 0;
+  font-size: 9pt;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .c-check i { display: inline-block; width: 4.5mm; height: 4.5mm; margin-left: 1.5mm; border: 1px solid #666; }
 
 /*
