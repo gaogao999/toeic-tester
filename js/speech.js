@@ -20,6 +20,8 @@ const Speech = (() => {
 
   const supported = typeof window !== 'undefined' && 'speechSynthesis' in window;
   let chosen = null;
+  // 読み上げ中の発話を手元に持っておく。持っていないと Chrome が途中で捨てて、黙ることがある
+  let current = null;
   let onChange = () => {};
 
   const all = () => (supported ? speechSynthesis.getVoices() : []).filter((v) => /^en[-_]?/i.test(v.lang));
@@ -88,8 +90,11 @@ const Speech = (() => {
           speak(text, true); // ネットの声がだめなら、端末の声でもう一度
         };
       }
-      speechSynthesis.cancel();
+      // **読み上げ中のときだけ止める。**Safari は cancel() の直後の speak() を
+      // 黙って捨てることがある。何も読んでいないときに cancel() する理由は無い
+      if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
       try { speechSynthesis.resume(); } catch (e) { /* 古い Safari は resume が無い */ }
+      current = u;
       speechSynthesis.speak(u);
       return true;
     } catch (e) {
@@ -132,6 +137,11 @@ const Speech = (() => {
     label,
     setVoice,
     current: () => chosen,
+    /** 音が出ないときの手がかり。端末がいくつ声を持っているか */
+    report: () => {
+      const a = supported ? speechSynthesis.getVoices() : [];
+      return { supported, all: a.length, en: a.filter((v) => /^en[-_]?/i.test(v.lang)).length, chosen: chosen && chosen.name };
+    },
     hasGood: () => voices().some((v) => GOOD.test(v.name))
   };
 })();

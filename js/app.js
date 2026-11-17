@@ -18,7 +18,7 @@
    * 設定画面の下に出すリビジョン。ビルド工程が無いので実行時に git を読めない。
    * コミットの直前に tools/stamp-version.mjs で書き換える。
    */
-  const APP_VERSION = '2026-11-15 (9670ce3)';
+  const APP_VERSION = '2026-11-16 (1b5e953)';
 
   const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
 
@@ -607,6 +607,11 @@
     $('#s-perday').value = String(s.perDay);
     $('#s-range').value = s.range;
     $('#s-rate').value = String(s.rate);
+    // 端末が持っている声の数。「声が0」なら端末側（設定・ブラウザ）の問題だと分かる
+    const r = Speech.report();
+    $('#s-voice-report').textContent = !r.supported
+      ? 'このブラウザは読み上げができません。Safari か Chrome で開いてください。'
+      : `この端末の声: ぜんぶで ${r.all} ／ 英語 ${r.en}${r.chosen ? ` ／ 使っている声: ${r.chosen}` : ''}`;
     renderVoices();
   }
 
